@@ -1,23 +1,33 @@
 package com.github.mikesafonov.starter;
 
-import com.github.mikesafonov.starter.smpp.sender.AddressBuilder;
-import com.github.mikesafonov.starter.smpp.sender.DefaultTypeOfAddressParser;
-import com.github.mikesafonov.starter.smpp.sender.MessageBuilder;
-import com.github.mikesafonov.starter.smpp.sender.TypeOfAddressParser;
+import com.github.mikesafonov.starter.clients.AlwaysSuccessSmppResultGenerator;
+import com.github.mikesafonov.starter.clients.SmppResultGenerator;
+import com.github.mikesafonov.starter.smpp.sender.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 
 /**
  * @author Mike Safonov
  */
+@Slf4j
 @Configuration
+@EnableConfigurationProperties(SmppProperties.class)
 public class SmppAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(TypeOfAddressParser.class)
     public TypeOfAddressParser defaultTypeOfAddressParser() {
         return new DefaultTypeOfAddressParser();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(SmppResultGenerator.class)
+    public SmppResultGenerator alwaysSuccessSmppResultGenerator() {
+        return new AlwaysSuccessSmppResultGenerator();
     }
 
     @Bean

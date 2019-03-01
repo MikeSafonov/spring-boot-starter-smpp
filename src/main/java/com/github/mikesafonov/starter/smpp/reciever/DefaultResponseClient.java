@@ -12,10 +12,14 @@ import com.github.mikesafonov.starter.smpp.config.ReceiverConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Mike Safonov
@@ -55,6 +59,7 @@ public class DefaultResponseClient implements ResponseClient {
     private SmppSession session;
 
     private volatile boolean inProcess = false;
+    private final String id;
 
     /**
      * Create {@link DefaultResponseClient} with {@link DefaultSmppClient}.
@@ -62,10 +67,11 @@ public class DefaultResponseClient implements ResponseClient {
      * @param receiverConfiguration smpp receiver configuration
      * @param rebindPeriod          reconnection period in seconds
      */
-    protected DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
+    protected DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod, @NotNull String id) {
         client = new DefaultSmppClient();
-        this.sessionConfiguration = receiverConfiguration;
+        this.sessionConfiguration = requireNonNull(receiverConfiguration);
         this.rebindPeriod = rebindPeriod;
+        this.id = requireNonNull(id);
     }
 
     /**
@@ -75,7 +81,23 @@ public class DefaultResponseClient implements ResponseClient {
      * @param rebindPeriod          reconnection period in seconds
      */
     public static DefaultResponseClient of(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
-        return new DefaultResponseClient(receiverConfiguration, rebindPeriod);
+        return of(receiverConfiguration, rebindPeriod, UUID.randomUUID().toString());
+    }
+
+    /**
+     * Create {@link DefaultResponseClient} with {@link DefaultSmppClient}.
+     *
+     * @param receiverConfiguration smpp receiver configuration
+     * @param rebindPeriod          reconnection period in seconds
+     * @param id client id
+     */
+    public static DefaultResponseClient of(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod, @NotNull String id) {
+        return new DefaultResponseClient(receiverConfiguration, rebindPeriod, id);
+    }
+
+    @Override
+    public @NotNull String getId() {
+        return id;
     }
 
     @Override

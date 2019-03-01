@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Default implementation of {@link SenderClient}, build on top of {@link DefaultSmppClient} and
@@ -59,18 +60,23 @@ public class DefaultSenderClient implements SenderClient {
     private final String id;
 
 
-    protected DefaultSenderClient(TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, MessageBuilder messageBuilder) {
+    protected DefaultSenderClient(@NotNull TransmitterConfiguration configuration, int maxTryCount,
+                                  boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder, @NotNull String id) {
         client = new DefaultSmppClient();
-        sessionConfig = configuration;
+        sessionConfig = requireNonNull(configuration);
         this.maxTryCount = maxTryCount;
         this.ucs2Only = ucs2Only;
-        this.messageBuilder = messageBuilder;
+        this.messageBuilder = requireNonNull(messageBuilder);
         this.timeoutMillis = timeoutMillis;
-        id = UUID.randomUUID().toString();
+        this.id = requireNonNull(id);
     }
 
-    public static SenderClient of(TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, MessageBuilder messageBuilder) {
-        return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, messageBuilder);
+    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder) {
+        return of(configuration, maxTryCount, ucs2Only, timeoutMillis, messageBuilder, UUID.randomUUID().toString());
+    }
+
+    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder, @NotNull String id) {
+        return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, messageBuilder, id);
     }
 
     @Override

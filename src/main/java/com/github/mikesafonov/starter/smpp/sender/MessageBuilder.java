@@ -44,7 +44,7 @@ public class MessageBuilder {
 
         SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress, destAddress, silent, ucs2Only);
 
-        if (message.getMessageType() != MessageType.DATAGRAM) {
+        if (!message.isDatagram()) {
             registerDeliveryReport(submitSm);
         }
 
