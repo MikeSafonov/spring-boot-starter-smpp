@@ -4,13 +4,14 @@ import com.cloudhopper.commons.gsm.TypeOfAddress;
 import com.cloudhopper.smpp.type.Address;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.IllegalAddressException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 
 
 /**
- * @author MikeSafonov
+ * Class for building {@link Address} of source and destination
+ *
+ * @author Mike Safonov
  */
 @RequiredArgsConstructor
 public class AddressBuilder {
@@ -19,35 +20,31 @@ public class AddressBuilder {
 
 
     /**
-     * Метод создает адрес отправителя сообщения. Сначала производится анализ
-     * источника сообщения с помощью {@link DefaultTypeOfAddressParser#getSourceParameters(String)}. В
-     * случае ошибки используются параметры по умолчанию.
+     * Detect TON and NPI parameters from {@code source} and convert to {@link Address}
      *
      * @param source message source
      * @return source address
-     * @throws IllegalAddressException if source not supported
      */
     @NotNull
-    public Address createSourceAddress(@Nullable String source) throws IllegalAddressException {
-        TypeOfAddress typeOfAddress = addressParser.getSource(source);
-        byte ton = (byte) typeOfAddress.getTon().toInt();
-        byte npi = (byte) typeOfAddress.getNpi().toInt();
-        return new Address(ton, npi, source);
+    public Address createSourceAddress(@NotNull String source) throws IllegalAddressException {
+        return convertToAddress(source, addressParser.getSource(source));
     }
 
+
     /**
-     * Метод создает адрес получателя сообщения. Предполагается, что номер абонента находится в
-     * международном формате. Однако, во избежание ситуаций когда номер будет не в международном формате,
-     * мы добавили сюда проверку формата с помощью PhoneNormalizer.
+     * Detect TON and NPI parameters from {@code msisdn} and convert to {@link Address}
      *
      * @param msisdn destination phone number
      * @return destination address
      */
     @NotNull
-    public Address createDestAddress(@Nullable String msisdn) {
-        TypeOfAddress typeOfAddress = addressParser.getDestination(msisdn);
+    public Address createDestAddress(@NotNull String msisdn) {
+        return convertToAddress(msisdn, addressParser.getDestination(msisdn));
+    }
+
+    private Address convertToAddress(String value, TypeOfAddress typeOfAddress){
         byte ton = (byte) typeOfAddress.getTon().toInt();
         byte npi = (byte) typeOfAddress.getNpi().toInt();
-        return new Address(ton, npi, msisdn);
+        return new Address(ton, npi, value);
     }
 }

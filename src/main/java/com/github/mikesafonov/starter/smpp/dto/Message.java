@@ -43,4 +43,12 @@ public class Message {
     @NotNull
     private MessageType messageType;
 
+    public boolean isSilent() {
+        return messageType == MessageType.DATAGRAM;
+    }
+
+    public boolean isDatagram() {
+        return messageType == MessageType.DATAGRAM;
+    }
+
 }

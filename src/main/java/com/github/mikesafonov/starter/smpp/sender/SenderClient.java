@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
  */
 public interface SenderClient {
 
+    @NotNull String getId();
+
     /**
      * Connect to SMSC via SMPP protocol
      *

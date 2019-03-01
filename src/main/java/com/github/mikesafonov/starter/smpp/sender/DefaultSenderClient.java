@@ -12,7 +12,6 @@ import com.github.mikesafonov.starter.smpp.config.TransmitterConfiguration;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageErrorInformation;
 import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
-import com.github.mikesafonov.starter.smpp.dto.MessageType;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.IllegalAddressException;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.SenderClientBindException;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.SmppException;
@@ -20,6 +19,8 @@ import com.github.mikesafonov.starter.smpp.sender.exceptions.SmppSessionExceptio
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
+
+import java.util.UUID;
 
 import static java.lang.String.format;
 
@@ -54,7 +55,8 @@ public class DefaultSenderClient implements SenderClient {
     /**
      * SMPP session.
      */
-    private static SmppSession session;
+    private SmppSession session;
+    private final String id;
 
 
     protected DefaultSenderClient(TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, MessageBuilder messageBuilder) {
@@ -64,10 +66,16 @@ public class DefaultSenderClient implements SenderClient {
         this.ucs2Only = ucs2Only;
         this.messageBuilder = messageBuilder;
         this.timeoutMillis = timeoutMillis;
+        id = UUID.randomUUID().toString();
     }
 
     public static SenderClient of(TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, MessageBuilder messageBuilder) {
         return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, messageBuilder);
+    }
+
+    @Override
+    public @NotNull String getId() {
+        return id;
     }
 
     /**
@@ -91,16 +99,16 @@ public class DefaultSenderClient implements SenderClient {
      * @param message сообщение
      * @return результат сообщения
      */
+    @NotNull
     @Override
     public MessageResponse send(@NotNull Message message) {
 
+        if (message.getText() == null || message.getText().isEmpty()) {
+            return MessageResponse.error(message, new MessageErrorInformation(0, "Empty message text"));
+        }
+
         try {
-            SubmitSm submitSm;
-            if (message.getMessageType() == MessageType.SILENT) {
-                submitSm = messageBuilder.createSubmitSm(message, MessageType.SIMPLE, true, ucs2Only);
-            } else {
-                submitSm = messageBuilder.createSubmitSm(message, message.getMessageType(), ucs2Only);
-            }
+            SubmitSm submitSm = messageBuilder.createSubmitSm(message, message.isSilent(), ucs2Only);
             SubmitSmResp send = send(submitSm);
             return analyzeResponse(message, send);
         } catch (SmppInvalidArgumentException e) {

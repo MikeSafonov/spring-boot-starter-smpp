@@ -22,7 +22,6 @@ public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
 
     private static final Pattern ALPHABET_PATTERN = Pattern.compile("^[a-zA-Z0-9_ -]{3,11}$");
     private static final Pattern INTERNATIONAL_PATTERN = Pattern.compile("^[0-9]{10,15}$");
-    private static final Pattern NETWORK_SPECIFIC_PATTERN = Pattern.compile("^[0-9]{3,8}$");
 
 
     /**
@@ -51,7 +50,7 @@ public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
 
     /**
      * Create TON and NPI parameters for message destination {@code destination}. If number in international number format
-     * retyrbs {@link Ton#INTERNATIONAL}, otherwise return {@link Ton#UNKNOWN}
+     * returns {@link Ton#INTERNATIONAL}, otherwise return {@link Ton#UNKNOWN}
      *
      * @param destination message destination
      * @return ton and npi for destination
