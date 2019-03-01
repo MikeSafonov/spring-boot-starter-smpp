@@ -25,6 +25,11 @@ public class SmppAutoConfiguration {
     }
 
     @Bean
+    public SenderClientFactoryBean senderClientFactoryBean(SmppProperties smppProperties){
+        return new SenderClientFactoryBean(smppProperties);
+    }
+
+    @Bean
     @ConditionalOnMissingBean(SmppResultGenerator.class)
     public SmppResultGenerator alwaysSuccessSmppResultGenerator() {
         return new AlwaysSuccessSmppResultGenerator();
