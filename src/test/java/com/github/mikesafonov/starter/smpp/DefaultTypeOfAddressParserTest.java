@@ -3,7 +3,6 @@ package com.github.mikesafonov.starter.smpp;
 import com.cloudhopper.commons.gsm.Npi;
 import com.cloudhopper.commons.gsm.Ton;
 import com.cloudhopper.commons.gsm.TypeOfAddress;
-import com.cloudhopper.smpp.SmppConstants;
 import com.github.mikesafonov.starter.smpp.sender.DefaultTypeOfAddressParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,8 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class DefaultTypeOfAddressParserTest {
 
+    private static final TypeOfAddress unknown = new TypeOfAddress(Ton.UNKNOWN, Npi.UNKNOWN);
+
     private static List<String> invalidSource() {
-        return asList("3805030922353333", "", null, "$$$$$$", "@fasd", "Прив");
+        return asList("3805030922353333", "",  "$$$$$$", "@fasd", "Прив");
     }
 
     private static List<String> numericSource() {
@@ -40,30 +41,27 @@ class DefaultTypeOfAddressParserTest {
 
     @ParameterizedTest
     @MethodSource("invalidSource")
-    void shouldReturnNullBecauseSourceInvalid(String invalidSource) {
-        TypeOfAddress unknown = new TypeOfAddress(Ton.UNKNOWN, Npi.UNKNOWN);
+    void shouldReturnUnknownBecauseSourceInvalid(String invalidSource) {
         TypeOfAddress typeOfAddress = defaultTypeOfAddressParser.getSource(invalidSource);
 
         assertEquals(unknown.getTon(), typeOfAddress.getTon());
         assertEquals(unknown.getNpi(), typeOfAddress.getNpi());
     }
 
-//
-//    @ParameterizedTest
-//    @MethodSource("numericSource")
-//    void shouldReturnNumericSource(String numericSource) {
-//        SourceParameters sourceParameters = defaultTypeOfAddressParser.getSourceParameters(numericSource).orElseThrow(NullPointerException::new);
-//
-//        assertEquals(SmppConstants.TON_INTERNATIONAL, sourceParameters.getSourceTon());
-//        assertEquals(SmppConstants.NPI_E164, sourceParameters.getSourceNpi());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("textSource")
-//    void shouldReturnTextSource(String numericSource) {
-//        SourceParameters sourceParameters = defaultTypeOfAddressParser.getSourceParameters(numericSource).orElseThrow(NullPointerException::new);
-//
-//        assertEquals(SmppConstants.TON_ALPHANUMERIC, sourceParameters.getSourceTon());
-//        assertEquals(SmppConstants.NPI_UNKNOWN, sourceParameters.getSourceNpi());
-//    }
+    @ParameterizedTest
+    @MethodSource("numericSource")
+    void shouldReturnNumericSource(String numericSource) {
+        TypeOfAddress typeOfAddress = defaultTypeOfAddressParser.getSource(numericSource);
+        assertEquals(Ton.INTERNATIONAL, typeOfAddress.getTon());
+        assertEquals(Npi.ISDN, typeOfAddress.getNpi());
+    }
+
+    @ParameterizedTest
+    @MethodSource("textSource")
+    void shouldReturnTextSource(String numericSource) {
+        TypeOfAddress typeOfAddress = defaultTypeOfAddressParser.getSource(numericSource);
+
+        assertEquals(Ton.ALPHANUMERIC, typeOfAddress.getTon());
+        assertEquals(Npi.UNKNOWN, typeOfAddress.getNpi());
+    }
 }

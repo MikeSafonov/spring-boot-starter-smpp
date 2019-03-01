@@ -21,7 +21,8 @@ import static java.lang.String.format;
 public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
 
     private static final Pattern ALPHABET_PATTERN = Pattern.compile("^[a-zA-Z0-9_ -]{3,11}$");
-    private static final Pattern INTERNATIONAL_PATTERN = Pattern.compile("^[0-9]{12}$");
+    private static final Pattern INTERNATIONAL_PATTERN = Pattern.compile("^[0-9]{10,15}$");
+    private static final Pattern NETWORK_SPECIFIC_PATTERN = Pattern.compile("^[0-9]{3,8}$");
 
 
     /**
@@ -36,9 +37,9 @@ public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
     @NotNull
     public TypeOfAddress getSource(@NotNull String source) throws IllegalAddressException {
         try {
-            if (checkTonInternationalNumber(source)) {
+            if (checkPattern(source, INTERNATIONAL_PATTERN)) {
                 return new TypeOfAddress(Ton.INTERNATIONAL, Npi.ISDN);
-            } else if (checkTonAlphabet(source)) {
+            } else if (checkPattern(source, ALPHABET_PATTERN)) {
                 return new TypeOfAddress(Ton.ALPHANUMERIC, Npi.UNKNOWN);
             }
             return new TypeOfAddress(Ton.UNKNOWN, Npi.UNKNOWN);
@@ -49,8 +50,8 @@ public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
     }
 
     /**
-     * Create TON and NPI parameters for message destination {@code destination}. Supported two types of destination:
-     * international or national, otherwise return {@link Ton#UNKNOWN}
+     * Create TON and NPI parameters for message destination {@code destination}. If number in international number format
+     * retyrbs {@link Ton#INTERNATIONAL}, otherwise return {@link Ton#UNKNOWN}
      *
      * @param destination message destination
      * @return ton and npi for destination
@@ -60,7 +61,7 @@ public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
     @NotNull
     public TypeOfAddress getDestination(@NotNull String destination) {
         try {
-            if (checkTonInternationalNumber(destination)) {
+            if (checkPattern(destination, INTERNATIONAL_PATTERN)) {
                 return new TypeOfAddress(Ton.INTERNATIONAL, Npi.ISDN);
             }
             return new TypeOfAddress(Ton.UNKNOWN, Npi.UNKNOWN);
@@ -70,23 +71,15 @@ public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
         }
     }
 
-    /**
-     * Check is source matching alphanumeric pattern
-     *
-     * @param source message source.
-     * @return true if source is alphanumeric format number
-     */
-    private boolean checkTonAlphabet(@NotNull String source) {
-        return ALPHABET_PATTERN.matcher(source).matches();
-    }
 
     /**
-     * Check is source matching international pattern
+     * Check is source matching specific pattern
      *
-     * @param source message source.
-     * @return true if source is international format number
+     * @param source text.
+     * @return true if source is matching pattern
      */
-    private boolean checkTonInternationalNumber(@NotNull String source) {
-        return INTERNATIONAL_PATTERN.matcher(source).matches();
+    private boolean checkPattern(@NotNull String source, @NotNull Pattern pattern){
+        return pattern.matcher(source).matches();
     }
+
 }
