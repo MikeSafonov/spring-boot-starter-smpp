@@ -1,0 +1,19 @@
+language: java
+before_install:
+  - chmod +x gradlew
+
+addons:
+  sonarcloud:
+    organization: "mikesafonov-github"
+install:
+  - ./gradlew build --scan
+script:
+  - sonar-scanner
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/modules-2/
+    - $HOME/.gradle/wrapper/dists/
