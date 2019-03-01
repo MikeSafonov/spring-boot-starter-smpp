@@ -15,7 +15,7 @@ import java.util.UUID;
 public class MockSenderClient implements SenderClient {
 
     private final SmppResultGenerator smppResultGenerator;
-    private final String id = UUID.randomUUID().toString();
+    private final String id;
 
 
     @Override

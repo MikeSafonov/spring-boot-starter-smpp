@@ -110,7 +110,7 @@ public class DefaultSenderClient implements SenderClient {
     public MessageResponse send(@NotNull Message message) {
 
         if (message.getText() == null || message.getText().isEmpty()) {
-            return MessageResponse.error(message, new MessageErrorInformation(0, "Empty message text"));
+            return MessageResponse.error(message, getId(), new MessageErrorInformation(0, "Empty message text"));
         }
 
         try {
@@ -119,12 +119,12 @@ public class DefaultSenderClient implements SenderClient {
             return analyzeResponse(message, send);
         } catch (SmppInvalidArgumentException e) {
             log.error(e.getMessage(), e);
-            return MessageResponse.error(message, new MessageErrorInformation(INVALID_PARAM, "Invalid param"));
+            return MessageResponse.error(message, getId(), new MessageErrorInformation(INVALID_PARAM, "Invalid param"));
         } catch (IllegalAddressException e) {
             log.error(e.getMessage(), e);
-            return MessageResponse.error(message, new MessageErrorInformation(INVALID_PARAM, e.getMessage()));
+            return MessageResponse.error(message, getId(), new MessageErrorInformation(INVALID_PARAM, e.getMessage()));
         } catch (SmppException e) {
-            return MessageResponse.error(message, new MessageErrorInformation(e.getErrorCode(),
+            return MessageResponse.error(message, getId(), new MessageErrorInformation(e.getErrorCode(),
                     e.getErrorMessage()));
         }
     }
@@ -156,9 +156,9 @@ public class DefaultSenderClient implements SenderClient {
 
     private MessageResponse analyzeResponse(Message message, SubmitSmResp submitSmResp) {
         if (submitSmResp.getCommandStatus() == SmppConstants.STATUS_OK)
-            return MessageResponse.success(message, submitSmResp.getMessageId());
+            return MessageResponse.success(message, getId(), submitSmResp.getMessageId());
         else
-            return MessageResponse.error(message, new MessageErrorInformation(INVALID_PARAM,
+            return MessageResponse.error(message, getId(), new MessageErrorInformation(INVALID_PARAM,
                     submitSmResp.getResultMessage()));
     }
 

@@ -25,8 +25,8 @@ public class SmppAutoConfiguration {
     }
 
     @Bean
-    public SenderClientFactoryBean senderClientFactoryBean(SmppProperties smppProperties){
-        return new SenderClientFactoryBean(smppProperties);
+    public SmscConnectionFactoryBean senderClientFactoryBean(SmppProperties smppProperties){
+        return new SmscConnectionFactoryBean(smppProperties);
     }
 
     @Bean

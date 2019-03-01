@@ -11,23 +11,19 @@ import com.cloudhopper.smpp.type.LoggingOptions;
  */
 public class TransmitterConfiguration extends SmppSessionConfiguration {
 
-    public TransmitterConfiguration(SmppConfigurationProperties configurationProperties) {
+    public TransmitterConfiguration(String host, int port, String username, String password, int windowSize, boolean isLoggingBytes, boolean isLoggingPdu) {
 
         super();
 
-        if (configurationProperties == null) {
-            throw new RuntimeException("configurationProperties must not be null");
-        }
-
         setType(SmppBindType.TRANSMITTER);
-        setHost(configurationProperties.getHost());
-        setPort(configurationProperties.getPort());
-        setSystemId(configurationProperties.getUsername());
-        setPassword(configurationProperties.getPassword());
-        setWindowSize(configurationProperties.getWindowSize());
+        setHost(host);
+        setPort(port);
+        setSystemId(username);
+        setPassword(password);
+        setWindowSize(windowSize);
         LoggingOptions loggingOptions = new LoggingOptions();
-        loggingOptions.setLogBytes(configurationProperties.isLoggingBytes());
-        loggingOptions.setLogPdu(configurationProperties.isLoggingPdu());
+        loggingOptions.setLogBytes(isLoggingBytes);
+        loggingOptions.setLogPdu(isLoggingPdu);
         setLoggingOptions(loggingOptions);
 
     }

@@ -11,9 +11,11 @@ import java.time.ZoneId;
  * @author Mike Safonov
  */
 public class AlwaysSuccessSmppResultGenerator implements SmppResultGenerator {
+
     @Override
     public MessageResponse generate(Message message) {
-        return MessageResponse.success(message, randomHexId());
+        //TODO: fix
+        return MessageResponse.success(message, randomHexId(), null);
     }
 
 
