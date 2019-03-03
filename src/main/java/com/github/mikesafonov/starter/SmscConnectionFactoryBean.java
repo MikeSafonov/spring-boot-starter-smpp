@@ -1,19 +1,15 @@
 package com.github.mikesafonov.starter;
 
-import com.github.mikesafonov.starter.clients.MockSenderClient;
 import com.github.mikesafonov.starter.clients.SmppResultGenerator;
-import com.github.mikesafonov.starter.clients.TestSenderClient;
-import com.github.mikesafonov.starter.smpp.config.SmppConfigurationProperties;
-import com.github.mikesafonov.starter.smpp.config.TransmitterConfiguration;
-import com.github.mikesafonov.starter.smpp.reciever.DefaultResponseClient;
-import com.github.mikesafonov.starter.smpp.sender.DefaultSenderClient;
+import com.github.mikesafonov.starter.smpp.reciever.DeliveryReportConsumer;
+import com.github.mikesafonov.starter.smpp.reciever.ResponseClient;
+import com.github.mikesafonov.starter.smpp.reciever.ResponseSmppSessionHandler;
 import com.github.mikesafonov.starter.smpp.sender.MessageBuilder;
 import com.github.mikesafonov.starter.smpp.sender.SenderClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.FactoryBean;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,6 +21,7 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
     private final SmppProperties smppProperties;
     private final SmppResultGenerator smppResultGenerator;
     private final MessageBuilder messageBuilder;
+    private final DeliveryReportConsumer deliveryReportConsumer;
 
 
     @Override
@@ -36,42 +33,31 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
 
             switch (starterMode) {
                 case MOCK: {
-                    MockSenderClient senderClient = new MockSenderClient(smppResultGenerator, name);
-                    smscConnections.add(new SmscConnection(name, null, senderClient));
+                    smscConnections.add(new SmscConnection(name, ClientFactory.mockSender(name, smppResultGenerator)));
                     break;
                 }
                 case TEST: {
-                    TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(
-                            smsc.getHost(), smsc.getPort(), smsc.getUsername(), smsc.getPassword(),
-                            smsc.getWindowSize(), smsc.isLoggingBytes(), smsc.isLoggingPdu()
-                    );
-                    SenderClient senderClient = DefaultSenderClient.of(transmitterConfiguration, smsc.getMaxTry(),
-                            smsc.isUcs2Only(), smsc.getRebindPeriod().getSeconds(), messageBuilder, name);
-                    TestSenderClient testSenderClient = new TestSenderClient(senderClient, Arrays.asList(smsc.getAllowedPhones()), smppResultGenerator);
-
-
-                    DefaultResponseClient responseClient = DefaultResponseClient.of();
-
-                    smscConnections.add(new SmscConnection(name, responseClient, testSenderClient));
+                    SenderClient senderClient = ClientFactory.testSender(name, smppResultGenerator, smsc, messageBuilder);
+                    ResponseClient responseClient = ClientFactory.defaultResponse(name, smsc);
+                    setupClients(senderClient, responseClient);
+                    smscConnections.add(new SmscConnection(name, responseClient, senderClient));
                 }
                 case STANDARD: {
-
-                }
-                default: {
+                    SenderClient senderClient = ClientFactory.defaultSender(name, smsc, messageBuilder);
+                    ResponseClient responseClient = ClientFactory.defaultResponse(name, smsc);
+                    setupClients(senderClient, responseClient);
+                    smscConnections.add(new SmscConnection(name, responseClient, senderClient));
                 }
             }
-
-
-            if (starterMode == StarterMode.MOCK) {
-                MockSenderClient senderClient = new MockSenderClient(smppResultGenerator, name);
-                smscConnections.add(new SmscConnection(name, null, senderClient));
-            }
-
         });
 
+        return smscConnections;
+    }
 
-        //TODO: implements sender client registry.
-        return null;
+    private void setupClients(SenderClient senderClient, ResponseClient responseClient){
+        senderClient.setup();
+        ResponseSmppSessionHandler responseSmppSessionHandler = new ResponseSmppSessionHandler(responseClient, deliveryReportConsumer);
+        responseClient.setup(responseSmppSessionHandler);
     }
 
     @Override

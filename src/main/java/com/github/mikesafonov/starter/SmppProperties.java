@@ -67,7 +67,12 @@ public class SmppProperties {
         /**
          * Rebind period
          */
-        private Duration rebindPeriod;
+        private Duration rebindPeriod = Duration.ofSeconds(90);
+
+        /**
+         * Request timeout
+         */
+        private Duration requestTimeout = Duration.ofSeconds(5);
         /**
          * Array of phones to send. Using only if {@link #starterMode} is {@link StarterMode#TEST}
          */

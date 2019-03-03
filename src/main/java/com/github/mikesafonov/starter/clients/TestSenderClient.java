@@ -18,7 +18,6 @@ public class TestSenderClient implements SenderClient {
     private final List<String> allowedPhones;
     private final SenderClient senderClient;
     private final SmppResultGenerator smppResultGenerator;
-    private final String id = UUID.randomUUID().toString();
 
     public TestSenderClient(SenderClient senderClient, List<String> allowedPhones, SmppResultGenerator smppResultGenerator) {
         this.senderClient = senderClient;
@@ -28,7 +27,7 @@ public class TestSenderClient implements SenderClient {
 
     @Override
     public @NotNull String getId() {
-        return id;
+        return senderClient.getId();
     }
 
     @Override
@@ -40,7 +39,7 @@ public class TestSenderClient implements SenderClient {
         if (isAllowed(message.getMsisdn())) {
             return senderClient.send(message);
         }
-        return smppResultGenerator.generate(message);
+        return smppResultGenerator.generate(getId(), message);
     }
 
     private boolean isAllowed(String phone) {

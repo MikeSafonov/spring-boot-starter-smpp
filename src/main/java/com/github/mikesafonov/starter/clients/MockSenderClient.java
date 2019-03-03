@@ -29,7 +29,7 @@ public class MockSenderClient implements SenderClient {
 
     @Override
     public @NotNull MessageResponse send(@NotNull Message message) {
-        return smppResultGenerator.generate(message);
+        return smppResultGenerator.generate(getId(), message);
     }
 
 }

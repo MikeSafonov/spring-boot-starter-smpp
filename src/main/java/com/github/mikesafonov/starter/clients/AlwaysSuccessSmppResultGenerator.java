@@ -13,9 +13,8 @@ import java.time.ZoneId;
 public class AlwaysSuccessSmppResultGenerator implements SmppResultGenerator {
 
     @Override
-    public MessageResponse generate(Message message) {
-        //TODO: fix
-        return MessageResponse.success(message, randomHexId(), null);
+    public MessageResponse generate(String smscId, Message message) {
+        return MessageResponse.success(message, smscId, randomHexId());
     }
 
 

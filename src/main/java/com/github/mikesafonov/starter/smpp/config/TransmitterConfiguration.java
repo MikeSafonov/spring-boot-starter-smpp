@@ -3,6 +3,9 @@ package com.github.mikesafonov.starter.smpp.config;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSessionConfiguration;
 import com.cloudhopper.smpp.type.LoggingOptions;
+import com.github.mikesafonov.starter.SmppProperties;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Configuration for sender session
@@ -11,23 +14,20 @@ import com.cloudhopper.smpp.type.LoggingOptions;
  */
 public class TransmitterConfiguration extends SmppSessionConfiguration {
 
-    public TransmitterConfiguration(String host, int port, String username, String password, int windowSize, boolean isLoggingBytes, boolean isLoggingPdu) {
-
+    public TransmitterConfiguration(@NotNull SmppProperties.SMSC smsc) {
         super();
 
         setType(SmppBindType.TRANSMITTER);
-        setHost(host);
-        setPort(port);
-        setSystemId(username);
-        setPassword(password);
-        setWindowSize(windowSize);
+        setHost(smsc.getHost());
+        setPort(smsc.getPort());
+        setSystemId(smsc.getUsername());
+        setPassword(smsc.getPassword());
+        setWindowSize(smsc.getWindowSize());
         LoggingOptions loggingOptions = new LoggingOptions();
-        loggingOptions.setLogBytes(isLoggingBytes);
-        loggingOptions.setLogPdu(isLoggingPdu);
+        loggingOptions.setLogBytes(smsc.isLoggingBytes());
+        loggingOptions.setLogPdu(smsc.isLoggingPdu());
         setLoggingOptions(loggingOptions);
-
     }
-
 
     public String configInformation() {
         return String.format("%s host=%s port=%d username=%s windowsSize=%d", "Transmitter", getHost(), getPort(), getSystemId(), getWindowSize());
