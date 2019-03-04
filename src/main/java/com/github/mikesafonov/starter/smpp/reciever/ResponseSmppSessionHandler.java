@@ -12,6 +12,8 @@ import org.joda.time.DateTimeZone;
 
 import javax.validation.constraints.NotNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @author Mike Safonov
  */
@@ -22,8 +24,8 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
     private final DeliveryReportConsumer deliveryReportConsumer;
 
     public ResponseSmppSessionHandler(@NotNull ResponseClient client, @NotNull DeliveryReportConsumer deliveryReportConsumer) {
-        this.client = client;
-        this.deliveryReportConsumer = deliveryReportConsumer;
+        this.client = requireNonNull(client);
+        this.deliveryReportConsumer = requireNonNull(deliveryReportConsumer);
     }
 
     @Override
@@ -37,8 +39,6 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
                 return response;
             }
             log.debug(pduRequest.toString());
-        } else {
-            log.debug(null);
         }
         return super.firePduRequestReceived(pduRequest);
     }

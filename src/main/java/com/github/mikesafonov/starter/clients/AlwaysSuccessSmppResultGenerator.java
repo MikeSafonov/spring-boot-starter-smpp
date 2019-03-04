@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
+ * Implementation of {@link SmppResultGenerator} which always generate success {@link MessageResponse} with
+ * random smsc message id.
+ *
  * @author Mike Safonov
  */
 public class AlwaysSuccessSmppResultGenerator implements SmppResultGenerator {

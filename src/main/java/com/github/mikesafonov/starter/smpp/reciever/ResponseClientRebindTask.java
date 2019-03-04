@@ -1,7 +1,11 @@
 package com.github.mikesafonov.starter.smpp.reciever;
 
+import javax.validation.constraints.NotNull;
+
+import static java.util.Objects.requireNonNull;
+
 /**
- * Runnable class for checking and reconnecting {@link DefaultResponseClient}
+ * Runnable class for checking and reconnecting {@link ResponseClient}
  *
  * @author Mike Safonov
  */
@@ -9,8 +13,8 @@ class ResponseClientRebindTask implements Runnable {
 
     private final ResponseClient client;
 
-    ResponseClientRebindTask(ResponseClient client) {
-        this.client = client;
+    ResponseClientRebindTask(@NotNull ResponseClient client) {
+        this.client = requireNonNull(client);
     }
 
     /**

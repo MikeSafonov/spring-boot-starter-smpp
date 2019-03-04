@@ -6,9 +6,11 @@ import com.github.mikesafonov.starter.smpp.sender.SenderClient;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 /**
+ * Implementation of {@link SenderClient} which not perform any connection via smpp and only generate {@link MessageResponse}
+ * by using {@link SmppResultGenerator}
+ *
  * @author Mike Safonov
  */
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class MockSenderClient implements SenderClient {
 
     @Override
     public @NotNull MessageResponse send(@NotNull Message message) {
-        return smppResultGenerator.generate(getId(), message);
+        return smppResultGenerator.generate(id, message);
     }
 
 }

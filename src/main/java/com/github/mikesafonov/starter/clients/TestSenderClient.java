@@ -8,15 +8,28 @@ import com.github.mikesafonov.starter.smpp.sender.exceptions.SenderClientBindExc
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
+ * Implementation of {@link SenderClient} which should be used for testing purpose. This client
+ * may provide real smpp connection via incoming implementation of {@link SenderClient}. Every incoming request will be redirected to
+ * real {@link #senderClient} only if list of allowed phone numbers {@link #allowedPhones} contains message destination phone.
+ * Otherwise {@link MessageResponse} will be generated via {@link SmppResultGenerator}
+ *
  * @author Mike Safonov
  */
 public class TestSenderClient implements SenderClient {
 
+    /**
+     * List of allowed phones to real smpp actions
+     */
     private final List<String> allowedPhones;
+    /**
+     * Real smpp sender client
+     */
     private final SenderClient senderClient;
+    /**
+     * Generator for {@link MessageResponse}
+     */
     private final SmppResultGenerator smppResultGenerator;
 
     public TestSenderClient(SenderClient senderClient, List<String> allowedPhones, SmppResultGenerator smppResultGenerator) {
@@ -39,7 +52,7 @@ public class TestSenderClient implements SenderClient {
         if (isAllowed(message.getMsisdn())) {
             return senderClient.send(message);
         }
-        return smppResultGenerator.generate(getId(), message);
+        return smppResultGenerator.generate(senderClient.getId(), message);
     }
 
     private boolean isAllowed(String phone) {

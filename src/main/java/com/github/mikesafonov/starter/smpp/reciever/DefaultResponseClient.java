@@ -12,8 +12,6 @@ import com.github.mikesafonov.starter.smpp.config.ReceiverConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -72,16 +70,6 @@ public class DefaultResponseClient implements ResponseClient {
         this.sessionConfiguration = requireNonNull(receiverConfiguration);
         this.rebindPeriod = rebindPeriod;
         this.id = requireNonNull(id);
-    }
-
-    /**
-     * Create {@link DefaultResponseClient} with {@link DefaultSmppClient}.
-     *
-     * @param receiverConfiguration smpp receiver configuration
-     * @param rebindPeriod          reconnection period in seconds
-     */
-    public static DefaultResponseClient of(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
-        return of(receiverConfiguration, rebindPeriod, UUID.randomUUID().toString());
     }
 
     /**
