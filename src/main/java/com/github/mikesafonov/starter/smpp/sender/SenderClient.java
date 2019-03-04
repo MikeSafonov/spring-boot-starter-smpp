@@ -13,6 +13,9 @@ import javax.validation.constraints.NotNull;
  */
 public interface SenderClient {
 
+    /**
+     * @return Identifier of response client
+     */
     @NotNull String getId();
 
     /**

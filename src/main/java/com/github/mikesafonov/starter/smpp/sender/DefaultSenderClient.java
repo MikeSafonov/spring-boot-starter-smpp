@@ -18,7 +18,6 @@ import com.github.mikesafonov.starter.smpp.sender.exceptions.SmppSessionExceptio
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -48,7 +47,13 @@ public class DefaultSenderClient implements SenderClient {
      * Number of attempts to reconnect if smpp session closed
      */
     private final int maxTryCount;
+    /**
+     * Request timeout in millis
+     */
     private final long timeoutMillis;
+    /**
+     * Message builder
+     */
     private final MessageBuilder messageBuilder;
     private final boolean ucs2Only;
     /**
@@ -59,22 +64,20 @@ public class DefaultSenderClient implements SenderClient {
 
 
     protected DefaultSenderClient(@NotNull TransmitterConfiguration configuration, int maxTryCount,
-                                  boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder, @NotNull String id) {
+                                  boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser, @NotNull String id) {
         client = new DefaultSmppClient();
         sessionConfig = requireNonNull(configuration);
         this.maxTryCount = maxTryCount;
         this.ucs2Only = ucs2Only;
-        this.messageBuilder = requireNonNull(messageBuilder);
+        this.messageBuilder = new MessageBuilder(typeOfAddressParser);
         this.timeoutMillis = timeoutMillis;
         this.id = requireNonNull(id);
     }
 
-    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder) {
-        return of(configuration, maxTryCount, ucs2Only, timeoutMillis, messageBuilder, UUID.randomUUID().toString());
-    }
 
-    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder, @NotNull String id) {
-        return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, messageBuilder, id);
+
+    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser, @NotNull String id) {
+        return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, typeOfAddressParser, id);
     }
 
     @Override
@@ -126,7 +129,6 @@ public class DefaultSenderClient implements SenderClient {
                     e.getErrorMessage()));
         }
     }
-
 
     /**
      * Sending {@link SubmitSm} command via smpp. First of all checking session state, if session is

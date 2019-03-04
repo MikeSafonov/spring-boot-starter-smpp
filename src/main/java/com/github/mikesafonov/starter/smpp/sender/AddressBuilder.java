@@ -3,9 +3,10 @@ package com.github.mikesafonov.starter.smpp.sender;
 import com.cloudhopper.commons.gsm.TypeOfAddress;
 import com.cloudhopper.smpp.type.Address;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.IllegalAddressException;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -13,11 +14,13 @@ import javax.validation.constraints.NotNull;
  *
  * @author Mike Safonov
  */
-@RequiredArgsConstructor
 public class AddressBuilder {
 
     private final TypeOfAddressParser addressParser;
 
+    public AddressBuilder(@NotNull TypeOfAddressParser addressParser) {
+        this.addressParser = requireNonNull(addressParser);
+    }
 
     /**
      * Detect TON and NPI parameters from {@code source} and convert to {@link Address}
@@ -42,7 +45,7 @@ public class AddressBuilder {
         return convertToAddress(msisdn, addressParser.getDestination(msisdn));
     }
 
-    private Address convertToAddress(String value, TypeOfAddress typeOfAddress){
+    private Address convertToAddress(String value, TypeOfAddress typeOfAddress) {
         byte ton = (byte) typeOfAddress.getTon().toInt();
         byte npi = (byte) typeOfAddress.getNpi().toInt();
         return new Address(ton, npi, value);

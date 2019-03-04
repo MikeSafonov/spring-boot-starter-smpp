@@ -14,11 +14,12 @@ import javax.validation.constraints.NotNull;
  */
 public class TransmitterConfiguration extends SmppSessionConfiguration {
 
-    public TransmitterConfiguration(@NotNull SmppProperties.SMSC smsc) {
+    public TransmitterConfiguration(@NotNull String name, @NotNull SmppProperties.SMSC smsc) {
         super();
 
         setType(SmppBindType.TRANSMITTER);
         setHost(smsc.getHost());
+        setName(name);
         setPort(smsc.getPort());
         setSystemId(smsc.getUsername());
         setPassword(smsc.getPassword());
@@ -30,6 +31,6 @@ public class TransmitterConfiguration extends SmppSessionConfiguration {
     }
 
     public String configInformation() {
-        return String.format("%s host=%s port=%d username=%s windowsSize=%d", "Transmitter", getHost(), getPort(), getSystemId(), getWindowSize());
+        return String.format("%s host=%s port=%d username=%s windowsSize=%d", getName(), getHost(), getPort(), getSystemId(), getWindowSize());
     }
 }

@@ -12,7 +12,6 @@ import com.github.mikesafonov.starter.smpp.dto.MessageType;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.IllegalAddressException;
 import com.github.mikesafonov.starter.smpp.utils.CountWithEncoding;
 import com.github.mikesafonov.starter.smpp.utils.MessageUtil;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
@@ -20,12 +19,15 @@ import javax.validation.constraints.NotNull;
 /**
  * @author MikeSafonov
  */
-@RequiredArgsConstructor
 public class MessageBuilder {
 
     private static final byte SILENT_CODING = (byte) 0xC0;
 
     private final AddressBuilder addressBuilder;
+
+    public MessageBuilder(@NotNull TypeOfAddressParser typeOfAddressParser) {
+        addressBuilder = new AddressBuilder(typeOfAddressParser);
+    }
 
     /**
      * Builds {@link SubmitSm} for sending via smpp.
