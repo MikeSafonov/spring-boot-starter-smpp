@@ -1,9 +1,6 @@
 package com.github.mikesafonov.starter.smpp.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,8 +10,7 @@ import javax.validation.constraints.NotNull;
  *
  * @author Mike Safonov
  */
-@Data
-@AllArgsConstructor
+@Value
 public class MessageResponse {
     /**
      * Original message

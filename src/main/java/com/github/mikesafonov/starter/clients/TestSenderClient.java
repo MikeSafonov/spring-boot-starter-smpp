@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Implementation of {@link SenderClient} which should be used for testing purpose. This client
  * may provide real smpp connection via incoming implementation of {@link SenderClient}. Every incoming request will be redirected to
@@ -32,10 +34,10 @@ public class TestSenderClient implements SenderClient {
      */
     private final SmppResultGenerator smppResultGenerator;
 
-    public TestSenderClient(SenderClient senderClient, List<String> allowedPhones, SmppResultGenerator smppResultGenerator) {
-        this.senderClient = senderClient;
+    public TestSenderClient(@NotNull SenderClient senderClient, @NotNull List<String> allowedPhones, @NotNull SmppResultGenerator smppResultGenerator) {
+        this.senderClient = requireNonNull(senderClient);
         this.allowedPhones = new ArrayList<>(allowedPhones);
-        this.smppResultGenerator = smppResultGenerator;
+        this.smppResultGenerator = requireNonNull(smppResultGenerator);
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.cloudhopper.smpp.pdu.EnquireLink;
 import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.pdu.SubmitSmResp;
 import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
-import com.github.mikesafonov.starter.smpp.config.TransmitterConfiguration;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageErrorInformation;
 import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
@@ -19,7 +18,6 @@ import com.github.mikesafonov.starter.smpp.sender.exceptions.SmppSessionExceptio
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
-
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -263,7 +261,7 @@ public class DefaultSenderClient implements SenderClient {
             session.enquireLink(new EnquireLink(), 1000);
             return true;
         } catch (Exception ex) {
-            log.info(ex.getMessage(), ex);
+            log.debug(ex.getMessage(), ex);
         }
         return false;
     }

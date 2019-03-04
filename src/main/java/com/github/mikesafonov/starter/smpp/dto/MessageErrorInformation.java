@@ -1,13 +1,11 @@
 package com.github.mikesafonov.starter.smpp.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
 /**
- * @author MikeSafonov
+ * @author Mike Safonov
  */
-@Data
-@AllArgsConstructor
+@Value
 public class MessageErrorInformation {
     private int errorCode;
     private String errorMessage;

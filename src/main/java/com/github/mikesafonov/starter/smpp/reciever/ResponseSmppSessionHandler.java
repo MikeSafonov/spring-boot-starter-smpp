@@ -15,6 +15,8 @@ import javax.validation.constraints.NotNull;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Handler for listening PDU events (delivery reports, etc)
+ *
  * @author Mike Safonov
  */
 @Slf4j

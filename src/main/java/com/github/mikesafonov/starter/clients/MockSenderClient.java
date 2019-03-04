@@ -3,9 +3,10 @@ package com.github.mikesafonov.starter.clients;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
 import com.github.mikesafonov.starter.smpp.sender.SenderClient;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Implementation of {@link SenderClient} which not perform any connection via smpp and only generate {@link MessageResponse}
@@ -13,12 +14,15 @@ import javax.validation.constraints.NotNull;
  *
  * @author Mike Safonov
  */
-@RequiredArgsConstructor
 public class MockSenderClient implements SenderClient {
 
     private final SmppResultGenerator smppResultGenerator;
     private final String id;
 
+    public MockSenderClient(@NotNull SmppResultGenerator smppResultGenerator, @NotNull String id) {
+        this.smppResultGenerator = requireNonNull(smppResultGenerator);
+        this.id = requireNonNull(id);
+    }
 
     @Override
     public @NotNull String getId() {

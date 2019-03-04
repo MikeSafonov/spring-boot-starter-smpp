@@ -1,4 +1,4 @@
-package com.github.mikesafonov.starter.smpp.config;
+package com.github.mikesafonov.starter.smpp.sender;
 
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSessionConfiguration;

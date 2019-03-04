@@ -1,4 +1,4 @@
-package com.github.mikesafonov.starter.smpp.config;
+package com.github.mikesafonov.starter.smpp.reciever;
 
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSessionConfiguration;
@@ -14,11 +14,12 @@ import javax.validation.constraints.NotNull;
  */
 public class ReceiverConfiguration extends SmppSessionConfiguration {
 
-    public ReceiverConfiguration(@NotNull SmppProperties.SMSC smsc) {
+    public ReceiverConfiguration(@NotNull String name, @NotNull SmppProperties.SMSC smsc) {
         super();
 
         setType(SmppBindType.RECEIVER);
         setHost(smsc.getHost());
+        setName(name);
         setPort(smsc.getPort());
         setSystemId(smsc.getUsername());
         setPassword(smsc.getPassword());
@@ -30,6 +31,6 @@ public class ReceiverConfiguration extends SmppSessionConfiguration {
     }
 
     public String configInformation() {
-        return String.format("%s host=%s port=%d username=%s", "Receiver", getHost(), getPort(), getSystemId());
+        return String.format("%s host=%s port=%d username=%s", getName(), getHost(), getPort(), getSystemId());
     }
 }

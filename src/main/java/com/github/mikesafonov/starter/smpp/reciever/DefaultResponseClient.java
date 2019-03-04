@@ -8,7 +8,6 @@ import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
-import com.github.mikesafonov.starter.smpp.config.ReceiverConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -17,6 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -40,9 +40,9 @@ public class DefaultResponseClient implements ResponseClient {
      */
     private final SmppClient client;
     /**
-     * Scheduled reconnection timer
+     * Scheduled reconnection scheduledExecutorService
      */
-    private ScheduledExecutorService timer;
+    private ScheduledExecutorService scheduledExecutorService;
     /**
      * ScheduledFuture for {@link ResponseClientRebindTask}.
      */
@@ -93,7 +93,7 @@ public class DefaultResponseClient implements ResponseClient {
         this.sessionHandler = sessionHandler;
         bind();
         if (session == null) {
-            throw new ResponseClientBindException(String.format("Unable to bind with configuration: %s ", sessionConfiguration.configInformation()));
+            throw new ResponseClientBindException(format("Unable to bind with configuration: %s ", sessionConfiguration.configInformation()));
         }
         setupRebindTask();
     }
@@ -109,14 +109,14 @@ public class DefaultResponseClient implements ResponseClient {
 
     /**
      * Destroying {@link DefaultResponseClient}. Closing session by {@link #closeSession()},
-     * destroying smpp client and shutdown {@link #timer}
+     * destroying smpp client and shutdown {@link #scheduledExecutorService}
      */
     @Override
     public void destroyClient() {
-        closeSession();
         interruptIfNotNull();
+        scheduledExecutorService.shutdown();
+        closeSession();
         client.destroy();
-        timer.shutdown();
     }
 
     @Override
@@ -155,11 +155,11 @@ public class DefaultResponseClient implements ResponseClient {
      * @see Executors#newSingleThreadScheduledExecutor()
      */
     private void setupRebindTask() {
-        if (timer == null) {
-            timer = Executors.newSingleThreadScheduledExecutor();
+        if (scheduledExecutorService == null) {
+            scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         }
         interruptIfNotNull();
-        rebindTask = timer.scheduleAtFixedRate(new ResponseClientRebindTask(this),
+        rebindTask = scheduledExecutorService.scheduleAtFixedRate(new ResponseClientRebindTask(this),
                 5, rebindPeriod, TimeUnit.SECONDS);
     }
 
