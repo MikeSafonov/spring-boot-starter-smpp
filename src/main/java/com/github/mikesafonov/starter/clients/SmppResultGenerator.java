@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * Implementations of this intreface is used by mock {@link MockSenderClient} or test {@link TestSenderClient} sender
+ * Implementations of this interface is used by mock {@link MockSenderClient} or test {@link TestSenderClient}
  * clients to generate request answer {@link MessageResponse}
  *
  * @author Mike Safonov
