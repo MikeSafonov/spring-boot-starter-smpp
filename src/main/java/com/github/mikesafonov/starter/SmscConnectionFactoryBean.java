@@ -4,8 +4,8 @@ import com.github.mikesafonov.starter.clients.SmppResultGenerator;
 import com.github.mikesafonov.starter.smpp.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.starter.smpp.reciever.ResponseClient;
 import com.github.mikesafonov.starter.smpp.reciever.ResponseSmppSessionHandler;
-import com.github.mikesafonov.starter.smpp.sender.MessageBuilder;
 import com.github.mikesafonov.starter.smpp.sender.SenderClient;
+import com.github.mikesafonov.starter.smpp.sender.TypeOfAddressParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -20,8 +20,8 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
 
     private final SmppProperties smppProperties;
     private final SmppResultGenerator smppResultGenerator;
-    private final MessageBuilder messageBuilder;
     private final DeliveryReportConsumer deliveryReportConsumer;
+    private final TypeOfAddressParser typeOfAddressParser;
 
 
     @Override
@@ -37,13 +37,14 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
                     break;
                 }
                 case TEST: {
-                    SenderClient senderClient = ClientFactory.testSender(name, smppResultGenerator, smsc, messageBuilder);
+                    SenderClient senderClient = ClientFactory.defaultSender(name, smsc, typeOfAddressParser);
+                    SenderClient testSenderClient = ClientFactory.testSender(senderClient, smppResultGenerator, smsc);
                     ResponseClient responseClient = ClientFactory.defaultResponse(name, smsc);
                     setupClients(senderClient, responseClient);
-                    smscConnections.add(new SmscConnection(name, responseClient, senderClient));
+                    smscConnections.add(new SmscConnection(name, responseClient, testSenderClient));
                 }
                 case STANDARD: {
-                    SenderClient senderClient = ClientFactory.defaultSender(name, smsc, messageBuilder);
+                    SenderClient senderClient = ClientFactory.defaultSender(name, smsc, typeOfAddressParser);
                     ResponseClient responseClient = ClientFactory.defaultResponse(name, smsc);
                     setupClients(senderClient, responseClient);
                     smscConnections.add(new SmscConnection(name, responseClient, senderClient));
@@ -54,7 +55,7 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
         return smscConnections;
     }
 
-    private void setupClients(SenderClient senderClient, ResponseClient responseClient){
+    private void setupClients(SenderClient senderClient, ResponseClient responseClient) {
         senderClient.setup();
         ResponseSmppSessionHandler responseSmppSessionHandler = new ResponseSmppSessionHandler(responseClient, deliveryReportConsumer);
         responseClient.setup(responseSmppSessionHandler);
@@ -67,6 +68,6 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
 
     @Override
     public boolean isSingleton() {
-        return false;
+        return true;
     }
 }

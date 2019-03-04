@@ -1,8 +1,11 @@
 package com.github.mikesafonov.starter;
 
 import com.github.mikesafonov.starter.clients.AlwaysSuccessSmppResultGenerator;
+import com.github.mikesafonov.starter.clients.NullDeliveryReportConsumer;
 import com.github.mikesafonov.starter.clients.SmppResultGenerator;
-import com.github.mikesafonov.starter.smpp.sender.*;
+import com.github.mikesafonov.starter.smpp.reciever.DeliveryReportConsumer;
+import com.github.mikesafonov.starter.smpp.sender.DefaultTypeOfAddressParser;
+import com.github.mikesafonov.starter.smpp.sender.TypeOfAddressParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,23 +28,21 @@ public class SmppAutoConfiguration {
     }
 
     @Bean
-    public SmscConnectionFactoryBean senderClientFactoryBean(SmppProperties smppProperties){
-        return new SmscConnectionFactoryBean(smppProperties);
+    @ConditionalOnMissingBean(DeliveryReportConsumer.class)
+    public DeliveryReportConsumer nullDeliveryReportConsumer() {
+        return new NullDeliveryReportConsumer();
+    }
+
+    @Bean
+    public SmscConnectionFactoryBean senderClientFactoryBean(SmppProperties smppProperties, SmppResultGenerator smppResultGenerator,
+                                                             TypeOfAddressParser typeOfAddressParser,
+                                                             DeliveryReportConsumer deliveryReportConsumer) {
+        return new SmscConnectionFactoryBean(smppProperties, smppResultGenerator, deliveryReportConsumer, typeOfAddressParser);
     }
 
     @Bean
     @ConditionalOnMissingBean(SmppResultGenerator.class)
     public SmppResultGenerator alwaysSuccessSmppResultGenerator() {
         return new AlwaysSuccessSmppResultGenerator();
-    }
-
-    @Bean
-    public AddressBuilder addressBuilder(TypeOfAddressParser typeOfAddressParser) {
-        return new AddressBuilder(typeOfAddressParser);
-    }
-
-    @Bean
-    public MessageBuilder messageBuilder(AddressBuilder addressBuilder) {
-        return new MessageBuilder(addressBuilder);
     }
 }
