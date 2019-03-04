@@ -2,6 +2,7 @@ plugins {
     id "idea"
     id "java"
     id "io.spring.dependency-management" version "1.0.7.RELEASE"
+    id "com.gradle.build-scan" version "2.2"
 }
 
 apply plugin: 'java-library'
@@ -47,4 +48,11 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+buildScan {
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
+
+    publishAlways()
 }
