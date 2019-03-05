@@ -14,18 +14,18 @@ import javax.validation.constraints.NotNull;
  */
 public class ReceiverConfiguration extends SmppSessionConfiguration {
 
-    public ReceiverConfiguration(@NotNull String name, @NotNull SmppProperties.SMSC smsc) {
+    public ReceiverConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials, boolean loggingBytes, boolean loggingPdu) {
         super();
 
         setType(SmppBindType.RECEIVER);
-        setHost(smsc.getHost());
         setName(name);
-        setPort(smsc.getPort());
-        setSystemId(smsc.getUsername());
-        setPassword(smsc.getPassword());
+        setHost(credentials.getHost());
+        setPort(credentials.getPort());
+        setSystemId(credentials.getUsername());
+        setPassword(credentials.getPassword());
         LoggingOptions loggingOptions = new LoggingOptions();
-        loggingOptions.setLogBytes(smsc.isLoggingBytes());
-        loggingOptions.setLogPdu(smsc.isLoggingPdu());
+        loggingOptions.setLogBytes(loggingBytes);
+        loggingOptions.setLogPdu(loggingPdu);
         setLoggingOptions(loggingOptions);
 
     }

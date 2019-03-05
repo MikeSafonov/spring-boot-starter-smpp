@@ -43,6 +43,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testCompile("org.junit.jupiter:junit-jupiter:5.4.0")
+    testCompile("com.devskiller:jfairy:0.6.2")
     testCompile('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit', module: 'junit'
     }

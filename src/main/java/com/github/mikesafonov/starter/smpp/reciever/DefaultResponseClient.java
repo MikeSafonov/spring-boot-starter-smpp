@@ -58,7 +58,6 @@ public class DefaultResponseClient implements ResponseClient {
 
     private volatile boolean inProcess = false;
     private boolean inited = false;
-    private final String id;
 
     /**
      * Create {@link DefaultResponseClient} with {@link DefaultSmppClient}.
@@ -70,7 +69,6 @@ public class DefaultResponseClient implements ResponseClient {
         client = new DefaultSmppClient();
         this.sessionConfiguration = requireNonNull(receiverConfiguration);
         this.rebindPeriod = rebindPeriod;
-        this.id = receiverConfiguration.getName();
     }
 
     /**
@@ -85,7 +83,7 @@ public class DefaultResponseClient implements ResponseClient {
 
     @Override
     public @NotNull String getId() {
-        return id;
+        return sessionConfiguration.getName();
     }
 
     @Override

@@ -14,19 +14,21 @@ import javax.validation.constraints.NotNull;
  */
 public class TransmitterConfiguration extends SmppSessionConfiguration {
 
-    public TransmitterConfiguration(@NotNull String name, @NotNull SmppProperties.SMSC smsc) {
+    public TransmitterConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials, boolean loggingBytes,
+                                    boolean loggingPdu, int windowsSize) {
         super();
 
         setType(SmppBindType.TRANSMITTER);
-        setHost(smsc.getHost());
         setName(name);
-        setPort(smsc.getPort());
-        setSystemId(smsc.getUsername());
-        setPassword(smsc.getPassword());
-        setWindowSize(smsc.getWindowSize());
+        setHost(credentials.getHost());
+        setPort(credentials.getPort());
+        setSystemId(credentials.getUsername());
+        setPassword(credentials.getPassword());
+        setWindowSize(windowsSize);
+
         LoggingOptions loggingOptions = new LoggingOptions();
-        loggingOptions.setLogBytes(smsc.isLoggingBytes());
-        loggingOptions.setLogPdu(smsc.isLoggingPdu());
+        loggingOptions.setLogBytes(loggingBytes);
+        loggingOptions.setLogPdu(loggingPdu);
         setLoggingOptions(loggingOptions);
     }
 

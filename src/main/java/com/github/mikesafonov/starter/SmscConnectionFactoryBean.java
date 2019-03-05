@@ -25,9 +25,10 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
 
 
     @Override
-    public List<SmscConnection> getObject() throws Exception {
+    public List<SmscConnection> getObject() {
 
         List<SmscConnection> smscConnections = new ArrayList<>();
+        SmppProperties.Defaults defaults = smppProperties.getDefaults();
         smppProperties.getConnections().forEach((name, smsc) -> {
             StarterMode starterMode = smsc.getStarterMode();
 
@@ -37,15 +38,15 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
                     break;
                 }
                 case TEST: {
-                    SenderClient senderClient = ClientFactory.defaultSender(name, smsc, typeOfAddressParser);
-                    SenderClient testSenderClient = ClientFactory.testSender(senderClient, smppResultGenerator, smsc);
-                    ResponseClient responseClient = ClientFactory.defaultResponse(name, smsc);
+                    SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
+                    SenderClient testSenderClient = ClientFactory.testSender(senderClient, defaults, smppResultGenerator, smsc);
+                    ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
                     setupClients(senderClient, responseClient);
                     smscConnections.add(new SmscConnection(name, responseClient, testSenderClient));
                 }
                 case STANDARD: {
-                    SenderClient senderClient = ClientFactory.defaultSender(name, smsc, typeOfAddressParser);
-                    ResponseClient responseClient = ClientFactory.defaultResponse(name, smsc);
+                    SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
+                    ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
                     setupClients(senderClient, responseClient);
                     smscConnections.add(new SmscConnection(name, responseClient, senderClient));
                 }

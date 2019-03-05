@@ -61,7 +61,6 @@ public class DefaultSenderClient implements SenderClient {
      * SMPP session.
      */
     private SmppSession session;
-    private final String id;
 
 
     protected DefaultSenderClient(@NotNull TransmitterConfiguration configuration, int maxTryCount,
@@ -72,7 +71,6 @@ public class DefaultSenderClient implements SenderClient {
         this.ucs2Only = ucs2Only;
         this.messageBuilder = new MessageBuilder(typeOfAddressParser);
         this.timeoutMillis = timeoutMillis;
-        this.id = configuration.getName();
     }
 
 
@@ -82,7 +80,7 @@ public class DefaultSenderClient implements SenderClient {
 
     @Override
     public @NotNull String getId() {
-        return id;
+        return sessionConfig.getName();
     }
 
     /**

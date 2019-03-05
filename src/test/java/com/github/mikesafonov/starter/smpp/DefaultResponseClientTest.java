@@ -5,6 +5,7 @@ import com.github.mikesafonov.starter.smpp.reciever.DefaultResponseClient;
 import com.github.mikesafonov.starter.smpp.reciever.ReceiverConfiguration;
 import org.junit.jupiter.api.Test;
 
+import static com.github.mikesafonov.starter.smpp.util.Randomizer.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -18,16 +19,21 @@ class DefaultResponseClientTest {
     }
 
     @Test
-    void shouldContainExpectedId(){
+    void shouldContainExpectedId() {
+        SmppProperties.Credentials credentials = new SmppProperties.Credentials();
+        credentials.setHost(randomIp());
+        credentials.setPort(randomPort());
+        credentials.setUsername(randomString());
+        credentials.setPassword(randomString());
+
         SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setHost("<host>");
-        smsc.setPort(1111);
-        smsc.setUsername("<username>");
-        smsc.setPassword("<password>");
+        smsc.setCredentials(credentials);
+        smsc.setLoggingBytes(false);
+        smsc.setLoggingPdu(false);
 
-        ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration("res", smsc);
+        ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(randomString(), smsc.getCredentials(), smsc.getLoggingBytes(), smsc.getLoggingPdu());
 
-        DefaultResponseClient responseClient = DefaultResponseClient.of(receiverConfiguration, 1000);
+        DefaultResponseClient responseClient = DefaultResponseClient.of(receiverConfiguration, randomInt());
 
         assertEquals(receiverConfiguration.getName(), responseClient.getId());
     }
