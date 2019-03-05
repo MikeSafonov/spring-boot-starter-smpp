@@ -2,7 +2,6 @@ package com.github.mikesafonov.starter.smpp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -44,7 +43,7 @@ public class Message {
     private MessageType messageType;
 
     public boolean isSilent() {
-        return messageType == MessageType.DATAGRAM;
+        return messageType == MessageType.SILENT;
     }
 
     public boolean isDatagram() {

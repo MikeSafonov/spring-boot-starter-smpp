@@ -27,7 +27,7 @@ public class ClientFactory {
                                           @NotNull SmppProperties.SMSC smsc, @NotNull TypeOfAddressParser typeOfAddressParser) {
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc);
         SenderClient senderClient = DefaultSenderClient.of(transmitterConfiguration, smsc.getMaxTry(),
-                smsc.isUcs2Only(), smsc.getRequestTimeout().toMillis(), typeOfAddressParser, name);
+                smsc.isUcs2Only(), smsc.getRequestTimeout().toMillis(), typeOfAddressParser);
         return new TestSenderClient(senderClient, Arrays.asList(smsc.getAllowedPhones()), smppResultGenerator);
     }
 
@@ -40,11 +40,11 @@ public class ClientFactory {
                                              @NotNull TypeOfAddressParser typeOfAddressParser) {
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc);
         return DefaultSenderClient.of(transmitterConfiguration, smsc.getMaxTry(),
-                smsc.isUcs2Only(), smsc.getRequestTimeout().toMillis(), typeOfAddressParser, name);
+                smsc.isUcs2Only(), smsc.getRequestTimeout().toMillis(), typeOfAddressParser);
     }
 
     public static ResponseClient defaultResponse(@NotBlank String name, @NotNull SmppProperties.SMSC smsc) {
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc);
-        return DefaultResponseClient.of(receiverConfiguration, smsc.getRebindPeriod().getSeconds(), name);
+        return DefaultResponseClient.of(receiverConfiguration, smsc.getRebindPeriod().getSeconds());
     }
 }

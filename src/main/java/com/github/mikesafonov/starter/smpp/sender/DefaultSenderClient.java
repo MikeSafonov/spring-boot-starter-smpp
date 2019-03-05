@@ -56,6 +56,7 @@ public class DefaultSenderClient implements SenderClient {
      */
     private final MessageBuilder messageBuilder;
     private final boolean ucs2Only;
+    private boolean inited = false;
     /**
      * SMPP session.
      */
@@ -64,20 +65,19 @@ public class DefaultSenderClient implements SenderClient {
 
 
     protected DefaultSenderClient(@NotNull TransmitterConfiguration configuration, int maxTryCount,
-                                  boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser, @NotNull String id) {
+                                  boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser) {
         client = new DefaultSmppClient();
         sessionConfig = requireNonNull(configuration);
         this.maxTryCount = maxTryCount;
         this.ucs2Only = ucs2Only;
         this.messageBuilder = new MessageBuilder(typeOfAddressParser);
         this.timeoutMillis = timeoutMillis;
-        this.id = requireNonNull(id);
+        this.id = configuration.getName();
     }
 
 
-
-    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser, @NotNull String id) {
-        return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, typeOfAddressParser, id);
+    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser) {
+        return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, typeOfAddressParser);
     }
 
     @Override
@@ -92,11 +92,14 @@ public class DefaultSenderClient implements SenderClient {
      * @see #checkSession()
      */
     public void setup() throws SenderClientBindException {
-        try {
-            checkSession();
-        } catch (SmppSessionException e) {
-            log.error(e.getErrorMessage(), e);
-            throw new SenderClientBindException(format("Unable to bind with configuration: %s ", sessionConfig.configInformation()));
+        if (!inited) {
+            try {
+                checkSession();
+            } catch (SmppSessionException e) {
+                log.error(e.getErrorMessage(), e);
+                throw new SenderClientBindException(format("Unable to bind with configuration: %s ", sessionConfig.configInformation()));
+            }
+            inited = true;
         }
     }
 

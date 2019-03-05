@@ -57,6 +57,7 @@ public class DefaultResponseClient implements ResponseClient {
     private SmppSession session;
 
     private volatile boolean inProcess = false;
+    private boolean inited = false;
     private final String id;
 
     /**
@@ -65,11 +66,11 @@ public class DefaultResponseClient implements ResponseClient {
      * @param receiverConfiguration smpp receiver configuration
      * @param rebindPeriod          reconnection period in seconds
      */
-    protected DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod, @NotNull String id) {
+    protected DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
         client = new DefaultSmppClient();
         this.sessionConfiguration = requireNonNull(receiverConfiguration);
         this.rebindPeriod = rebindPeriod;
-        this.id = requireNonNull(id);
+        this.id = receiverConfiguration.getName();
     }
 
     /**
@@ -77,10 +78,9 @@ public class DefaultResponseClient implements ResponseClient {
      *
      * @param receiverConfiguration smpp receiver configuration
      * @param rebindPeriod          reconnection period in seconds
-     * @param id client id
      */
-    public static DefaultResponseClient of(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod, @NotNull String id) {
-        return new DefaultResponseClient(receiverConfiguration, rebindPeriod, id);
+    public static DefaultResponseClient of(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
+        return new DefaultResponseClient(receiverConfiguration, rebindPeriod);
     }
 
     @Override
@@ -90,12 +90,15 @@ public class DefaultResponseClient implements ResponseClient {
 
     @Override
     public void setup(ResponseSmppSessionHandler sessionHandler) throws ResponseClientBindException {
-        this.sessionHandler = sessionHandler;
-        bind();
-        if (session == null) {
-            throw new ResponseClientBindException(format("Unable to bind with configuration: %s ", sessionConfiguration.configInformation()));
+        if (!inited) {
+            this.sessionHandler = sessionHandler;
+            bind();
+            if (session == null) {
+                throw new ResponseClientBindException(format("Unable to bind with configuration: %s ", sessionConfiguration.configInformation()));
+            }
+            setupRebindTask();
+            inited = true;
         }
-        setupRebindTask();
     }
 
     /**

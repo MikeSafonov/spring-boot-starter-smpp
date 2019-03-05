@@ -1,16 +1,12 @@
 package com.github.mikesafonov.starter.smpp.utils;
 
 import com.cloudhopper.commons.charset.Charset;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 /**
  * @author Mike Safonov
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 public class CountWithEncoding {
     private int count;
     private Charset charset;

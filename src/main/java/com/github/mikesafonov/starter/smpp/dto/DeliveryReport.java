@@ -2,19 +2,19 @@ package com.github.mikesafonov.starter.smpp.dto;
 
 import com.cloudhopper.smpp.util.DeliveryReceipt;
 import lombok.Data;
-import lombok.ToString;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
+
+import static com.github.mikesafonov.starter.smpp.utils.JodaJavaConverter.convert;
 
 /**
  * @author Mike Safonov
  */
 @Data
-@ToString
 public class DeliveryReport {
 
     private String messageId;
-    private LocalDate deliveryDate;
+    private ZonedDateTime deliveryDate;
     private int deliveryCount;
     private int submitCount;
     private int error;
@@ -27,14 +27,7 @@ public class DeliveryReport {
         deliveryReport.setError(deliveryReceipt.getErrorCode());
         deliveryReport.setState(deliveryReceipt.getState());
         deliveryReport.setSubmitCount(deliveryReceipt.getSubmitCount());
-        deliveryReport.setDeliveryDate(jodaToJava8(deliveryReceipt.getDoneDate().toLocalDate()));
+        deliveryReport.setDeliveryDate(convert(deliveryReceipt.getDoneDate()));
         return deliveryReport;
     }
-
-    private static LocalDate jodaToJava8(org.joda.time.LocalDate joda) {
-        return LocalDate.of(joda.getYear(), joda.getMonthOfYear(), joda.getDayOfMonth());
-    }
-
-
-
 }

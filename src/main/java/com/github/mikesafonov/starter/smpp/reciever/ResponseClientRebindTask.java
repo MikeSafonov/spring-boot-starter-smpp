@@ -9,11 +9,11 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Mike Safonov
  */
-class ResponseClientRebindTask implements Runnable {
+public class ResponseClientRebindTask implements Runnable {
 
     private final ResponseClient client;
 
-    ResponseClientRebindTask(@NotNull ResponseClient client) {
+    public ResponseClientRebindTask(@NotNull ResponseClient client) {
         this.client = requireNonNull(client);
     }
 
