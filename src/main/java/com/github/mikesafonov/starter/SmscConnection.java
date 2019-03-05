@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Value;
 
 /**
+ * This class represent configured smsc connection with {@link SenderClient} and {@link ResponseClient} (optionally)
+ *
  * @author Mike Safonov
  */
 @Value

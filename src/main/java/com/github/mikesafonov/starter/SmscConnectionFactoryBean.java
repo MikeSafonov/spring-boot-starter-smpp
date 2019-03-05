@@ -1,5 +1,6 @@
 package com.github.mikesafonov.starter;
 
+import com.github.mikesafonov.starter.clients.ClientFactory;
 import com.github.mikesafonov.starter.clients.SmppResultGenerator;
 import com.github.mikesafonov.starter.smpp.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.starter.smpp.reciever.ResponseClient;
@@ -30,9 +31,9 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
         List<SmscConnection> smscConnections = new ArrayList<>();
         SmppProperties.Defaults defaults = smppProperties.getDefaults();
         smppProperties.getConnections().forEach((name, smsc) -> {
-            StarterMode starterMode = smsc.getStarterMode();
+            ConnectionMode connectionMode = smsc.getConnectionMode();
 
-            switch (starterMode) {
+            switch (connectionMode) {
                 case MOCK: {
                     smscConnections.add(new SmscConnection(name, ClientFactory.mockSender(name, smppResultGenerator)));
                     break;

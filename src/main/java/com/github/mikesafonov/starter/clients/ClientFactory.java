@@ -1,8 +1,6 @@
-package com.github.mikesafonov.starter;
+package com.github.mikesafonov.starter.clients;
 
-import com.github.mikesafonov.starter.clients.MockSenderClient;
-import com.github.mikesafonov.starter.clients.SmppResultGenerator;
-import com.github.mikesafonov.starter.clients.TestSenderClient;
+import com.github.mikesafonov.starter.SmppProperties;
 import com.github.mikesafonov.starter.smpp.reciever.DefaultResponseClient;
 import com.github.mikesafonov.starter.smpp.reciever.ReceiverConfiguration;
 import com.github.mikesafonov.starter.smpp.reciever.ResponseClient;
@@ -17,20 +15,15 @@ import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Helper class for building {@link SenderClient} and {@link ResponseClient}
+ */
 @UtilityClass
 public class ClientFactory {
 
     public static SenderClient mockSender(@NotBlank String name, @NotNull SmppResultGenerator smppResultGenerator) {
         return new MockSenderClient(smppResultGenerator, name);
     }
-
-//    public static SenderClient testSender(@NotBlank String name, @NotNull SmppResultGenerator smppResultGenerator,
-//                                          @NotNull SmppProperties.SMSC smsc, @NotNull TypeOfAddressParser typeOfAddressParser) {
-//        TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc);
-//        SenderClient senderClient = DefaultSenderClient.of(transmitterConfiguration, smsc.getMaxTry(),
-//                smsc.isUcs2Only(), smsc.getRequestTimeout().toMillis(), typeOfAddressParser);
-//        return new TestSenderClient(senderClient, Arrays.asList(smsc.getAllowedPhones()), smppResultGenerator);
-//    }
 
     public static SenderClient testSender(@NotNull SenderClient senderClient, @NotNull SmppProperties.Defaults defaults,
                                           @NotNull SmppResultGenerator smppResultGenerator,
@@ -41,21 +34,30 @@ public class ClientFactory {
 
     public static SenderClient defaultSender(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc,
                                              @NotNull TypeOfAddressParser typeOfAddressParser) {
-        boolean loggingBytes = (smsc.getLoggingBytes() == null) ? defaults.isLoggingBytes() : smsc.getLoggingBytes();
-        boolean loggingPdu = (smsc.getLoggingPdu() == null) ? defaults.isLoggingPdu() : smsc.getLoggingPdu();
-        int windowsSize = (smsc.getWindowSize() == null) ? defaults.getWindowSize() : smsc.getWindowSize();
-        boolean ucs2Only = (smsc.getUcs2Only() == null) ? defaults.isUcs2Only() : smsc.getUcs2Only();
-        long requestTimeout = (smsc.getRequestTimeout() == null) ? defaults.getRequestTimeout().toMillis() : smsc.getRequestTimeout().toMillis();
+        boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
+        boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
+        int windowsSize = getOrDefault(smsc.getWindowSize(), defaults.getWindowSize());
+        boolean ucs2Only = getOrDefault(smsc.getUcs2Only(), defaults.isUcs2Only());
+        long requestTimeout = getOrDefault(smsc.getRequestTimeout(), defaults.getRequestTimeout()).toMillis();
+
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
         return DefaultSenderClient.of(transmitterConfiguration, smsc.getMaxTry(),
                 ucs2Only, requestTimeout, typeOfAddressParser);
     }
 
     public static ResponseClient defaultResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc) {
-        boolean loggingBytes = (smsc.getLoggingBytes() == null) ? defaults.isLoggingBytes() : smsc.getLoggingBytes();
-        boolean loggingPdu = (smsc.getLoggingPdu() == null) ? defaults.isLoggingPdu() : smsc.getLoggingPdu();
-        long rebindPeriod = (smsc.getRebindPeriod() == null) ? defaults.getRebindPeriod().getSeconds() : smsc.getRebindPeriod().getSeconds();
+        boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
+        boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
+        long rebindPeriod = getOrDefault(smsc.getRebindPeriod(), defaults.getRebindPeriod()).getSeconds();
+
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu);
         return DefaultResponseClient.of(receiverConfiguration, rebindPeriod);
+    }
+
+    public <T> T getOrDefault(T obj, T defaultObj) {
+        if (obj == null) {
+            return defaultObj;
+        }
+        return obj;
     }
 }

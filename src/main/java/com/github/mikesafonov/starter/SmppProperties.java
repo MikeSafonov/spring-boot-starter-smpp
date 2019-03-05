@@ -33,7 +33,7 @@ public class SmppProperties {
         /**
          * Mode of client
          */
-        private StarterMode starterMode = StarterMode.STANDARD;
+        private ConnectionMode connectionMode = ConnectionMode.STANDARD;
         /**
          * Smpp connection window size
          */
@@ -56,7 +56,7 @@ public class SmppProperties {
          */
         private Duration requestTimeout = Duration.ofSeconds(5);
         /**
-         * Array of phones to send. Using only if {@link #starterMode} is {@link StarterMode#TEST}
+         * Array of phones to send. Using only if {@link #connectionMode} is {@link ConnectionMode#TEST}
          */
         private String[] allowedPhones = new String[0];
     }
@@ -102,7 +102,7 @@ public class SmppProperties {
         /**
          * Mode of client
          */
-        private StarterMode starterMode;
+        private ConnectionMode connectionMode;
         /**
          * Smpp connection window size
          */
@@ -125,7 +125,7 @@ public class SmppProperties {
          */
         private Duration requestTimeout;
         /**
-         * Array of phones to send. Using only if {@link #starterMode} is {@link StarterMode#TEST}
+         * Array of phones to send. Using only if {@link #connectionMode} is {@link ConnectionMode#TEST}
          */
         private String[] allowedPhones;
     }
