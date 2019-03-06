@@ -1,5 +1,7 @@
 package com.github.mikesafonov.starter.clients;
 
+import com.github.mikesafonov.starter.smpp.dto.CancelMessage;
+import com.github.mikesafonov.starter.smpp.dto.CancelMessageResponse;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
 import com.github.mikesafonov.starter.smpp.sender.SenderClient;
@@ -15,7 +17,7 @@ import static java.util.Objects.requireNonNull;
  * Implementation of {@link SenderClient} which should be used for testing purpose. This client
  * may provide real smpp connection via incoming implementation of {@link SenderClient}. Every incoming request will be redirected to
  * real {@link #senderClient} only if list of allowed phone numbers {@link #allowedPhones} contains message destination phone.
- * Otherwise {@link MessageResponse} will be generated via {@link SmppResultGenerator}
+ * Otherwise {@link MessageResponse}/{@link CancelMessageResponse} will be generated via {@link SmppResultGenerator}
  *
  * @author Mike Safonov
  */
@@ -55,6 +57,14 @@ public class TestSenderClient implements SenderClient {
             return senderClient.send(message);
         }
         return smppResultGenerator.generate(senderClient.getId(), message);
+    }
+
+    @Override
+    public @NotNull CancelMessageResponse cancel(@NotNull CancelMessage cancelMessage) {
+        if (isAllowed(cancelMessage.getMsisdn())) {
+            return senderClient.cancel(cancelMessage);
+        }
+        return smppResultGenerator.generate(senderClient.getId(), cancelMessage);
     }
 
     private boolean isAllowed(String phone) {

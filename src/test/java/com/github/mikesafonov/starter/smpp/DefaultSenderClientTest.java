@@ -1,10 +1,7 @@
 package com.github.mikesafonov.starter.smpp;
 
 import com.github.mikesafonov.starter.SmppProperties;
-import com.github.mikesafonov.starter.smpp.dto.Message;
-import com.github.mikesafonov.starter.smpp.dto.MessageErrorInformation;
-import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
-import com.github.mikesafonov.starter.smpp.dto.MessageType;
+import com.github.mikesafonov.starter.smpp.dto.*;
 import com.github.mikesafonov.starter.smpp.sender.DefaultSenderClient;
 import com.github.mikesafonov.starter.smpp.sender.DefaultTypeOfAddressParser;
 import com.github.mikesafonov.starter.smpp.sender.SenderClient;
@@ -54,6 +51,23 @@ class DefaultSenderClientTest {
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertNull(messageResponse.getSmscMessageID());
         assertFalse(messageResponse.isSended());
+        assertEquals(messageErrorInformation, messageResponse.getMessageErrorInformation());
+    }
+
+    @Test
+    void shouldReturnErrorBecauseMessageIdIsEmpty(){
+        DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
+
+        SenderClient senderClient = DefaultSenderClient.of(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
+        CancelMessage originalMessage = new CancelMessage(null, randomString(), randomString());
+        MessageErrorInformation messageErrorInformation = new MessageErrorInformation(0, "Empty message id");
+
+        CancelMessageResponse messageResponse = senderClient.cancel(originalMessage);
+
+        assertEquals(originalMessage, messageResponse.getOriginal());
+        assertEquals(senderClient.getId(), messageResponse.getSmscId());
+        assertFalse(messageResponse.isSuccess());
         assertEquals(messageErrorInformation, messageResponse.getMessageErrorInformation());
     }
 

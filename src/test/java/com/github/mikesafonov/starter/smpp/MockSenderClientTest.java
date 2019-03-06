@@ -3,6 +3,7 @@ package com.github.mikesafonov.starter.smpp;
 import com.github.mikesafonov.starter.clients.AlwaysSuccessSmppResultGenerator;
 import com.github.mikesafonov.starter.clients.MockSenderClient;
 import com.github.mikesafonov.starter.clients.SmppResultGenerator;
+import com.github.mikesafonov.starter.smpp.dto.CancelMessage;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageType;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,18 @@ class MockSenderClientTest {
 
         Message message = new Message(randomString(), randomString(), randomString(), randomString(), MessageType.SIMPLE);
         senderClient.send(message);
+
+        verify(smppResultGenerator, times(1)).generate(id, message);
+    }
+
+    @Test
+    void shouldCallGeneratorForCancel() {
+        SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
+        String id = randomString();
+        MockSenderClient senderClient = new MockSenderClient(smppResultGenerator, id);
+
+        CancelMessage message = new CancelMessage(randomString(), randomString(), randomString());
+        senderClient.cancel(message);
 
         verify(smppResultGenerator, times(1)).generate(id, message);
     }

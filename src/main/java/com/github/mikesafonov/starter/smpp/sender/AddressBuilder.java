@@ -2,7 +2,6 @@ package com.github.mikesafonov.starter.smpp.sender;
 
 import com.cloudhopper.commons.gsm.TypeOfAddress;
 import com.cloudhopper.smpp.type.Address;
-import com.github.mikesafonov.starter.smpp.sender.exceptions.IllegalAddressException;
 
 import javax.validation.constraints.NotNull;
 
@@ -29,7 +28,7 @@ public class AddressBuilder {
      * @return source address
      */
     @NotNull
-    public Address createSourceAddress(@NotNull String source) throws IllegalAddressException {
+    public Address createSourceAddress(@NotNull String source) {
         return convertToAddress(source, addressParser.getSource(source));
     }
 

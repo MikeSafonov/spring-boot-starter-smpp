@@ -8,6 +8,7 @@ using [SMPP](https://en.wikipedia.org/wiki/Short_Message_Peer-to-Peer). [SMPP v3
 - [x] Sending message with delivery receipt 
 - [x] Sending datagram message
 - [ ] Sending silent message
+- [x] Cancel message
 - [ ] Multiply SMPP connection
 - [ ] SMPP connection load balancing
 
@@ -29,7 +30,7 @@ Spring-boot-starter-smpp comes with several implementations:
   <dd>Implementation of SenderClient which should be used for testing purpose. 
   This client may provide real smpp connection via incoming implementation of SenderClient. 
   Every incoming request will be redirected to real SenderClient only if list of allowed phone numbers contains message destination phone. 
-  Otherwise response will be generated via **SmppResultGenerator**</dd>
+  Otherwise response will be generated via SmppResultGenerator</dd>
     
   <dt>MockSenderClient</dt>
   <dd>Implementation of SenderClient which not perform any connection via smpp and only generate response by using SmppResultGenerator</dd>
@@ -38,8 +39,8 @@ Spring-boot-starter-smpp comes with several implementations:
 
 ### SmppResultGenerator
 
-Implementations of this interface is used by MockSenderClient or TestSenderClient clients to generate request response - MessageResponse. Starter
-by default use **AlwaysSuccessSmppResultGenerator** which always generate success response with random smsc message id.
+Implementations of this interface is used by MockSenderClient or TestSenderClient clients to generate request response - MessageResponse and cancel request response - CancelMessageRespons. 
+Starter by default use **AlwaysSuccessSmppResultGenerator** which always generate success response with random smsc message id.
 
 You can implement own **SmppResultGenerator** to add custom logic.
 

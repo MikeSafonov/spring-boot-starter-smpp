@@ -1,16 +1,13 @@
 package com.github.mikesafonov.starter.smpp.sender;
 
+import com.cloudhopper.commons.util.windowing.WindowFuture;
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.SmppSessionConfiguration;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
-import com.cloudhopper.smpp.pdu.EnquireLink;
-import com.cloudhopper.smpp.pdu.SubmitSm;
-import com.cloudhopper.smpp.pdu.SubmitSmResp;
-import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
-import com.github.mikesafonov.starter.smpp.dto.Message;
-import com.github.mikesafonov.starter.smpp.dto.MessageErrorInformation;
-import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
+import com.cloudhopper.smpp.pdu.*;
+import com.cloudhopper.smpp.type.*;
+import com.github.mikesafonov.starter.smpp.dto.*;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.IllegalAddressException;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.SenderClientBindException;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.SmppException;
@@ -102,16 +99,16 @@ public class DefaultSenderClient implements SenderClient {
     }
 
     /**
-     * Отправка сообщения с отчетом о доставке
+     * Sending message via smpp protocol
      *
-     * @param message сообщение
-     * @return результат сообщения
+     * @param message incoming message
+     * @return message response
      */
     @NotNull
     @Override
     public MessageResponse send(@NotNull Message message) {
 
-        if (message.getText() == null || message.getText().isEmpty()) {
+        if (message == null || isNullOrEmpty(message.getText())) {
             return MessageResponse.error(message, getId(), new MessageErrorInformation(0, "Empty message text"));
         }
 
@@ -130,6 +127,48 @@ public class DefaultSenderClient implements SenderClient {
                     e.getErrorMessage()));
         }
     }
+
+    /**
+     * Cancel smsc message
+     *
+     * @param cancelMessage message to cancel
+     * @return cancel response
+     */
+    @Override
+    public @NotNull CancelMessageResponse cancel(@NotNull CancelMessage cancelMessage) {
+
+        if (cancelMessage == null || isNullOrEmpty(cancelMessage.getMessageId())) {
+            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(0, "Empty message id"));
+        }
+
+        try {
+            CancelSm cancelSm = messageBuilder.createCancelSm(cancelMessage);
+            WindowFuture<Integer, PduRequest, PduResponse> futureResponse = session.sendRequestPdu(cancelSm, timeoutMillis, true);
+            if (futureResponse.await()) {
+                if (futureResponse.isDone() && futureResponse.isSuccess()) {
+                    CancelSmResp cancelSmResp = (CancelSmResp) futureResponse.getResponse();
+                    if (cancelSmResp.getCommandStatus() == SmppConstants.STATUS_OK) {
+                        return CancelMessageResponse.success(cancelMessage, getId());
+                    } else {
+                        return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM,
+                                cancelSmResp.getResultMessage()));
+                    }
+                }
+            }
+            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM, "Unable to get response"));
+        } catch (RecoverablePduException | UnrecoverablePduException | SmppTimeoutException | SmppChannelException | InterruptedException e) {
+            log.error(e.getMessage(), e);
+            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM, e.getMessage()));
+        } catch (Exception e){
+            log.error(e.getMessage(), e);
+            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_SENDING_ERROR, "Unexpected exception"));
+        }
+    }
+
+    private boolean isNullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
 
     /**
      * Sending {@link SubmitSm} command via smpp. First of all checking session state, if session is

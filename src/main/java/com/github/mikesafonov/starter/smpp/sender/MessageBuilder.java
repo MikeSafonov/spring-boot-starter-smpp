@@ -3,10 +3,12 @@ package com.github.mikesafonov.starter.smpp.sender;
 import com.cloudhopper.commons.charset.Charset;
 import com.cloudhopper.commons.charset.CharsetUtil;
 import com.cloudhopper.smpp.SmppConstants;
+import com.cloudhopper.smpp.pdu.CancelSm;
 import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.tlv.Tlv;
 import com.cloudhopper.smpp.type.Address;
 import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
+import com.github.mikesafonov.starter.smpp.dto.CancelMessage;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageType;
 import com.github.mikesafonov.starter.smpp.sender.exceptions.IllegalAddressException;
@@ -51,6 +53,24 @@ public class MessageBuilder {
         }
 
         return submitSm;
+    }
+
+    /**
+     * Builds {@link CancelSm} for canceling sms message
+     *
+     * @param cancelMessage cancel message
+     * @return request {@link CancelSm}
+     * @throws IllegalAddressException if source/destination address not created
+     */
+    public CancelSm createCancelSm(CancelMessage cancelMessage) throws IllegalAddressException {
+        Address sourceAddress = addressBuilder.createSourceAddress(cancelMessage.getSource());
+        Address destAddress = addressBuilder.createDestAddress(cancelMessage.getMsisdn());
+
+        CancelSm cancelSm = new CancelSm();
+        cancelSm.setSourceAddress(sourceAddress);
+        cancelSm.setDestAddress(destAddress);
+        cancelSm.setMessageId(cancelMessage.getMessageId());
+        return cancelSm;
     }
 
     private byte getEsmClass(MessageType messageType) {

@@ -24,7 +24,7 @@ public class MessageResponse {
     private String smscId;
 
     /**
-     * Id of smsc. May be null if {@link #sended} false or if {@link #original} is datagram message
+     * Id of smsc message. May be null if {@link #sended} false or if {@link #original} is datagram message
      */
     private String smscMessageID;
 

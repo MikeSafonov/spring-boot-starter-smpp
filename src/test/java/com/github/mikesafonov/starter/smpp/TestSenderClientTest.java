@@ -3,6 +3,7 @@ package com.github.mikesafonov.starter.smpp;
 import com.github.mikesafonov.starter.clients.AlwaysSuccessSmppResultGenerator;
 import com.github.mikesafonov.starter.clients.SmppResultGenerator;
 import com.github.mikesafonov.starter.clients.TestSenderClient;
+import com.github.mikesafonov.starter.smpp.dto.CancelMessage;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageType;
 import com.github.mikesafonov.starter.smpp.sender.SenderClient;
@@ -73,5 +74,40 @@ class TestSenderClientTest {
 
         verify(smppResultGenerator, times(0)).generate(id, message);
         verify(senderClient, times(1)).send(message);
+    }
+
+    @Test
+    void shouldGenerateResponseForCancel() {
+        SenderClient senderClient = mock(SenderClient.class);
+        List<String> allowedPhones = asList(randomString());
+        SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
+        TestSenderClient testSenderClient = new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
+
+        String id = randomString();
+        when(senderClient.getId()).thenReturn(id);
+
+        CancelMessage message = new CancelMessage(randomString(),  randomString(), randomString());
+        testSenderClient.cancel(message);
+
+        verify(smppResultGenerator, times(1)).generate(id, message);
+        verify(senderClient, times(0)).cancel(message);
+    }
+
+    @Test
+    void shouldCallSenderClientForCancel() {
+        SenderClient senderClient = mock(SenderClient.class);
+        String destinationPhone = randomString();
+        List<String> allowedPhones = asList(destinationPhone);
+        SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
+        TestSenderClient testSenderClient = new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
+
+        String id = randomString();
+        when(senderClient.getId()).thenReturn(id);
+
+        CancelMessage message = new CancelMessage(randomString(),  randomString(), destinationPhone);
+        testSenderClient.cancel(message);
+
+        verify(smppResultGenerator, times(0)).generate(id, message);
+        verify(senderClient, times(1)).cancel(message);
     }
 }
