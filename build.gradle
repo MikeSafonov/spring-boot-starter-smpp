@@ -43,6 +43,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.4")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+    testCompileOnly("org.projectlombok:lombok:1.18.4")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.4")
     testCompile("org.junit.jupiter:junit-jupiter:5.4.0")
     testCompile("com.devskiller:jfairy:0.6.2")
