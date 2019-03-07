@@ -1,6 +1,7 @@
 plugins {
     id "idea"
     id "java"
+    id "jacoco"
     id "io.spring.dependency-management" version "1.0.7.RELEASE"
     id "com.gradle.build-scan" version "2.2"
 }
@@ -42,12 +43,29 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.4")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.4")
     testCompile("org.junit.jupiter:junit-jupiter:5.4.0")
     testCompile("com.devskiller:jfairy:0.6.2")
     testCompile('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit', module: 'junit'
     }
 }
+
+jacoco{
+    toolVersion = "0.8.3"
+}
+
+tasks.jacocoTestReport{
+    reports {
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
 
 test {
     useJUnitPlatform()
