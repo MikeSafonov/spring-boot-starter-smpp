@@ -24,14 +24,14 @@ public class MessageResponse {
     private String smscId;
 
     /**
-     * Id of smsc message. May be null if {@link #sended} false or if {@link #original} is datagram message
+     * Id of smsc message. May be null if {@link #sent} false or if {@link #original} is datagram message
      */
     private String smscMessageID;
 
     /**
      * Is message sent successfully
      */
-    private boolean sended;
+    private boolean sent;
     /**
      * Error code and message. May be null if response success
      */

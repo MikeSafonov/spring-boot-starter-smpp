@@ -21,7 +21,7 @@ class AlwaysSuccessSmppResultGeneratorTest {
         MessageResponse messageResponse = generator.generate(smscId, message);
 
         assertEquals(message, messageResponse.getOriginal());
-        assertTrue(messageResponse.isSended());
+        assertTrue(messageResponse.isSent());
         assertEquals(smscId, messageResponse.getSmscId());
         assertNotNull(messageResponse.getSmscMessageID());
         assertNull(messageResponse.getMessageErrorInformation());

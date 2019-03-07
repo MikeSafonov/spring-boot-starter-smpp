@@ -62,5 +62,15 @@ this interface by **DefaultResponseClient**. This class keeping smpp connection 
 This class dedicated to handle DeliveryReport on client side. Client may build custom logic on receiving delivery receipts by implementing this interface.
 If client doesnt provide any implementation of **DeliveryReportConsumer** then starter use **NullDeliveryReportConsumer** which ignore any delivery receipts.
 
+### SenderManager
+
+This is high level abstraction over sender clients.
+
+This starter comes with one default implementation - **StrategySenderManager**. **StrategySenderManager** holds
+list of smsc connections and return sender client based on some rules which implemented by **IndexDetectionStrategy**
+
+There are two default implementation of **IndexDetectionStrategy** - **RandomIndexDetectionStrategy**(return random sender client) and **RoundRobinIndexDetectionStrategy**
+(return sender client based on round and robbin algorithm). **RoundRobinIndexDetectionStrategy** strategy used by default.
+
 ## Configuration
 TODO

@@ -50,7 +50,7 @@ class DefaultSenderClientTest {
         assertEquals(originalMessage, messageResponse.getOriginal());
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertNull(messageResponse.getSmscMessageID());
-        assertFalse(messageResponse.isSended());
+        assertFalse(messageResponse.isSent());
         assertEquals(messageErrorInformation, messageResponse.getMessageErrorInformation());
     }
 

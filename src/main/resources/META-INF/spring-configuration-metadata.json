@@ -1,0 +1,73 @@
+{
+  "properties": [
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.ucs2Only",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Using ucs2 encoding only"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.maxTry",
+      "type": "java.lang.Integer",
+      "defaultValue": 5,
+      "description": "Number of attempts to reconnect if smpp session closed"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.connectionMode",
+      "type": "com.github.mikesafonov.starter.ConnectionMode",
+      "defaultValue": "STANDARD",
+      "description": "Connection mode of client"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.windowSize",
+      "type": "java.lang.Integer",
+      "defaultValue": 90,
+      "description": "Smpp connection window size"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.loggingPdu",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Is logging smpp pdu"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.loggingBytes",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Is logging smpp bytes"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.rebindPeriod",
+      "type": "java.time.Duration",
+      "defaultValue": "90s",
+      "description": "Connection rebind period"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.requestTimeout",
+      "type": "java.time.Duration",
+      "defaultValue": "5s",
+      "description": "Request timeout"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.defaults.allowedPhones",
+      "type": "java.lang.String[]",
+      "defaultValue": [],
+      "description": "Array of phones to send. Using only if connectionMode is TEST"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.starter.SmppProperties",
+      "name": "spring.smpp.connections",
+      "type": "java.util.Map<java.lang.String,com.github.mikesafonov.starter.SmppProperties$SMSC>",
+      "description": "Map of SMSC connections"
+    }
+  ]
+}
