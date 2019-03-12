@@ -1,5 +1,9 @@
 # spring-boot-starter-smpp
 
+![Travis-CI](https://travis-ci.com/MikeSafonov/spring-boot-starter-smpp.svg?branch=master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=alert_status)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+
+
 This Spring Boot starter can be used by any Spring Boot application that wants to send SMS messages 
 using [SMPP](https://en.wikipedia.org/wiki/Short_Message_Peer-to-Peer). [SMPP v3.4 spec](http://docs.nimta.com/SMPP_v3_4_Issue1_2.pdf)
 
