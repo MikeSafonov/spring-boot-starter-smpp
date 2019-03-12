@@ -7,12 +7,11 @@ import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.UUID;
 
 /**
  * Implementation of {@link SmppResultGenerator} which always generate success {@link MessageResponse}/{@link CancelMessageResponse} with
- * random smsc message id.
+ * random smsc message id (random UUID).
  *
  * @author Mike Safonov
  */
@@ -30,7 +29,6 @@ public class AlwaysSuccessSmppResultGenerator implements SmppResultGenerator {
 
 
     private String randomHexId() {
-        long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        return Long.toHexString(timestamp);
+        return UUID.randomUUID().toString();
     }
 }
