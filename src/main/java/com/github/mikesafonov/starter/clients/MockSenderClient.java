@@ -33,6 +33,7 @@ public class MockSenderClient implements SenderClient {
 
     @Override
     public void setup() {
+        // should be empty
     }
 
     @Override

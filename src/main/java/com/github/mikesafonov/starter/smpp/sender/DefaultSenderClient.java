@@ -144,22 +144,20 @@ public class DefaultSenderClient implements SenderClient {
         try {
             CancelSm cancelSm = messageBuilder.createCancelSm(cancelMessage);
             WindowFuture<Integer, PduRequest, PduResponse> futureResponse = session.sendRequestPdu(cancelSm, timeoutMillis, true);
-            if (futureResponse.await()) {
-                if (futureResponse.isDone() && futureResponse.isSuccess()) {
-                    CancelSmResp cancelSmResp = (CancelSmResp) futureResponse.getResponse();
-                    if (cancelSmResp.getCommandStatus() == SmppConstants.STATUS_OK) {
-                        return CancelMessageResponse.success(cancelMessage, getId());
-                    } else {
-                        return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM,
-                                cancelSmResp.getResultMessage()));
-                    }
+            if (futureResponse.await() && futureResponse.isDone() && futureResponse.isSuccess()) {
+                CancelSmResp cancelSmResp = (CancelSmResp) futureResponse.getResponse();
+                if (cancelSmResp.getCommandStatus() == SmppConstants.STATUS_OK) {
+                    return CancelMessageResponse.success(cancelMessage, getId());
+                } else {
+                    return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM,
+                            cancelSmResp.getResultMessage()));
                 }
             }
             return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM, "Unable to get response"));
         } catch (RecoverablePduException | UnrecoverablePduException | SmppTimeoutException | SmppChannelException | InterruptedException e) {
             log.error(e.getMessage(), e);
             return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM, e.getMessage()));
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_SENDING_ERROR, "Unexpected exception"));
         }
@@ -277,6 +275,7 @@ public class DefaultSenderClient implements SenderClient {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException ignore) {
+            // ignore
         }
     }
 

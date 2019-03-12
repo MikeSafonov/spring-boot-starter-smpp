@@ -32,29 +32,43 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
         SmppProperties.Defaults defaults = smppProperties.getDefaults();
         smppProperties.getConnections().forEach((name, smsc) -> {
             ConnectionMode connectionMode = smsc.getConnectionMode();
-
-            switch (connectionMode) {
-                case MOCK: {
-                    smscConnections.add(new SmscConnection(name, ClientFactory.mockSender(name, smppResultGenerator)));
-                    break;
-                }
-                case TEST: {
-                    SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
-                    SenderClient testSenderClient = ClientFactory.testSender(senderClient, defaults, smppResultGenerator, smsc);
-                    ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
-                    setupClients(senderClient, responseClient);
-                    smscConnections.add(new SmscConnection(name, responseClient, testSenderClient));
-                }
-                case STANDARD: {
-                    SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
-                    ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
-                    setupClients(senderClient, responseClient);
-                    smscConnections.add(new SmscConnection(name, responseClient, senderClient));
-                }
-            }
+            smscConnections.add(getSmscConnection(defaults, name, smsc, connectionMode));
         });
 
         return smscConnections;
+    }
+
+    private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc, ConnectionMode connectionMode) {
+        switch (connectionMode) {
+            case MOCK: {
+                return new SmscConnection(name, ClientFactory.mockSender(name, smppResultGenerator));
+            }
+            case TEST: {
+                return getTestSmscConnection(defaults, name, smsc);
+            }
+            case STANDARD: {
+                return getStandardSmscConnection(defaults, name, smsc);
+            }
+
+            default: {
+                throw new RuntimeException("Unknown connection mode " + connectionMode);
+            }
+        }
+    }
+
+    private SmscConnection getStandardSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
+        SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
+        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
+        setupClients(senderClient, responseClient);
+        return new SmscConnection(name, responseClient, senderClient);
+    }
+
+    private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
+        SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
+        SenderClient testSenderClient = ClientFactory.testSender(senderClient, defaults, smppResultGenerator, smsc);
+        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
+        setupClients(senderClient, responseClient);
+        return new SmscConnection(name, responseClient, testSenderClient);
     }
 
     private void setupClients(SenderClient senderClient, ResponseClient responseClient) {

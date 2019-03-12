@@ -29,7 +29,7 @@ class MessageUtilTest {
 
     private void testLatinRegular() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < MessageUtil.gsm7RegularMessageLength; i++) {
+        for (int i = 0; i < MessageUtil.GSM_7_REGULAR_MESSAGE_LENGTH; i++) {
             builder.append('W');
         }
 
@@ -40,7 +40,7 @@ class MessageUtilTest {
 
     private void testLatinMultipart() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 2 * MessageUtil.gsm7MultipartMessageLength + 1; i++) {
+        for (int i = 0; i < 2 * MessageUtil.GSM_7_MULTIPART_MESSAGE_LENGTH + 1; i++) {
             builder.append('W');
         }
 
@@ -51,7 +51,7 @@ class MessageUtilTest {
 
     private void testLatinOnlyUcs2() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < MessageUtil.ucs2RegularMessageLength + 1; i++) {
+        for (int i = 0; i < MessageUtil.UCS_2_REGULAR_MESSAGE_LENGTH + 1; i++) {
             builder.append('W');
         }
 
@@ -62,7 +62,7 @@ class MessageUtilTest {
 
     private void testLatinAndCyrillicSymbol() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < MessageUtil.ucs2RegularMessageLength - 1; i++) {
+        for (int i = 0; i < MessageUtil.UCS_2_REGULAR_MESSAGE_LENGTH - 1; i++) {
             builder.append('W');
         }
 
@@ -76,7 +76,7 @@ class MessageUtilTest {
 
     private void testCyrillicRegular() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < MessageUtil.ucs2RegularMessageLength; i++) {
+        for (int i = 0; i < MessageUtil.UCS_2_REGULAR_MESSAGE_LENGTH; i++) {
             builder.append('А');
         }
 
@@ -89,7 +89,7 @@ class MessageUtilTest {
 
     private void testCyrillicMultipart() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 2 * MessageUtil.ucs2MultipartMessageLength + 1; i++) {
+        for (int i = 0; i < 2 * MessageUtil.UCS_2_MULTIPART_MESSAGE_LENGTH + 1; i++) {
             builder.append('А');
         }
 

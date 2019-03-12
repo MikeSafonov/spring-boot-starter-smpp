@@ -5,8 +5,8 @@ package com.github.mikesafonov.starter.smpp.sender.exceptions;
  */
 public class SmppException extends RuntimeException {
 
-    protected int errorCode;
-    protected String errorMessage;
+    protected final int errorCode;
+    protected final String errorMessage;
 
     public SmppException(int errorCode, String errorMessage){
 

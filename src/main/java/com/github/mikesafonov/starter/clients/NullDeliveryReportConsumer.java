@@ -12,6 +12,6 @@ import com.github.mikesafonov.starter.smpp.reciever.DeliveryReportConsumer;
 public class NullDeliveryReportConsumer implements DeliveryReportConsumer {
     @Override
     public void accept(DeliveryReport deliveryReport) {
-
+        // ignore delivery report
     }
 }

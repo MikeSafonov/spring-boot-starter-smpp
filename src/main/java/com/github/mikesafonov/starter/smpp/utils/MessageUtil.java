@@ -15,10 +15,10 @@ public class MessageUtil {
 
     private static final Pattern PATTERN = Pattern.compile("^[A-Za-z0-9 \\r\\n@£$¥èéùìòÇØøÅå\u0394_\u03A6\u0393\u039B\u03A9\u03A0\u03A8\u03A3\u0398\u039EÆæßÉ!\"#$%&'()*+,\\-./:;<=>?¡ÄÖÑÜ§¿äöñüà^{}\\\\\\[~\\]|\u20AC]*$");
 
-    public static final int ucs2RegularMessageLength = 70;
-    public static final int ucs2MultipartMessageLength = 67;
-    public static final int gsm7RegularMessageLength = 160;
-    public static final int gsm7MultipartMessageLength = 153;
+    public static final int UCS_2_REGULAR_MESSAGE_LENGTH = 70;
+    public static final int UCS_2_MULTIPART_MESSAGE_LENGTH = 67;
+    public static final int GSM_7_REGULAR_MESSAGE_LENGTH = 160;
+    public static final int GSM_7_MULTIPART_MESSAGE_LENGTH = 153;
 
     /**
      * Calculate count of sms message parts need to delivery with message text {@code message}. If {@code ucs2Only = true}
@@ -60,11 +60,11 @@ public class MessageUtil {
     }
 
     private static int countUcs2(int length) {
-        return countFragments(length, ucs2RegularMessageLength, ucs2MultipartMessageLength);
+        return countFragments(length, UCS_2_REGULAR_MESSAGE_LENGTH, UCS_2_MULTIPART_MESSAGE_LENGTH);
     }
 
     private static int countGsm(int length) {
-        return countFragments(length, gsm7RegularMessageLength, gsm7MultipartMessageLength);
+        return countFragments(length, GSM_7_REGULAR_MESSAGE_LENGTH, GSM_7_MULTIPART_MESSAGE_LENGTH);
     }
 
     /**

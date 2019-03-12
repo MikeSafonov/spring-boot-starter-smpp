@@ -49,6 +49,7 @@ public class TestSenderClient implements SenderClient {
 
     @Override
     public void setup() throws SenderClientBindException {
+        // should be empty
     }
 
     @Override
