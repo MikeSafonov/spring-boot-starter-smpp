@@ -108,7 +108,8 @@ public class DefaultSenderClient implements SenderClient {
     @Override
     public MessageResponse send(@NotNull Message message) {
 
-        if (message == null || isNullOrEmpty(message.getText())) {
+        requireNonNull(message);
+        if (isNullOrEmpty(message.getText())) {
             return MessageResponse.error(message, getId(), new MessageErrorInformation(0, "Empty message text"));
         }
 
@@ -137,7 +138,8 @@ public class DefaultSenderClient implements SenderClient {
     @Override
     public @NotNull CancelMessageResponse cancel(@NotNull CancelMessage cancelMessage) {
 
-        if (cancelMessage == null || isNullOrEmpty(cancelMessage.getMessageId())) {
+        requireNonNull(cancelMessage);
+        if (isNullOrEmpty(cancelMessage.getMessageId())) {
             return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(0, "Empty message id"));
         }
 
