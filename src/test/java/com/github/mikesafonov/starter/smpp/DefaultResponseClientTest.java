@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class DefaultResponseClientTest {
     @Test
     void shouldThrowNPE() {
-        assertThrows(NullPointerException.class, () -> DefaultResponseClient.of(null, 10));
+        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(null, 10));
     }
 
     @Test
@@ -33,7 +33,7 @@ class DefaultResponseClientTest {
 
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(randomString(), smsc.getCredentials(), smsc.getLoggingBytes(), smsc.getLoggingPdu());
 
-        DefaultResponseClient responseClient = DefaultResponseClient.of(receiverConfiguration, randomInt());
+        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, randomInt());
 
         assertEquals(receiverConfiguration.getName(), responseClient.getId());
     }

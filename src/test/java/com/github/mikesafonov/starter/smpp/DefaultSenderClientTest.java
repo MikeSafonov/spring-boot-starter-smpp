@@ -22,9 +22,9 @@ class DefaultSenderClientTest {
         TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
         assertThrows(NullPointerException.class,
-                () -> DefaultSenderClient.of(null, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser));
+                () -> new DefaultSenderClient(null, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser));
         assertThrows(NullPointerException.class,
-                () -> DefaultSenderClient.of(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), null));
+                () -> new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), null));
     }
 
     @Test
@@ -32,7 +32,7 @@ class DefaultSenderClientTest {
         DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
         TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        SenderClient senderClient = DefaultSenderClient.of(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
+        SenderClient senderClient = new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
         assertEquals(transmitterConfiguration.getName(), senderClient.getId());
     }
 
@@ -41,7 +41,7 @@ class DefaultSenderClientTest {
         DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
         TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        SenderClient senderClient = DefaultSenderClient.of(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
+        SenderClient senderClient = new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
         Message originalMessage = new Message(null, randomString(), randomString(), randomString(), MessageType.SIMPLE);
         MessageErrorInformation messageErrorInformation = new MessageErrorInformation(0, "Empty message text");
 
@@ -59,7 +59,7 @@ class DefaultSenderClientTest {
         DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
         TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        SenderClient senderClient = DefaultSenderClient.of(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
+        SenderClient senderClient = new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
         CancelMessage originalMessage = new CancelMessage(null, randomString(), randomString());
         MessageErrorInformation messageErrorInformation = new MessageErrorInformation(0, "Empty message id");
 

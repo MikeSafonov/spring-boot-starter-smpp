@@ -3,6 +3,8 @@ package com.github.mikesafonov.starter.smpp.util;
 import com.devskiller.jfairy.Fairy;
 import lombok.experimental.UtilityClass;
 
+import java.time.Duration;
+
 /**
  * @author Mike Safonov
  */
@@ -18,6 +20,10 @@ public class Randomizer {
         return FAIRY.baseProducer().randomInt(9999);
     }
 
+    public static long randomLong() {
+        return FAIRY.baseProducer().randomBetween(0, 9999);
+    }
+
     public static boolean randomBoolean() {
         return FAIRY.baseProducer().trueOrFalse();
     }
@@ -28,5 +34,9 @@ public class Randomizer {
 
     public static String randomIp() {
         return FAIRY.networkProducer().ipAddress();
+    }
+
+    public static Duration randomDuration() {
+        return Duration.ofSeconds(randomLong());
     }
 }
