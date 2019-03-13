@@ -60,19 +60,14 @@ public class DefaultSenderClient implements SenderClient {
     private SmppSession session;
 
 
-    protected DefaultSenderClient(@NotNull TransmitterConfiguration configuration, int maxTryCount,
+    public DefaultSenderClient(@NotNull TransmitterConfiguration configuration, int maxTryCount,
                                   boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser) {
-        client = new DefaultSmppClient();
-        sessionConfig = requireNonNull(configuration);
+        this.sessionConfig = requireNonNull(configuration);
+        this.messageBuilder = new MessageBuilder(typeOfAddressParser);
+        this.client = new DefaultSmppClient();
         this.maxTryCount = maxTryCount;
         this.ucs2Only = ucs2Only;
-        this.messageBuilder = new MessageBuilder(typeOfAddressParser);
         this.timeoutMillis = timeoutMillis;
-    }
-
-
-    public static SenderClient of(@NotNull TransmitterConfiguration configuration, int maxTryCount, boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser) {
-        return new DefaultSenderClient(configuration, maxTryCount, ucs2Only, timeoutMillis, typeOfAddressParser);
     }
 
     @Override

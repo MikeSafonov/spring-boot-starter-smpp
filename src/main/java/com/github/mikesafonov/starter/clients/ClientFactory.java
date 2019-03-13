@@ -15,6 +15,9 @@ import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
+
 /**
  * Helper class for building {@link SenderClient} and {@link ResponseClient}
  */
@@ -22,18 +25,32 @@ import java.util.List;
 public class ClientFactory {
 
     public static SenderClient mockSender(@NotBlank String name, @NotNull SmppResultGenerator smppResultGenerator) {
+        validateName(name);
+        requireNonNull(smppResultGenerator);
+
         return new MockSenderClient(smppResultGenerator, name);
     }
 
     public static SenderClient testSender(@NotNull SenderClient senderClient, @NotNull SmppProperties.Defaults defaults,
                                           @NotNull SmppResultGenerator smppResultGenerator,
                                           @NotNull SmppProperties.SMSC smsc) {
-        List<String> allowedPhones = (smsc.getAllowedPhones() == null) ? Arrays.asList(defaults.getAllowedPhones()) : Arrays.asList(smsc.getAllowedPhones());
+        requireNonNull(senderClient);
+        requireNonNull(defaults);
+        requireNonNull(smppResultGenerator);
+        requireNonNull(smsc);
+
+        String[] phones = getOrDefault(smsc.getAllowedPhones(), defaults.getAllowedPhones());
+        List<String> allowedPhones = (phones == null) ? emptyList() : Arrays.asList(phones);
         return new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
     }
 
     public static SenderClient defaultSender(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc,
                                              @NotNull TypeOfAddressParser typeOfAddressParser) {
+        validateName(name);
+        requireNonNull(defaults);
+        requireNonNull(smsc);
+        requireNonNull(typeOfAddressParser);
+
         boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
         boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
         int windowsSize = getOrDefault(smsc.getWindowSize(), defaults.getWindowSize());
@@ -41,20 +58,30 @@ public class ClientFactory {
         long requestTimeout = getOrDefault(smsc.getRequestTimeout(), defaults.getRequestTimeout()).toMillis();
 
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
-        return DefaultSenderClient.of(transmitterConfiguration, smsc.getMaxTry(),
+        return new DefaultSenderClient(transmitterConfiguration, smsc.getMaxTry(),
                 ucs2Only, requestTimeout, typeOfAddressParser);
     }
 
     public static ResponseClient defaultResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc) {
+        validateName(name);
+        requireNonNull(defaults);
+        requireNonNull(smsc);
+
         boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
         boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
         long rebindPeriod = getOrDefault(smsc.getRebindPeriod(), defaults.getRebindPeriod()).getSeconds();
 
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu);
-        return DefaultResponseClient.of(receiverConfiguration, rebindPeriod);
+        return new DefaultResponseClient(receiverConfiguration, rebindPeriod);
     }
 
-    public <T> T getOrDefault(T obj, T defaultObj) {
+    private void validateName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new RuntimeException("Name must not be empty!");
+        }
+    }
+
+    private  <T> T getOrDefault(T obj, T defaultObj) {
         if (obj == null) {
             return defaultObj;
         }

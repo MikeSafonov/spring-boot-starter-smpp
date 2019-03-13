@@ -65,20 +65,10 @@ public class DefaultResponseClient implements ResponseClient {
      * @param receiverConfiguration smpp receiver configuration
      * @param rebindPeriod          reconnection period in seconds
      */
-    protected DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
-        client = new DefaultSmppClient();
+     public DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
         this.sessionConfiguration = requireNonNull(receiverConfiguration);
+        client = new DefaultSmppClient();
         this.rebindPeriod = rebindPeriod;
-    }
-
-    /**
-     * Create {@link DefaultResponseClient} with {@link DefaultSmppClient}.
-     *
-     * @param receiverConfiguration smpp receiver configuration
-     * @param rebindPeriod          reconnection period in seconds
-     */
-    public static DefaultResponseClient of(@NotNull ReceiverConfiguration receiverConfiguration, long rebindPeriod) {
-        return new DefaultResponseClient(receiverConfiguration, rebindPeriod);
     }
 
     @Override

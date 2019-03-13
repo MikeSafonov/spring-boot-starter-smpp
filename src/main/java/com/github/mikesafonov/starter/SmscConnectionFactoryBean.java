@@ -56,19 +56,18 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
         }
     }
 
+    private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
+        SenderClient testSenderClient = ClientFactory.testSender(ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser), defaults, smppResultGenerator, smsc);
+        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
+        setupClients(testSenderClient, responseClient);
+        return new SmscConnection(name, responseClient, testSenderClient);
+    }
+
     private SmscConnection getStandardSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
         SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
         ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
         setupClients(senderClient, responseClient);
         return new SmscConnection(name, responseClient, senderClient);
-    }
-
-    private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
-        SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
-        SenderClient testSenderClient = ClientFactory.testSender(senderClient, defaults, smppResultGenerator, smsc);
-        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
-        setupClients(senderClient, responseClient);
-        return new SmscConnection(name, responseClient, testSenderClient);
     }
 
     private void setupClients(SenderClient senderClient, ResponseClient responseClient) {

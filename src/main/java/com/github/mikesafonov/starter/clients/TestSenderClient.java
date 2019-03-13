@@ -48,7 +48,7 @@ public class TestSenderClient implements SenderClient {
 
     @Override
     public void setup() {
-        // should be empty
+        senderClient.setup();
     }
 
     @Override
@@ -69,5 +69,9 @@ public class TestSenderClient implements SenderClient {
 
     private boolean isAllowed(String phone) {
         return allowedPhones.contains(phone);
+    }
+
+    public List<String> getAllowedPhones() {
+        return allowedPhones;
     }
 }
