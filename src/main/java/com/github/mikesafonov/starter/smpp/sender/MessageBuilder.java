@@ -41,7 +41,7 @@ public class MessageBuilder {
      * @throws SmppInvalidArgumentException see {@link SubmitSm#setShortMessage}
      */
     @NotNull
-    public SubmitSm createSubmitSm(@NotNull Message message, boolean silent, boolean ucs2Only) throws SmppInvalidArgumentException, IllegalAddressException {
+    public SubmitSm createSubmitSm(@NotNull Message message, boolean silent, boolean ucs2Only) throws SmppInvalidArgumentException {
         byte esmClass = getEsmClass(message.getMessageType());
         Address sourceAddress = addressBuilder.createSourceAddress(message.getSource());
         Address destAddress = addressBuilder.createDestAddress(message.getMsisdn());
@@ -62,7 +62,7 @@ public class MessageBuilder {
      * @return request {@link CancelSm}
      * @throws IllegalAddressException if source/destination address not created
      */
-    public CancelSm createCancelSm(CancelMessage cancelMessage) throws IllegalAddressException {
+    public CancelSm createCancelSm(CancelMessage cancelMessage){
         Address sourceAddress = addressBuilder.createSourceAddress(cancelMessage.getSource());
         Address destAddress = addressBuilder.createDestAddress(cancelMessage.getMsisdn());
 

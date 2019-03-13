@@ -87,7 +87,7 @@ public class DefaultResponseClient implements ResponseClient {
     }
 
     @Override
-    public void setup(ResponseSmppSessionHandler sessionHandler) throws ResponseClientBindException {
+    public void setup(ResponseSmppSessionHandler sessionHandler){
         if (!inited) {
             this.sessionHandler = sessionHandler;
             bind();

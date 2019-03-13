@@ -24,7 +24,7 @@ public interface ResponseClient {
      * @param sessionHandler handler for listening PDU events (delivery reports, etc)
      * @throws ResponseClientBindException if connection not successfully
      */
-    void setup(ResponseSmppSessionHandler sessionHandler) throws ResponseClientBindException;
+    void setup(ResponseSmppSessionHandler sessionHandler);
 
     /**
      * Access to SMPP session

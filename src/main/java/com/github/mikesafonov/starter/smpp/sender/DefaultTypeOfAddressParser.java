@@ -34,7 +34,7 @@ public class DefaultTypeOfAddressParser implements TypeOfAddressParser {
      */
     @Override
     @NotNull
-    public TypeOfAddress getSource(@NotNull String source) throws IllegalAddressException {
+    public TypeOfAddress getSource(@NotNull String source){
         try {
             if (checkPattern(source, INTERNATIONAL_PATTERN)) {
                 return new TypeOfAddress(Ton.INTERNATIONAL, Npi.ISDN);

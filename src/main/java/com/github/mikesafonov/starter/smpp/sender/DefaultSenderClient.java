@@ -86,7 +86,7 @@ public class DefaultSenderClient implements SenderClient {
      * @throws SenderClientBindException if connection fails
      * @see #checkSession()
      */
-    public void setup() throws SenderClientBindException {
+    public void setup(){
         if (!inited) {
             try {
                 checkSession();
@@ -179,7 +179,7 @@ public class DefaultSenderClient implements SenderClient {
      * @throws SmppException if some exception occurs
      * @see #checkSession()
      */
-    private SubmitSmResp send(SubmitSm sm) throws SmppException {
+    private SubmitSmResp send(SubmitSm sm){
 
         checkSession();
 
@@ -209,7 +209,7 @@ public class DefaultSenderClient implements SenderClient {
      *
      * @throws SmppSessionException if session not connected
      */
-    private void checkSession() throws SmppSessionException {
+    private void checkSession() {
         boolean connectionAlive = false;
         int tryCount = 0;
         while (!connectionAlive && tryCount <= maxTryCount) {

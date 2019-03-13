@@ -25,7 +25,7 @@ public interface SenderClient {
      *
      * @throws SenderClientBindException if connection fails
      */
-    void setup() throws SenderClientBindException;
+    void setup();
 
     /**
      * Send message via smpp protocol

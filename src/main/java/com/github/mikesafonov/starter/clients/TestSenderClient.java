@@ -5,7 +5,6 @@ import com.github.mikesafonov.starter.smpp.dto.CancelMessageResponse;
 import com.github.mikesafonov.starter.smpp.dto.Message;
 import com.github.mikesafonov.starter.smpp.dto.MessageResponse;
 import com.github.mikesafonov.starter.smpp.sender.SenderClient;
-import com.github.mikesafonov.starter.smpp.sender.exceptions.SenderClientBindException;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class TestSenderClient implements SenderClient {
     }
 
     @Override
-    public void setup() throws SenderClientBindException {
+    public void setup() {
         // should be empty
     }
 
