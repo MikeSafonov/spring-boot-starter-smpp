@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.github.mikesafonov.starter.SmppAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.github.mikesafonov.smpp.config.SmppAutoConfiguration

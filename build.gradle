@@ -91,7 +91,7 @@ buildScan {
 
 pitest {
     testPlugin = "junit5"
-    targetClasses = ['com.github.mikesafonov.starter.*']
+    targetClasses = ['com.github.mikesafonov.smpp.*']
     threads = 4
     outputFormats = ['HTML', 'XML']
     enableDefaultIncrementalAnalysis = true
