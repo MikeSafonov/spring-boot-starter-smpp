@@ -1,7 +1,7 @@
 package com.github.mikesafonov.smpp.config;
 
-import com.github.mikesafonov.smpp.core.clients.ClientFactory;
-import com.github.mikesafonov.smpp.core.clients.SmppResultGenerator;
+import com.github.mikesafonov.smpp.core.ClientFactory;
+import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;

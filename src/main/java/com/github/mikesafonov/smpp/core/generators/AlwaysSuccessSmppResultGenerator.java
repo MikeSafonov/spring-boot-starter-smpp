@@ -1,4 +1,4 @@
-package com.github.mikesafonov.smpp.core.clients;
+package com.github.mikesafonov.smpp.core.generators;
 
 
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;

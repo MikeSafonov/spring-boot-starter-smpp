@@ -20,6 +20,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Default implementation of {@link ResponseClient}.
  * @author Mike Safonov
  */
 @Slf4j

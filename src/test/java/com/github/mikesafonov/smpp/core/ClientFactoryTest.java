@@ -1,15 +1,10 @@
 package com.github.mikesafonov.smpp.core;
 
 import com.github.mikesafonov.smpp.config.SmppProperties;
-import com.github.mikesafonov.smpp.core.clients.ClientFactory;
-import com.github.mikesafonov.smpp.core.clients.MockSenderClient;
-import com.github.mikesafonov.smpp.core.clients.SmppResultGenerator;
-import com.github.mikesafonov.smpp.core.clients.TestSenderClient;
+import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DefaultResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
-import com.github.mikesafonov.smpp.core.sender.DefaultSenderClient;
-import com.github.mikesafonov.smpp.core.sender.SenderClient;
-import com.github.mikesafonov.smpp.core.sender.TypeOfAddressParser;
+import com.github.mikesafonov.smpp.core.sender.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 

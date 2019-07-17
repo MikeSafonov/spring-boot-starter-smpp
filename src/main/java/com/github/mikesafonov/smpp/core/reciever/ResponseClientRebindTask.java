@@ -18,7 +18,8 @@ public class ResponseClientRebindTask implements Runnable {
     }
 
     /**
-     * Is {@link #client}`s session is null then try to reconnect by calling {@link ResponseClient#reconnect()}
+     * Is {@link #client}`s session is null or session in bound state but client not in progress
+     * then try to reconnect by calling {@link ResponseClient#reconnect()}
      */
     @Override
     public void run() {

@@ -1,7 +1,6 @@
-package com.github.mikesafonov.smpp.core.clients;
+package com.github.mikesafonov.smpp.core.reciever;
 
 import com.github.mikesafonov.smpp.core.dto.DeliveryReport;
-import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 
 /**
  * Implementation of {@link DeliveryReportConsumer} which simple ignore any delivery reports. This is default implementation

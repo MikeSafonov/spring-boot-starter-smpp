@@ -1,7 +1,7 @@
 package com.github.mikesafonov.smpp.core;
 
-import com.github.mikesafonov.smpp.core.clients.AlwaysSuccessSmppResultGenerator;
 import com.github.mikesafonov.smpp.core.dto.*;
+import com.github.mikesafonov.smpp.core.generators.AlwaysSuccessSmppResultGenerator;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.core.util.Randomizer.randomString;

@@ -1,10 +1,12 @@
-package com.github.mikesafonov.smpp.core.clients;
+package com.github.mikesafonov.smpp.core.generators;
 
 
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageResponse;
+import com.github.mikesafonov.smpp.core.sender.MockSenderClient;
+import com.github.mikesafonov.smpp.core.sender.TestSenderClient;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

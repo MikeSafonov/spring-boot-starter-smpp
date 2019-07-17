@@ -1,11 +1,11 @@
 package com.github.mikesafonov.smpp.core;
 
-import com.github.mikesafonov.smpp.core.clients.AlwaysSuccessSmppResultGenerator;
-import com.github.mikesafonov.smpp.core.clients.MockSenderClient;
-import com.github.mikesafonov.smpp.core.clients.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
+import com.github.mikesafonov.smpp.core.generators.AlwaysSuccessSmppResultGenerator;
+import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
+import com.github.mikesafonov.smpp.core.sender.MockSenderClient;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.core.util.Randomizer.randomString;

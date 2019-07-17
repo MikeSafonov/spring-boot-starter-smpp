@@ -142,13 +142,7 @@ public class DefaultSenderClient implements SenderClient {
             CancelSm cancelSm = messageBuilder.createCancelSm(cancelMessage);
             WindowFuture<Integer, PduRequest, PduResponse> futureResponse = session.sendRequestPdu(cancelSm, timeoutMillis, true);
             if (futureResponse.await() && futureResponse.isDone() && futureResponse.isSuccess()) {
-                CancelSmResp cancelSmResp = (CancelSmResp) futureResponse.getResponse();
-                if (cancelSmResp.getCommandStatus() == SmppConstants.STATUS_OK) {
-                    return CancelMessageResponse.success(cancelMessage, getId());
-                } else {
-                    return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM,
-                            cancelSmResp.getResultMessage()));
-                }
+                return createCancelMessageResponse(cancelMessage, futureResponse);
             }
             return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM, "Unable to get response"));
         } catch (RecoverablePduException | UnrecoverablePduException | SmppTimeoutException | SmppChannelException | InterruptedException e) {
@@ -157,6 +151,17 @@ public class DefaultSenderClient implements SenderClient {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_SENDING_ERROR, "Unexpected exception"));
+        }
+    }
+
+    @NotNull
+    private CancelMessageResponse createCancelMessageResponse(@NotNull CancelMessage cancelMessage, WindowFuture<Integer, PduRequest, PduResponse> futureResponse) {
+        CancelSmResp cancelSmResp = (CancelSmResp) futureResponse.getResponse();
+        if (cancelSmResp.getCommandStatus() == SmppConstants.STATUS_OK) {
+            return CancelMessageResponse.success(cancelMessage, getId());
+        } else {
+            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM,
+                    cancelSmResp.getResultMessage()));
         }
     }
 
