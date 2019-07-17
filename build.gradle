@@ -1,3 +1,11 @@
+buildscript {
+    configurations.maybeCreate("pitest")
+    dependencies {
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
+        pitest 'org.pitest:pitest-junit5-plugin:0.9'
+    }
+}
+
 plugins {
     id "idea"
     id "java"
@@ -8,6 +16,7 @@ plugins {
 }
 
 apply plugin: 'java-library'
+apply plugin: "info.solidsoft.pitest"
 
 ext {
     springBootVersion = '2.1.6.RELEASE'
@@ -60,20 +69,17 @@ jacoco{
     toolVersion = "0.8.3"
 }
 
-tasks.jacocoTestReport{
+jacocoTestReport{
     reports {
         xml.enabled = true
         csv.enabled = false
     }
 }
 
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport)
-}
-
-
 test {
+    ignoreFailures = true
     useJUnitPlatform()
+    finalizedBy jacocoTestReport, "pitest"
 }
 
 buildScan {
@@ -81,4 +87,15 @@ buildScan {
     termsOfServiceAgree = "yes"
 
     publishAlways()
+}
+
+pitest {
+    testPlugin = "junit5"
+    targetClasses = ['com.github.mikesafonov.starter.*']
+    threads = 4
+    outputFormats = ['HTML', 'XML']
+    enableDefaultIncrementalAnalysis = true
+    timestampedReports = false
+    historyInputLocation = ".pitest/pitHistory.txt"
+    historyOutputLocation = ".pitest/pitHistory.txt"
 }
