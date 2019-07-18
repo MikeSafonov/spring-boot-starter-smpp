@@ -40,7 +40,7 @@ public class AddressBuilder {
      * @return destination address
      */
     @NotNull
-    public Address createDestAddress(@NotNull String msisdn) {
+    public Address createDestinationAddress(@NotNull String msisdn) {
         return convertToAddress(msisdn, addressParser.getDestination(msisdn));
     }
 

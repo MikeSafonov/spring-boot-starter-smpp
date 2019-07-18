@@ -35,7 +35,7 @@ public class MessageUtil {
         if (ucs2Only) {
             return new CountWithEncoding(countUcs2(message.length()), CharsetUtil.CHARSET_UCS_2);
         } else {
-            return (isUcs2(message)) ? new CountWithEncoding(countGsm(message.length()), CharsetUtil.CHARSET_GSM) :
+            return (isGsm(message)) ? new CountWithEncoding(countGsm(message.length()), CharsetUtil.CHARSET_GSM) :
                     new CountWithEncoding(countUcs2(message.length()), CharsetUtil.CHARSET_UCS_2);
         }
     }
@@ -55,7 +55,7 @@ public class MessageUtil {
         return value == null || value.trim().isEmpty();
     }
 
-    private static boolean isUcs2(@NotNull String message) {
+    private static boolean isGsm(@NotNull String message) {
         return PATTERN.matcher(message).matches();
     }
 

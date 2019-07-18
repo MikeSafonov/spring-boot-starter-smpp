@@ -28,27 +28,30 @@ public class MessageBuilder {
     private final AddressBuilder addressBuilder;
 
     public MessageBuilder(@NotNull TypeOfAddressParser typeOfAddressParser) {
-        addressBuilder = new AddressBuilder(typeOfAddressParser);
+       this(new AddressBuilder(typeOfAddressParser));
+    }
+
+    public MessageBuilder(@NotNull AddressBuilder addressBuilder) {
+        this.addressBuilder = addressBuilder;
     }
 
     /**
      * Builds {@link SubmitSm} for sending via smpp.
      *
      * @param message  client message
-     * @param silent   is message must be silent
      * @param ucs2Only use UCS2 encoding only or not
      * @return message {@link SubmitSm}.
      * @throws SmppInvalidArgumentException see {@link SubmitSm#setShortMessage}
      */
     @NotNull
-    public SubmitSm createSubmitSm(@NotNull Message message, boolean silent, boolean ucs2Only) throws SmppInvalidArgumentException {
+    public SubmitSm createSubmitSm(@NotNull Message message,  boolean ucs2Only) throws SmppInvalidArgumentException {
         byte esmClass = getEsmClass(message.getMessageType());
         Address sourceAddress = addressBuilder.createSourceAddress(message.getSource());
-        Address destAddress = addressBuilder.createDestAddress(message.getMsisdn());
+        Address destAddress = addressBuilder.createDestinationAddress(message.getMsisdn());
 
-        SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress, destAddress, silent, ucs2Only);
+        SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress, destAddress, message.isSilent(), ucs2Only);
 
-        if (!message.isDatagram()) {
+        if (message.getMessageType() == MessageType.SIMPLE) {
             registerDeliveryReport(submitSm);
         }
 
@@ -64,7 +67,7 @@ public class MessageBuilder {
      */
     public CancelSm createCancelSm(CancelMessage cancelMessage){
         Address sourceAddress = addressBuilder.createSourceAddress(cancelMessage.getSource());
-        Address destAddress = addressBuilder.createDestAddress(cancelMessage.getMsisdn());
+        Address destAddress = addressBuilder.createDestinationAddress(cancelMessage.getMsisdn());
 
         CancelSm cancelSm = new CancelSm();
         cancelSm.setSourceAddress(sourceAddress);

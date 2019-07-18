@@ -34,10 +34,6 @@ public abstract class BaseSenderManager implements SenderManager {
         return smscConnections.isEmpty();
     }
 
-    protected boolean isSingleton() {
-        return smscConnections.size() == 1;
-    }
-
     protected int size() {
         return smscConnections.size();
     }

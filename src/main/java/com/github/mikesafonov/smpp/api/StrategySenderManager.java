@@ -30,9 +30,6 @@ public class StrategySenderManager extends BaseSenderManager {
             return Optional.empty();
         }
 
-        if (isSingleton()) {
-            return Optional.of(smscConnections.get(0).getSenderClient());
-        }
 
         int nextIndex = indexDetectionStrategy.next(size());
         return Optional.of(smscConnections.get(nextIndex).getSenderClient());

@@ -109,7 +109,7 @@ public class DefaultSenderClient implements SenderClient {
         }
 
         try {
-            SubmitSm submitSm = messageBuilder.createSubmitSm(message, message.isSilent(), ucs2Only);
+            SubmitSm submitSm = messageBuilder.createSubmitSm(message, ucs2Only);
             SubmitSmResp send = send(submitSm);
             return analyzeResponse(message, send);
         } catch (SmppInvalidArgumentException e) {
