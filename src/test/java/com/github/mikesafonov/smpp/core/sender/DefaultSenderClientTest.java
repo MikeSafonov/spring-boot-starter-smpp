@@ -1,14 +1,10 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.sender;
 
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.dto.*;
-import com.github.mikesafonov.smpp.core.sender.DefaultSenderClient;
-import com.github.mikesafonov.smpp.core.sender.DefaultTypeOfAddressParser;
-import com.github.mikesafonov.smpp.core.sender.SenderClient;
-import com.github.mikesafonov.smpp.core.sender.TransmitterConfiguration;
 import org.junit.jupiter.api.Test;
 
-import static com.github.mikesafonov.smpp.core.util.Randomizer.*;
+import static com.github.mikesafonov.smpp.util.Randomizer.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

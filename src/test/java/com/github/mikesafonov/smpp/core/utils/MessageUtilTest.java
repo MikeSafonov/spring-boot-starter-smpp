@@ -1,9 +1,11 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.utils;
 
 import com.cloudhopper.commons.charset.CharsetUtil;
-import com.github.mikesafonov.smpp.core.utils.CountWithEncoding;
-import com.github.mikesafonov.smpp.core.utils.MessageUtil;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,21 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MessageUtilTest {
 
 
-    @Test
-    void encodingTest() {
-
-        testLatinRegular();
-        testLatinMultipart();
-
-        testLatinOnlyUcs2();
-
-        testLatinAndCyrillicSymbol();
-        testCyrillicRegular();
-        testCyrillicMultipart();
-
+    private static Stream<String> emptyTextProvider() {
+        return Stream.of("", null);
     }
 
-    private void testLatinRegular() {
+    @Test
+    void latinRegular() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < MessageUtil.GSM_7_REGULAR_MESSAGE_LENGTH; i++) {
             builder.append('W');
@@ -38,18 +31,20 @@ class MessageUtilTest {
         assertEquals(CharsetUtil.CHARSET_GSM, countWithEncoding.getCharset());
     }
 
-    private void testLatinMultipart() {
+    @Test
+    void latinMultipart() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 2 * MessageUtil.GSM_7_MULTIPART_MESSAGE_LENGTH + 1; i++) {
+        for (int i = 0; i < 2 * MessageUtil.GSM_7_MULTIPART_MESSAGE_LENGTH; i++) {
             builder.append('W');
         }
 
         CountWithEncoding countWithEncoding = MessageUtil.calculateCountSMS(builder.toString());
-        assertEquals(3, countWithEncoding.getCount());
+        assertEquals(2, countWithEncoding.getCount());
         assertEquals(CharsetUtil.CHARSET_GSM, countWithEncoding.getCharset());
     }
 
-    private void testLatinOnlyUcs2() {
+    @Test
+    void testLatinOnlyUcs2() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < MessageUtil.UCS_2_REGULAR_MESSAGE_LENGTH + 1; i++) {
             builder.append('W');
@@ -60,7 +55,8 @@ class MessageUtilTest {
         assertEquals(CharsetUtil.CHARSET_UCS_2, countWithEncoding.getCharset());
     }
 
-    private void testLatinAndCyrillicSymbol() {
+    @Test
+    void latinAndCyrillicSymbol() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < MessageUtil.UCS_2_REGULAR_MESSAGE_LENGTH - 1; i++) {
             builder.append('W');
@@ -74,7 +70,8 @@ class MessageUtilTest {
 
     }
 
-    private void testCyrillicRegular() {
+    @Test
+    void cyrillicRegular() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < MessageUtil.UCS_2_REGULAR_MESSAGE_LENGTH; i++) {
             builder.append('А');
@@ -86,8 +83,8 @@ class MessageUtilTest {
         assertEquals(CharsetUtil.CHARSET_UCS_2, countWithEncoding.getCharset());
     }
 
-
-    private void testCyrillicMultipart() {
+    @Test
+    void cyrillicMultipart() {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 2 * MessageUtil.UCS_2_MULTIPART_MESSAGE_LENGTH + 1; i++) {
             builder.append('А');
@@ -99,5 +96,13 @@ class MessageUtilTest {
         assertEquals(CharsetUtil.CHARSET_UCS_2, countWithEncoding.getCharset());
     }
 
+    @ParameterizedTest
+    @MethodSource("emptyTextProvider")
+    void shouldReturnEmpty(String value) {
+        CountWithEncoding countWithEncoding = MessageUtil.calculateCountSMS(value);
+
+        assertEquals(0, countWithEncoding.getCount());
+        assertEquals(CharsetUtil.CHARSET_UCS_2, countWithEncoding.getCharset());
+    }
 
 }

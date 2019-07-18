@@ -1,12 +1,12 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.utils;
 
-import com.github.mikesafonov.smpp.core.utils.JodaJavaConverter;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Mike Safonov
@@ -27,5 +27,10 @@ class JodaJavaConverterTest {
         assertEquals(dateTime.getMinuteOfHour(), localDateTime.getMinute());
         assertEquals(dateTime.getSecondOfMinute(), localDateTime.getSecond());
         assertEquals(dateTime.getMillisOfSecond(), localDateTime.getNano() / 1000000);
+    }
+
+    @Test
+    void shouldReturnNull(){
+        assertNull(JodaJavaConverter.convert(null));
     }
 }

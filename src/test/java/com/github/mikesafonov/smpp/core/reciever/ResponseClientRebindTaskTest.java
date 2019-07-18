@@ -1,8 +1,6 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.reciever;
 
 import com.cloudhopper.smpp.SmppSession;
-import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
-import com.github.mikesafonov.smpp.core.reciever.ResponseClientRebindTask;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -1,9 +1,8 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.sender;
 
 import com.cloudhopper.commons.gsm.Npi;
 import com.cloudhopper.commons.gsm.Ton;
 import com.cloudhopper.commons.gsm.TypeOfAddress;
-import com.github.mikesafonov.smpp.core.sender.UnknownTypeOfAddressParser;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -27,8 +26,17 @@ class UnknownTypeOfAddressParserTest {
 
     @ParameterizedTest
     @MethodSource("sources")
-    void shouldReturnUnknownAddress(String source) {
+    void shouldReturnUnknownSourceAddress(String source) {
         TypeOfAddress typeOfAddress = addressParser.getSource(source);
+
+        assertEquals(unknown.getTon(), typeOfAddress.getTon());
+        assertEquals(unknown.getNpi(), typeOfAddress.getNpi());
+    }
+
+    @ParameterizedTest
+    @MethodSource("sources")
+    void shouldReturnUnknownDestinationAddress(String source) {
+        TypeOfAddress typeOfAddress = addressParser.getDestination(source);
 
         assertEquals(unknown.getTon(), typeOfAddress.getTon());
         assertEquals(unknown.getNpi(), typeOfAddress.getNpi());

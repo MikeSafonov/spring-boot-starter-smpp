@@ -1,9 +1,6 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.api;
 
-import com.github.mikesafonov.smpp.api.IndexDetectionStrategy;
-import com.github.mikesafonov.smpp.api.RandomIndexDetectionStrategy;
-import com.github.mikesafonov.smpp.api.RoundRobinIndexDetectionStrategy;
-import com.github.mikesafonov.smpp.api.StrategySenderManager;
+
 import com.github.mikesafonov.smpp.config.SmscConnection;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import org.junit.jupiter.api.Nested;
@@ -12,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.mikesafonov.smpp.core.util.Randomizer.randomString;
+import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;

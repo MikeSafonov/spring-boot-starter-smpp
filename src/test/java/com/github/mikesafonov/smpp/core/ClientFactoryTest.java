@@ -10,7 +10,7 @@ import org.junit.jupiter.api.function.Executable;
 
 import java.time.Duration;
 
-import static com.github.mikesafonov.smpp.core.util.Randomizer.*;
+import static com.github.mikesafonov.smpp.util.Randomizer.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;

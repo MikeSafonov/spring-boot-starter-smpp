@@ -1,9 +1,6 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.config;
 
-import com.github.mikesafonov.smpp.config.ConnectionMode;
-import com.github.mikesafonov.smpp.config.SmppProperties;
-import com.github.mikesafonov.smpp.config.SmscConnection;
-import com.github.mikesafonov.smpp.config.SmscConnectionFactoryBean;
+
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.sender.MockSenderClient;
@@ -15,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.mikesafonov.smpp.core.util.Randomizer.randomString;
+import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

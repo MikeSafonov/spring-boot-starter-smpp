@@ -1,11 +1,9 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.reciever;
 
 import com.github.mikesafonov.smpp.config.SmppProperties;
-import com.github.mikesafonov.smpp.core.reciever.DefaultResponseClient;
-import com.github.mikesafonov.smpp.core.reciever.ReceiverConfiguration;
 import org.junit.jupiter.api.Test;
 
-import static com.github.mikesafonov.smpp.core.util.Randomizer.*;
+import static com.github.mikesafonov.smpp.util.Randomizer.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

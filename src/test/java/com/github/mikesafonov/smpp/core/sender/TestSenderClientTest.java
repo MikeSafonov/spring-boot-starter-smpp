@@ -1,17 +1,15 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.sender;
 
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
 import com.github.mikesafonov.smpp.core.generators.AlwaysSuccessSmppResultGenerator;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
-import com.github.mikesafonov.smpp.core.sender.SenderClient;
-import com.github.mikesafonov.smpp.core.sender.TestSenderClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.github.mikesafonov.smpp.core.util.Randomizer.randomString;
+import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
 import static java.util.Collections.emptyList;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +37,16 @@ class TestSenderClientTest {
         when(senderClient.getId()).thenReturn(id);
 
         assertEquals(id, testSenderClient.getId());
+    }
+
+    @Test
+    void shouldCallSenderClientSetup(){
+        SenderClient senderClient = mock(SenderClient.class);
+        SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
+        TestSenderClient testSenderClient = new TestSenderClient(senderClient, emptyList(), smppResultGenerator);
+        testSenderClient.setup();
+
+        verify(senderClient, times(1)).setup();
     }
 
     @Test

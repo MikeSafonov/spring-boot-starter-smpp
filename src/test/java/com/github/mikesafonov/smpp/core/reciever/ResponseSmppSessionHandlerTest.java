@@ -1,18 +1,17 @@
-package com.github.mikesafonov.smpp.core;
+package com.github.mikesafonov.smpp.core.reciever;
 
 import com.cloudhopper.smpp.pdu.DeliverSm;
 import com.cloudhopper.smpp.pdu.EnquireLink;
+import com.cloudhopper.smpp.pdu.PduResponse;
 import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
 import com.cloudhopper.smpp.util.DeliveryReceipt;
 import com.cloudhopper.smpp.util.DeliveryReceiptException;
 import com.github.mikesafonov.smpp.core.dto.DeliveryReport;
-import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
-import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
-import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -58,11 +57,13 @@ class ResponseSmppSessionHandlerTest {
         DeliverSm deliverSm = new DeliverSm();
         deliverSm.setShortMessage(dlSms.getBytes());
         DeliveryReport deliveryReport = DeliveryReport.of(DeliveryReceipt.parseShortMessage(dlSms, DateTimeZone.UTC));
-        responseSmppSessionHandler.firePduRequestReceived(deliverSm);
+        PduResponse pduResponse = responseSmppSessionHandler.firePduRequestReceived(deliverSm);
 
         verify(responseClient, times(1)).setInProcess(true);
         verify(responseClient, times(1)).setInProcess(false);
         verify(deliveryReportConsumer, times(1)).accept(deliveryReport);
+
+        assertThat(pduResponse.toString()).isEqualTo(deliverSm.createResponse().toString());
     }
 
 

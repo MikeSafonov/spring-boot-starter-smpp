@@ -1,4 +1,4 @@
-package com.github.mikesafonov.smpp.core.util;
+package com.github.mikesafonov.smpp.util;
 
 import com.devskiller.jfairy.Fairy;
 import lombok.experimental.UtilityClass;
