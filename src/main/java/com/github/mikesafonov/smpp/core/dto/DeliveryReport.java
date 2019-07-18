@@ -19,8 +19,9 @@ public class DeliveryReport {
     private int submitCount;
     private int error;
     private int state;
+    private String responseClientId;
 
-    public static DeliveryReport of(final DeliveryReceipt deliveryReceipt){
+    public static DeliveryReport of(final DeliveryReceipt deliveryReceipt, String responseClientId){
         DeliveryReport deliveryReport = new DeliveryReport();
         deliveryReport.setDeliveryCount(deliveryReceipt.getDeliveredCount());
         deliveryReport.setMessageId(deliveryReceipt.getMessageId());
@@ -28,6 +29,7 @@ public class DeliveryReport {
         deliveryReport.setState(deliveryReceipt.getState());
         deliveryReport.setSubmitCount(deliveryReceipt.getSubmitCount());
         deliveryReport.setDeliveryDate(convert(deliveryReceipt.getDoneDate()));
+        deliveryReport.setResponseClientId(responseClientId);
         return deliveryReport;
     }
 }

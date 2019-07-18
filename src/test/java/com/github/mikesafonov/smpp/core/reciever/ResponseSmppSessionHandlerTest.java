@@ -7,6 +7,7 @@ import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
 import com.cloudhopper.smpp.util.DeliveryReceipt;
 import com.cloudhopper.smpp.util.DeliveryReceiptException;
 import com.github.mikesafonov.smpp.core.dto.DeliveryReport;
+import com.github.mikesafonov.smpp.util.Randomizer;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +57,9 @@ class ResponseSmppSessionHandlerTest {
         String dlSms = "id:261BD3E2 sub:001 dlvrd:001 submit date:190305131326 done date:190305131326 stat:DELIVRD err:0 Text:report";
         DeliverSm deliverSm = new DeliverSm();
         deliverSm.setShortMessage(dlSms.getBytes());
-        DeliveryReport deliveryReport = DeliveryReport.of(DeliveryReceipt.parseShortMessage(dlSms, DateTimeZone.UTC));
+        String responseClientId = Randomizer.randomString();
+        when(responseClient.getId()).thenReturn(responseClientId);
+        DeliveryReport deliveryReport = DeliveryReport.of(DeliveryReceipt.parseShortMessage(dlSms, DateTimeZone.UTC), responseClientId);
         PduResponse pduResponse = responseSmppSessionHandler.firePduRequestReceived(deliverSm);
 
         verify(responseClient, times(1)).setInProcess(true);

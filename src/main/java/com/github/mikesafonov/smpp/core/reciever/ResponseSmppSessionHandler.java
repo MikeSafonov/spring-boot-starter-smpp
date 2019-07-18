@@ -63,7 +63,7 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
         byte[] shortMessage = deliverSm.getShortMessage();
         String sms = new String(shortMessage);
         DeliveryReceipt deliveryReceipt = DeliveryReceipt.parseShortMessage(sms, DateTimeZone.UTC);
-        return DeliveryReport.of(deliveryReceipt);
+        return DeliveryReport.of(deliveryReceipt, client.getId());
     }
 
     /**
