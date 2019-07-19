@@ -103,6 +103,7 @@ test {
 pitest {
     testPlugin = "junit5"
     targetClasses = ['com.github.mikesafonov.smpp.*']
+    excludedClasses = ['com.github.mikesafonov.smpp.config.SmppAutoConfiguration']
     threads = 4
     outputFormats = ['HTML', 'XML']
     enableDefaultIncrementalAnalysis = true

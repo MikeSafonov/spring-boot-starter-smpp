@@ -21,7 +21,7 @@ public class CancelMessageResponse {
      * Id of smsc connection
      */
     @NotBlank
-    private String smscId;
+    private String smscConnectionId;
     /**
      * Is cancel success
      */
@@ -32,12 +32,12 @@ public class CancelMessageResponse {
     private MessageErrorInformation messageErrorInformation;
 
 
-    public static CancelMessageResponse success(@NotNull CancelMessage original, @NotBlank String smscId) {
-        return new CancelMessageResponse(original, smscId, true, null);
+    public static CancelMessageResponse success(@NotNull CancelMessage original, @NotBlank String smscConnectionId) {
+        return new CancelMessageResponse(original, smscConnectionId, true, null);
     }
 
-    public static CancelMessageResponse error(@NotNull CancelMessage original, @NotBlank String smscId, @NotNull MessageErrorInformation messageErrorInformation) {
-        return new CancelMessageResponse(original, smscId, false, messageErrorInformation);
+    public static CancelMessageResponse error(@NotNull CancelMessage original, @NotBlank String smscConnectionId, @NotNull MessageErrorInformation messageErrorInformation) {
+        return new CancelMessageResponse(original, smscConnectionId, false, messageErrorInformation);
     }
 
 }

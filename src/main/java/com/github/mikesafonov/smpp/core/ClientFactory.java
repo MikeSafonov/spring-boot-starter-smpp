@@ -1,5 +1,6 @@
 package com.github.mikesafonov.smpp.core;
 
+import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DefaultResponseClient;
@@ -56,8 +57,9 @@ public class ClientFactory {
         long requestTimeout = getOrDefault(smsc.getRequestTimeout(), defaults.getRequestTimeout()).toMillis();
 
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
-        return new DefaultSenderClient(transmitterConfiguration, smsc.getMaxTry(),
-                ucs2Only, requestTimeout, typeOfAddressParser);
+        DefaultSmppClient client = new DefaultSmppClient();
+        return new DefaultSenderClient(transmitterConfiguration, client, smsc.getMaxTry(),
+                ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
 
     public static ResponseClient defaultResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc) {
@@ -70,7 +72,8 @@ public class ClientFactory {
         long rebindPeriod = getOrDefault(smsc.getRebindPeriod(), defaults.getRebindPeriod()).getSeconds();
 
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu);
-        return new DefaultResponseClient(receiverConfiguration, rebindPeriod);
+        DefaultSmppClient client = new DefaultSmppClient();
+        return new DefaultResponseClient(receiverConfiguration, client, rebindPeriod);
     }
 
     private void validateName(String name) {

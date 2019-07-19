@@ -34,7 +34,7 @@ class AlwaysSuccessSmppResultGeneratorTest {
 
         assertEquals(cancelMessage, messageResponse.getOriginal());
         assertTrue(messageResponse.isSuccess());
-        assertEquals(smscId, messageResponse.getSmscId());
+        assertEquals(smscId, messageResponse.getSmscConnectionId());
         assertNull(messageResponse.getMessageErrorInformation());
     }
 }

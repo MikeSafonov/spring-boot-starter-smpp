@@ -60,11 +60,11 @@ public class DefaultSenderClient implements SenderClient {
     private SmppSession session;
 
 
-    public DefaultSenderClient(@NotNull TransmitterConfiguration configuration, int maxTryCount,
-                                  boolean ucs2Only, long timeoutMillis, @NotNull TypeOfAddressParser typeOfAddressParser) {
+    public DefaultSenderClient(@NotNull TransmitterConfiguration configuration, @NotNull DefaultSmppClient client, int maxTryCount,
+                                  boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder) {
         this.sessionConfig = requireNonNull(configuration);
-        this.messageBuilder = new MessageBuilder(typeOfAddressParser);
-        this.client = new DefaultSmppClient();
+        this.messageBuilder = requireNonNull(messageBuilder);
+        this.client = requireNonNull(client);
         this.maxTryCount = maxTryCount;
         this.ucs2Only = ucs2Only;
         this.timeoutMillis = timeoutMillis;
@@ -240,16 +240,15 @@ public class DefaultSenderClient implements SenderClient {
      * @see #isBindingOrReconnect()
      */
     private boolean checkBoundState() {
-        if (!session.isBound()) {
-            return isBindingOrReconnect();
-        } else {
+        if (session.isBound()) {
             return pingOrReconnect();
+        } else {
+            return isBindingOrReconnect();
         }
     }
 
     /**
-     * Check is smpp session in `binding` state. If no in `binding` state - calling
-     * reconnect.
+     * Check is smpp session in `binding` state. Reconnect session if session not in `binding` state
      *
      * @return is {@link #session} in binding state - return false, otherwise returns result of {@link #reconnect()} method
      */

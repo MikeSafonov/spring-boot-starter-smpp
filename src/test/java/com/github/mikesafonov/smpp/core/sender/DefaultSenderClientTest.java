@@ -1,80 +1,60 @@
 package com.github.mikesafonov.smpp.core.sender;
 
-import com.github.mikesafonov.smpp.config.SmppProperties;
-import com.github.mikesafonov.smpp.core.dto.*;
+import com.cloudhopper.smpp.SmppSession;
+import com.cloudhopper.smpp.impl.DefaultSmppClient;
+import com.cloudhopper.smpp.type.SmppChannelException;
+import com.cloudhopper.smpp.type.SmppTimeoutException;
+import com.cloudhopper.smpp.type.UnrecoverablePduException;
+import com.github.mikesafonov.smpp.core.sender.exceptions.SenderClientBindException;
+import com.github.mikesafonov.smpp.core.sender.exceptions.SmppSessionException;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.*;
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Mike Safonov
  */
-class DefaultSenderClientTest {
+class DefaultSenderClientTest extends BaseDefaultSenderClientTest {
 
     @Test
     void shouldThrowNPE() {
-        DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
-        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
+        assertThrows(NullPointerException.class,
+                () -> new DefaultSenderClient(randomTransmitterConfiguration(), null, randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
+        assertThrows(NullPointerException.class,
+                () -> new DefaultSenderClient(null, new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
 
         assertThrows(NullPointerException.class,
-                () -> new DefaultSenderClient(null, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser));
-        assertThrows(NullPointerException.class,
-                () -> new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), null));
+                        () -> new DefaultSenderClient(randomTransmitterConfiguration(), new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), null));
+
     }
 
     @Test
     void shouldContainExpectedId() {
-        DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
-        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
-
-        SenderClient senderClient = new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
         assertEquals(transmitterConfiguration.getName(), senderClient.getId());
     }
 
     @Test
-    void shouldReturnErrorBecauseMessageIsEmpty(){
-        DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
-        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
+    void shouldThrowSenderClientBindExceptionWhenSetupFailed() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
 
-        SenderClient senderClient = new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
-        Message originalMessage = new Message(null, randomString(), randomString(), randomString(), MessageType.SIMPLE);
-        MessageErrorInformation messageErrorInformation = new MessageErrorInformation(0, "Empty message text");
+        when(smppClient.bind(transmitterConfiguration)).thenThrow(SmppSessionException.class);
 
-        MessageResponse messageResponse = senderClient.send(originalMessage);
-
-        assertEquals(originalMessage, messageResponse.getOriginal());
-        assertEquals(senderClient.getId(), messageResponse.getSmscId());
-        assertNull(messageResponse.getSmscMessageID());
-        assertFalse(messageResponse.isSent());
-        assertEquals(messageErrorInformation, messageResponse.getMessageErrorInformation());
+        String message = assertThrows(SenderClientBindException.class, () -> senderClient.setup()).getMessage();
+        assertEquals(format("Unable to bind with configuration: %s ", transmitterConfiguration.configInformation()), message);
     }
 
     @Test
-    void shouldReturnErrorBecauseMessageIdIsEmpty(){
-        DefaultTypeOfAddressParser defaultTypeOfAddressParser = new DefaultTypeOfAddressParser();
-        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
+    void shouldSuccessSetup() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
+        SmppSession session = mock(SmppSession.class);
 
-        SenderClient senderClient = new DefaultSenderClient(transmitterConfiguration, randomInt(), randomBoolean(), randomInt(), defaultTypeOfAddressParser);
-        CancelMessage originalMessage = new CancelMessage(null, randomString(), randomString());
-        MessageErrorInformation messageErrorInformation = new MessageErrorInformation(0, "Empty message id");
+        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
 
-        CancelMessageResponse messageResponse = senderClient.cancel(originalMessage);
+        assertDoesNotThrow(() -> senderClient.setup());
 
-        assertEquals(originalMessage, messageResponse.getOriginal());
-        assertEquals(senderClient.getId(), messageResponse.getSmscId());
-        assertFalse(messageResponse.isSuccess());
-        assertEquals(messageErrorInformation, messageResponse.getMessageErrorInformation());
-    }
+        senderClient.setup();
 
-
-    private TransmitterConfiguration randomTransmitterConfiguration(){
-        SmppProperties.Credentials credentials = new SmppProperties.Credentials();
-        credentials.setHost(randomIp());
-        credentials.setPort(randomPort());
-        credentials.setUsername(randomString());
-        credentials.setPassword(randomString());
-
-        return new TransmitterConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt());
+        verify(smppClient, times(1)).bind(transmitterConfiguration);
     }
 }
