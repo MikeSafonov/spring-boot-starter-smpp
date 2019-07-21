@@ -7,7 +7,6 @@ import com.github.mikesafonov.smpp.core.reciever.DefaultResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.ReceiverConfiguration;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
-import lombok.experimental.UtilityClass;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -21,19 +20,18 @@ import static java.util.Objects.requireNonNull;
 /**
  * Helper class for building {@link SenderClient} and {@link ResponseClient}
  */
-@UtilityClass
 public class ClientFactory {
 
-    public static SenderClient mockSender(@NotBlank String name, @NotNull SmppResultGenerator smppResultGenerator) {
+    public SenderClient mockSender(@NotBlank String name, @NotNull SmppResultGenerator smppResultGenerator) {
         validateName(name);
         requireNonNull(smppResultGenerator);
 
         return new MockSenderClient(smppResultGenerator, name);
     }
 
-    public static SenderClient testSender(@NotNull SenderClient senderClient, @NotNull SmppProperties.Defaults defaults,
-                                          @NotNull SmppResultGenerator smppResultGenerator,
-                                          @NotNull SmppProperties.SMSC smsc) {
+    public SenderClient testSender(@NotNull SenderClient senderClient, @NotNull SmppProperties.Defaults defaults,
+                                   @NotNull SmppProperties.SMSC smsc,
+                                   @NotNull SmppResultGenerator smppResultGenerator) {
         requireNonNull(senderClient);
         requireNonNull(defaults);
         requireNonNull(smppResultGenerator);
@@ -44,8 +42,8 @@ public class ClientFactory {
         return new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
     }
 
-    public static SenderClient defaultSender(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc,
-                                             @NotNull TypeOfAddressParser typeOfAddressParser) {
+    public SenderClient standardSender(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc,
+                                       @NotNull TypeOfAddressParser typeOfAddressParser) {
         validateName(name);
         requireNonNull(defaults);
         requireNonNull(smsc);
@@ -63,7 +61,7 @@ public class ClientFactory {
                 ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
 
-    public static ResponseClient defaultResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc) {
+    public ResponseClient standardResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc) {
         validateName(name);
         requireNonNull(defaults);
         requireNonNull(smsc);

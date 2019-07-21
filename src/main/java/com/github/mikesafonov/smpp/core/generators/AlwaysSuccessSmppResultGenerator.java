@@ -5,6 +5,7 @@ import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageResponse;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import java.util.UUID;
  *
  * @author Mike Safonov
  */
+@EqualsAndHashCode
 public class AlwaysSuccessSmppResultGenerator implements SmppResultGenerator {
 
     @Override

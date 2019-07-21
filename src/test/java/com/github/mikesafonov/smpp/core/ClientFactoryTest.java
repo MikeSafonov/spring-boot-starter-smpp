@@ -21,34 +21,36 @@ import static org.mockito.Mockito.when;
  */
 class ClientFactoryTest {
 
+    private ClientFactory clientFactory = new ClientFactory();
+
     @Test
     void shouldThrowRuntimeExceptionBecauseNameMustNotBeEmpty() throws Throwable {
-        checkThrowRuntimeWithMessage(() -> ClientFactory.mockSender(null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> ClientFactory.mockSender("", null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> ClientFactory.defaultResponse(null, null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> ClientFactory.defaultResponse("", null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> ClientFactory.defaultSender(null, null, null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> ClientFactory.defaultSender("", null, null, null), "Name must not be empty!");
+        checkThrowRuntimeWithMessage(() -> clientFactory.mockSender(null, null), "Name must not be empty!");
+        checkThrowRuntimeWithMessage(() -> clientFactory.mockSender("", null), "Name must not be empty!");
+        checkThrowRuntimeWithMessage(() -> clientFactory.standardResponse(null, null, null), "Name must not be empty!");
+        checkThrowRuntimeWithMessage(() -> clientFactory.standardResponse("", null, null), "Name must not be empty!");
+        checkThrowRuntimeWithMessage(() -> clientFactory.standardSender(null, null, null, null), "Name must not be empty!");
+        checkThrowRuntimeWithMessage(() -> clientFactory.standardSender("", null, null, null), "Name must not be empty!");
     }
 
     @Test
     void shouldThrowNpeBecauseInputArgumentIsNull() {
-        assertThrows(NullPointerException.class, () -> ClientFactory.defaultSender(randomString(), null, null, null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.defaultSender(randomString(), mock(SmppProperties.Defaults.class), null, null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.defaultSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.defaultResponse(randomString(), null, null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.defaultResponse(randomString(), mock(SmppProperties.Defaults.class), null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.mockSender(randomString(), null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.testSender(null, null, null, null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.testSender(mock(SenderClient.class), null, null, null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), null, null));
-        assertThrows(NullPointerException.class, () -> ClientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), mock(SmppResultGenerator.class), null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), null, null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), mock(SmppProperties.Defaults.class), null));
+        assertThrows(NullPointerException.class, () -> clientFactory.mockSender(randomString(), null));
+        assertThrows(NullPointerException.class, () -> clientFactory.testSender(null, null, null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), null, null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
     }
 
     @Test
     void shouldCreateMockSenderClient() {
         String name = randomString();
-        SenderClient senderClient = ClientFactory.mockSender(name, mock(SmppResultGenerator.class));
+        SenderClient senderClient = clientFactory.mockSender(name, mock(SmppResultGenerator.class));
 
         assertEquals(name, senderClient.getId());
         assertTrue(senderClient instanceof MockSenderClient);
@@ -68,7 +70,7 @@ class ClientFactoryTest {
         SmppProperties.SMSC smsc = new SmppProperties.SMSC();
         smsc.setCredentials(new SmppProperties.Credentials());
 
-        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
 
         assertThat(responseClient)
                 .extracting("id", "rebindPeriod", "sessionConfiguration.loggingOptions.isLogPduEnabled", "sessionConfiguration.loggingOptions.isLogBytesEnabled")
@@ -95,7 +97,7 @@ class ClientFactoryTest {
         smsc.setLoggingPdu(!isLoggingPdu);
         smsc.setRebindPeriod(customDuration);
 
-        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
 
         assertThat(responseClient)
                 .extracting("id", "rebindPeriod", "sessionConfiguration.loggingOptions.isLogPduEnabled", "sessionConfiguration.loggingOptions.isLogBytesEnabled")
@@ -117,7 +119,7 @@ class ClientFactoryTest {
         SenderClient senderClient = mock(SenderClient.class);
         when(senderClient.getId()).thenReturn(name);
 
-        TestSenderClient testSenderClient = (TestSenderClient) ClientFactory.testSender(senderClient, defaults, mock(SmppResultGenerator.class), smsc);
+        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
 
         assertThat(testSenderClient).satisfies(client -> {
             assertThat(client.getId()).isEqualTo(name);
@@ -140,7 +142,7 @@ class ClientFactoryTest {
         SenderClient senderClient = mock(SenderClient.class);
         when(senderClient.getId()).thenReturn(name);
 
-        TestSenderClient testSenderClient = (TestSenderClient) ClientFactory.testSender(senderClient, defaults, mock(SmppResultGenerator.class), smsc);
+        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
 
         assertThat(testSenderClient).satisfies(client -> {
             assertThat(client.getId()).isEqualTo(name);
@@ -162,7 +164,7 @@ class ClientFactoryTest {
         SenderClient senderClient = mock(SenderClient.class);
         when(senderClient.getId()).thenReturn(name);
 
-        TestSenderClient testSenderClient = (TestSenderClient) ClientFactory.testSender(senderClient, defaults, mock(SmppResultGenerator.class), smsc);
+        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
 
         assertThat(testSenderClient).satisfies(client -> {
             assertThat(client.getId()).isEqualTo(name);
@@ -186,7 +188,7 @@ class ClientFactoryTest {
         SenderClient senderClient = mock(SenderClient.class);
         when(senderClient.getId()).thenReturn(name);
 
-        TestSenderClient testSenderClient = (TestSenderClient) ClientFactory.testSender(senderClient, defaults, mock(SmppResultGenerator.class), smsc);
+        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
 
         assertThat(testSenderClient).satisfies(client -> {
             assertThat(client.getId()).isEqualTo(name);
@@ -217,7 +219,7 @@ class ClientFactoryTest {
         smsc.setMaxTry(maxTry);
 
 
-        DefaultSenderClient testSenderClient = (DefaultSenderClient) ClientFactory.defaultSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
+        DefaultSenderClient testSenderClient = (DefaultSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
 
         assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "maxTryCount",
                 "sessionConfig.loggingOptions.isLogPduEnabled", "sessionConfig.loggingOptions.isLogBytesEnabled", "sessionConfig.windowSize")
@@ -259,7 +261,7 @@ class ClientFactoryTest {
         smsc.setRequestTimeout(Duration.ofMillis(requestTimeout));
 
 
-        DefaultSenderClient testSenderClient = (DefaultSenderClient) ClientFactory.defaultSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
+        DefaultSenderClient testSenderClient = (DefaultSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
 
         assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "maxTryCount",
                 "sessionConfig.loggingOptions.isLogPduEnabled", "sessionConfig.loggingOptions.isLogBytesEnabled", "sessionConfig.windowSize")

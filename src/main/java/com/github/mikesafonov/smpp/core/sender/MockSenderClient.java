@@ -5,6 +5,7 @@ import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageResponse;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,6 +17,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Mike Safonov
  */
+@EqualsAndHashCode
 public class MockSenderClient implements SenderClient {
 
     private final SmppResultGenerator smppResultGenerator;
