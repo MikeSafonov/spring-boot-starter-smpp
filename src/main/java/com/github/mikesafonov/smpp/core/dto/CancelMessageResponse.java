@@ -1,6 +1,7 @@
 package com.github.mikesafonov.smpp.core.dto;
 
 import lombok.Value;
+import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class CancelMessageResponse {
     /**
      * Error information
      */
+    @Nullable
     private MessageErrorInformation messageErrorInformation;
 
 
