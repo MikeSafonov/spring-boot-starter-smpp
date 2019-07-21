@@ -13,6 +13,7 @@ import org.springframework.beans.factory.FactoryBean;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * @author Mike Safonov
  */
@@ -23,6 +24,7 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
     private final SmppResultGenerator smppResultGenerator;
     private final DeliveryReportConsumer deliveryReportConsumer;
     private final TypeOfAddressParser typeOfAddressParser;
+    private final ClientFactory clientFactory;
 
 
     @Override
@@ -32,16 +34,17 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
         SmppProperties.Defaults defaults = smppProperties.getDefaults();
         smppProperties.getConnections().forEach((name, smsc) -> {
             ConnectionMode connectionMode = smsc.getConnectionMode();
-            smscConnections.add(getSmscConnection(defaults, name, smsc, connectionMode));
+            smscConnections.add(getSmscConnection(defaults, name, smsc));
         });
 
         return smscConnections;
     }
 
-    private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc, ConnectionMode connectionMode) {
+    private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
+        ConnectionMode connectionMode = smsc.getConnectionMode();
         switch (connectionMode) {
             case MOCK: {
-                return new SmscConnection(name, ClientFactory.mockSender(name, smppResultGenerator));
+                return new SmscConnection(name, clientFactory.mockSender(name, smppResultGenerator));
             }
             case TEST: {
                 return getTestSmscConnection(defaults, name, smsc);
@@ -57,15 +60,16 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
     }
 
     private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
-        SenderClient testSenderClient = ClientFactory.testSender(ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser), defaults, smppResultGenerator, smsc);
-        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
+        SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
+        SenderClient testSenderClient = clientFactory.testSender(standardSender, defaults, smsc, smppResultGenerator);
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
         setupClients(testSenderClient, responseClient);
         return new SmscConnection(name, responseClient, testSenderClient);
     }
 
     private SmscConnection getStandardSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
-        SenderClient senderClient = ClientFactory.defaultSender(name, defaults, smsc, typeOfAddressParser);
-        ResponseClient responseClient = ClientFactory.defaultResponse(name, defaults, smsc);
+        SenderClient senderClient = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
         setupClients(senderClient, responseClient);
         return new SmscConnection(name, responseClient, senderClient);
     }
