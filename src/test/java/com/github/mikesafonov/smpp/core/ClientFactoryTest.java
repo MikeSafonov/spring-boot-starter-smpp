@@ -219,7 +219,7 @@ class ClientFactoryTest {
         smsc.setMaxTry(maxTry);
 
 
-        DefaultSenderClient testSenderClient = (DefaultSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
+        StandardSenderClient testSenderClient = (StandardSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
 
         assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "maxTryCount",
                 "sessionConfig.loggingOptions.isLogPduEnabled", "sessionConfig.loggingOptions.isLogBytesEnabled", "sessionConfig.windowSize")
@@ -261,7 +261,7 @@ class ClientFactoryTest {
         smsc.setRequestTimeout(Duration.ofMillis(requestTimeout));
 
 
-        DefaultSenderClient testSenderClient = (DefaultSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
+        StandardSenderClient testSenderClient = (StandardSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
 
         assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "maxTryCount",
                 "sessionConfig.loggingOptions.isLogPduEnabled", "sessionConfig.loggingOptions.isLogBytesEnabled", "sessionConfig.windowSize")

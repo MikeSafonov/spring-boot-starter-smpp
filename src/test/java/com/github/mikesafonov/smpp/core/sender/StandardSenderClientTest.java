@@ -17,17 +17,17 @@ import static org.mockito.Mockito.*;
 /**
  * @author Mike Safonov
  */
-class DefaultSenderClientTest extends BaseDefaultSenderClientTest {
+class StandardSenderClientTest extends BaseStandardSenderClientTest {
 
     @Test
     void shouldThrowNPE() {
         assertThrows(NullPointerException.class,
-                () -> new DefaultSenderClient(randomTransmitterConfiguration(), null, randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
+                () -> new StandardSenderClient(randomTransmitterConfiguration(), null, randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
         assertThrows(NullPointerException.class,
-                () -> new DefaultSenderClient(null, new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
+                () -> new StandardSenderClient(null, new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
 
         assertThrows(NullPointerException.class,
-                        () -> new DefaultSenderClient(randomTransmitterConfiguration(), new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), null));
+                        () -> new StandardSenderClient(randomTransmitterConfiguration(), new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), null));
 
     }
 

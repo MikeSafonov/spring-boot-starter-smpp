@@ -57,7 +57,7 @@ public class ClientFactory {
 
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
         DefaultSmppClient client = new DefaultSmppClient();
-        return new DefaultSenderClient(transmitterConfiguration, client, smsc.getMaxTry(),
+        return new StandardSenderClient(transmitterConfiguration, client, smsc.getMaxTry(),
                 ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
 

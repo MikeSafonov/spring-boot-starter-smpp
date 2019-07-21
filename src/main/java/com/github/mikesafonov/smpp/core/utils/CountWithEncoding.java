@@ -8,8 +8,8 @@ import lombok.Value;
  */
 @Value
 public class CountWithEncoding {
-    private int count;
-    private Charset charset;
+    private final int count;
+    private final Charset charset;
 
     public static CountWithEncoding empty(Charset charset){
         return new CountWithEncoding(0, charset);
