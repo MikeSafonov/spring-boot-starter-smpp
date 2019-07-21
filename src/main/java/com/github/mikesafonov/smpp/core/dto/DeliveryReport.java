@@ -3,6 +3,7 @@ package com.github.mikesafonov.smpp.core.dto;
 import com.cloudhopper.smpp.util.DeliveryReceipt;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
 import static com.github.mikesafonov.smpp.core.utils.JodaJavaConverter.convert;
@@ -21,7 +22,7 @@ public class DeliveryReport {
     private int state;
     private String responseClientId;
 
-    public static DeliveryReport of(final DeliveryReceipt deliveryReceipt, String responseClientId){
+    public static DeliveryReport of(@NotNull final DeliveryReceipt deliveryReceipt, @NotNull String responseClientId){
         DeliveryReport deliveryReport = new DeliveryReport();
         deliveryReport.setDeliveryCount(deliveryReceipt.getDeliveredCount());
         deliveryReport.setMessageId(deliveryReceipt.getMessageId());

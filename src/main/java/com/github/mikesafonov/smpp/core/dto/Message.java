@@ -2,6 +2,7 @@ package com.github.mikesafonov.smpp.core.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -34,6 +35,7 @@ public class Message {
     /**
      * Client specific id. May be null
      */
+    @Nullable
     private String messageId;
 
     /**
@@ -45,9 +47,4 @@ public class Message {
     public boolean isSilent() {
         return messageType == MessageType.SILENT;
     }
-
-    public boolean isDatagram() {
-        return messageType == MessageType.DATAGRAM;
-    }
-
 }

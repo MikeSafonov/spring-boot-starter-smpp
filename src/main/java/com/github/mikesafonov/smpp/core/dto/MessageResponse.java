@@ -1,6 +1,7 @@
 package com.github.mikesafonov.smpp.core.dto;
 
 import lombok.Value;
+import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ public class MessageResponse {
     /**
      * Id of smsc message. May be null if {@link #sent} false or if {@link #original} is datagram message
      */
+    @Nullable
     private String smscMessageID;
 
     /**
@@ -35,6 +37,7 @@ public class MessageResponse {
     /**
      * Error code and message. May be null if response success
      */
+    @Nullable
     private MessageErrorInformation messageErrorInformation;
 
 

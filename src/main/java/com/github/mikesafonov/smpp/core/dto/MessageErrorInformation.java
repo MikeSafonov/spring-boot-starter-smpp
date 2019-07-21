@@ -7,6 +7,6 @@ import lombok.Value;
  */
 @Value
 public class MessageErrorInformation {
-    private int errorCode;
-    private String errorMessage;
+    private final int errorCode;
+    private final String errorMessage;
 }
