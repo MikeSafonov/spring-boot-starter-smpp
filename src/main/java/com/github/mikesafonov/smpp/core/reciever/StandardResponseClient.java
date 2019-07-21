@@ -25,7 +25,7 @@ import static java.util.Objects.requireNonNull;
  * @author Mike Safonov
  */
 @Slf4j
-public class DefaultResponseClient implements ResponseClient {
+public class StandardResponseClient implements ResponseClient {
 
     private static final String SESSION_SUCCESS_MESSAGE = "SESSION SUCCESSFUL REBINDED";
 
@@ -62,16 +62,16 @@ public class DefaultResponseClient implements ResponseClient {
     private boolean inited = false;
 
     /**
-     * Create {@link DefaultResponseClient} with {@link DefaultSmppClient}.
+     * Create {@link StandardResponseClient} with {@link DefaultSmppClient}.
      *
      * @param receiverConfiguration    smpp receiver configuration
      * @param client                   {@link DefaultSmppClient}
      * @param rebindPeriod             reconnection period in seconds
      * @param scheduledExecutorService executor service
      */
-    public DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration,
-                                 @NotNull DefaultSmppClient client, long rebindPeriod,
-                                 @NotNull ScheduledExecutorService scheduledExecutorService) {
+    public StandardResponseClient(@NotNull ReceiverConfiguration receiverConfiguration,
+                                  @NotNull DefaultSmppClient client, long rebindPeriod,
+                                  @NotNull ScheduledExecutorService scheduledExecutorService) {
         this.sessionConfiguration = requireNonNull(receiverConfiguration);
         this.client = requireNonNull(client);
         this.scheduledExecutorService = requireNonNull(scheduledExecutorService);
@@ -106,7 +106,7 @@ public class DefaultResponseClient implements ResponseClient {
     }
 
     /**
-     * Destroying {@link DefaultResponseClient}. Closing session by {@link #closeSession()},
+     * Destroying {@link StandardResponseClient}. Closing session by {@link #closeSession()},
      * destroying smpp client and shutdown {@link #scheduledExecutorService}
      */
     @Override

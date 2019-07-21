@@ -20,12 +20,12 @@ import static org.mockito.Mockito.*;
 /**
  * @author Mike Safonov
  */
-class DefaultResponseClientTest {
+class StandardResponseClientTest {
     @Test
     void shouldThrowNPE() {
-        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(null, new DefaultSmppClient(), 10, Executors.newSingleThreadScheduledExecutor()));
-        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(randomReceiverConfiguration(), null, 10, Executors.newSingleThreadScheduledExecutor()));
-        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(randomReceiverConfiguration(), new DefaultSmppClient(), 10, null));
+        assertThrows(NullPointerException.class, () -> new StandardResponseClient(null, new DefaultSmppClient(), 10, Executors.newSingleThreadScheduledExecutor()));
+        assertThrows(NullPointerException.class, () -> new StandardResponseClient(randomReceiverConfiguration(), null, 10, Executors.newSingleThreadScheduledExecutor()));
+        assertThrows(NullPointerException.class, () -> new StandardResponseClient(randomReceiverConfiguration(), new DefaultSmppClient(), 10, null));
     }
 
     @Test
@@ -33,7 +33,7 @@ class DefaultResponseClientTest {
 
         ReceiverConfiguration receiverConfiguration = randomReceiverConfiguration();
 
-        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, new DefaultSmppClient(), randomInt(), Executors.newSingleThreadScheduledExecutor());
+        StandardResponseClient responseClient = new StandardResponseClient(receiverConfiguration, new DefaultSmppClient(), randomInt(), Executors.newSingleThreadScheduledExecutor());
 
         assertEquals(receiverConfiguration.getName(), responseClient.getId());
     }
@@ -47,7 +47,7 @@ class DefaultResponseClientTest {
 
         when(smppClient.bind(receiverConfiguration, handler)).thenThrow(SmppChannelException.class);
 
-        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, randomInt(), executorService);
+        StandardResponseClient responseClient = new StandardResponseClient(receiverConfiguration, smppClient, randomInt(), executorService);
 
 
         ResponseClientBindException exception = assertThrows(ResponseClientBindException.class, () -> responseClient.setup(handler));
@@ -66,7 +66,7 @@ class DefaultResponseClientTest {
 
         when(smppClient.bind(receiverConfiguration, handler)).thenReturn(session);
 
-        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
+        StandardResponseClient responseClient = new StandardResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
 
 
         responseClient.setup(handler);
@@ -89,7 +89,7 @@ class DefaultResponseClientTest {
 
         when(smppClient.bind(receiverConfiguration, handler)).thenReturn(session);
 
-        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
+        StandardResponseClient responseClient = new StandardResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
 
         responseClient.setup(handler);
 
@@ -115,7 +115,7 @@ class DefaultResponseClientTest {
         when(smppClient.bind(receiverConfiguration, handler)).thenReturn(session);
         when(executorService.scheduleAtFixedRate(any(ResponseClientRebindTask.class), eq(5L), eq(rebindPeriod), eq(TimeUnit.SECONDS))).thenReturn(rebindTask);
 
-        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
+        StandardResponseClient responseClient = new StandardResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
 
         responseClient.setup(handler);
 

@@ -2,8 +2,8 @@ package com.github.mikesafonov.smpp.core;
 
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
-import com.github.mikesafonov.smpp.core.reciever.DefaultResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
+import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -76,7 +76,7 @@ class ClientFactoryTest {
                 .extracting("id", "rebindPeriod", "sessionConfiguration.loggingOptions.isLogPduEnabled", "sessionConfiguration.loggingOptions.isLogBytesEnabled")
                 .containsExactly(name, defaultDuration.getSeconds(), isLoggingPdu, isLoggingBytes);
 
-        assertTrue(responseClient instanceof DefaultResponseClient);
+        assertTrue(responseClient instanceof StandardResponseClient);
     }
 
     @Test
@@ -103,7 +103,7 @@ class ClientFactoryTest {
                 .extracting("id", "rebindPeriod", "sessionConfiguration.loggingOptions.isLogPduEnabled", "sessionConfiguration.loggingOptions.isLogBytesEnabled")
                 .containsExactly(name, customDuration.getSeconds(), !isLoggingPdu, !isLoggingBytes);
 
-        assertTrue(responseClient instanceof DefaultResponseClient);
+        assertTrue(responseClient instanceof StandardResponseClient);
     }
 
     @Test

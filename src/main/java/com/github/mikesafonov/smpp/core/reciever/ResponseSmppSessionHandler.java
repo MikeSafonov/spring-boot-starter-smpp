@@ -67,7 +67,7 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
     }
 
     /**
-     * When channel closed unexpectedly then trying to reconnect using {@link DefaultResponseClient#reconnect()}.
+     * When channel closed unexpectedly then trying to reconnect using {@link StandardResponseClient#reconnect()}.
      */
     @Override
     public void fireChannelUnexpectedlyClosed() {

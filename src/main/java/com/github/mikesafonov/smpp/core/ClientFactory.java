@@ -3,9 +3,9 @@ package com.github.mikesafonov.smpp.core;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
-import com.github.mikesafonov.smpp.core.reciever.DefaultResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.ReceiverConfiguration;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
+import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
 
 import javax.validation.constraints.NotBlank;
@@ -72,7 +72,7 @@ public class ClientFactory {
 
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu);
         DefaultSmppClient client = new DefaultSmppClient();
-        return new DefaultResponseClient(receiverConfiguration, client, rebindPeriod, Executors.newSingleThreadScheduledExecutor());
+        return new StandardResponseClient(receiverConfiguration, client, rebindPeriod, Executors.newSingleThreadScheduledExecutor());
     }
 
     private void validateName(String name) {
