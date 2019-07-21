@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Mike Safonov
  */
-class DefaultSenderClientCancelMessageTest extends BaseDefaultSenderClientTest {
+class StandardSenderClientCancelMessageTest extends BaseStandardSenderClientTest {
 
 
     private static Stream<WindowFuture<Integer, PduRequest, PduResponse>> failWindowFutureProvider(){

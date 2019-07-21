@@ -9,8 +9,8 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Mike Safonov
  */
-abstract class BaseDefaultSenderClientTest {
-    protected DefaultSenderClient senderClient;
+abstract class BaseStandardSenderClientTest {
+    protected StandardSenderClient senderClient;
     protected TransmitterConfiguration transmitterConfiguration;
     protected DefaultSmppClient smppClient;
     protected MessageBuilder messageBuilder;
@@ -20,6 +20,6 @@ abstract class BaseDefaultSenderClientTest {
         transmitterConfiguration = randomTransmitterConfiguration();
         smppClient = mock(DefaultSmppClient.class);
         messageBuilder = mock(MessageBuilder.class);
-        senderClient = new DefaultSenderClient(transmitterConfiguration, smppClient, randomInt(), randomBoolean(), randomInt(), messageBuilder);
+        senderClient = new StandardSenderClient(transmitterConfiguration, smppClient, randomInt(), randomBoolean(), randomInt(), messageBuilder);
     }
 }

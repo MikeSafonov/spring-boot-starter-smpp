@@ -26,7 +26,7 @@ import static java.util.Objects.requireNonNull;
  * @author Mike Safonov
  */
 @Slf4j
-public class DefaultSenderClient implements SenderClient {
+public class StandardSenderClient implements SenderClient {
 
     private static final int INVALID_PARAM = 101;
     private static final int INVALID_SENDING_ERROR = 102;
@@ -60,8 +60,8 @@ public class DefaultSenderClient implements SenderClient {
     private SmppSession session;
 
 
-    public DefaultSenderClient(@NotNull TransmitterConfiguration configuration, @NotNull DefaultSmppClient client, int maxTryCount,
-                                  boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder) {
+    public StandardSenderClient(@NotNull TransmitterConfiguration configuration, @NotNull DefaultSmppClient client, int maxTryCount,
+                                boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder) {
         this.sessionConfig = requireNonNull(configuration);
         this.messageBuilder = requireNonNull(messageBuilder);
         this.client = requireNonNull(client);

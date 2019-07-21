@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author Mike Safonov
  */
-class DefaultSenderClientSendMessageTest extends BaseDefaultSenderClientTest {
+class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
 
     @Test
     void shouldReturnErrorBecauseMessageIsEmpty() {
