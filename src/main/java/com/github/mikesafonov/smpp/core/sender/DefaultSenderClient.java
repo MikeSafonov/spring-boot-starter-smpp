@@ -112,9 +112,6 @@ public class DefaultSenderClient implements SenderClient {
             SubmitSm submitSm = messageBuilder.createSubmitSm(message, ucs2Only);
             SubmitSmResp send = send(submitSm);
             return analyzeResponse(message, send);
-        } catch (SmppInvalidArgumentException e) {
-            log.error(e.getMessage(), e);
-            return MessageResponse.error(message, getId(), new MessageErrorInformation(INVALID_PARAM, "Invalid param"));
         } catch (IllegalAddressException e) {
             log.error(e.getMessage(), e);
             return MessageResponse.error(message, getId(), new MessageErrorInformation(INVALID_PARAM, e.getMessage()));

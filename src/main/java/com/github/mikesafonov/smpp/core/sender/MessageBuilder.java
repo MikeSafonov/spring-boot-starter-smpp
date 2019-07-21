@@ -12,8 +12,10 @@ import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
 import com.github.mikesafonov.smpp.core.sender.exceptions.IllegalAddressException;
+import com.github.mikesafonov.smpp.core.sender.exceptions.SmppMessageBuildingException;
 import com.github.mikesafonov.smpp.core.utils.CountWithEncoding;
 import com.github.mikesafonov.smpp.core.utils.MessageUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 
@@ -21,6 +23,7 @@ import javax.validation.constraints.NotNull;
 /**
  * @author MikeSafonov
  */
+@Slf4j
 public class MessageBuilder {
 
     private static final byte SILENT_CODING = (byte) 0xC0;
@@ -41,21 +44,25 @@ public class MessageBuilder {
      * @param message  client message
      * @param ucs2Only use UCS2 encoding only or not
      * @return message {@link SubmitSm}.
-     * @throws SmppInvalidArgumentException see {@link SubmitSm#setShortMessage}
      */
     @NotNull
-    public SubmitSm createSubmitSm(@NotNull Message message,  boolean ucs2Only) throws SmppInvalidArgumentException {
-        byte esmClass = getEsmClass(message.getMessageType());
-        Address sourceAddress = addressBuilder.createSourceAddress(message.getSource());
-        Address destAddress = addressBuilder.createDestinationAddress(message.getMsisdn());
+    public SubmitSm createSubmitSm(@NotNull Message message,  boolean ucs2Only) {
+        try {
+            byte esmClass = getEsmClass(message.getMessageType());
+            Address sourceAddress = addressBuilder.createSourceAddress(message.getSource());
+            Address destAddress = addressBuilder.createDestinationAddress(message.getMsisdn());
 
-        SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress, destAddress, message.isSilent(), ucs2Only);
+            SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress, destAddress, message.isSilent(), ucs2Only);
 
-        if (message.getMessageType() == MessageType.SIMPLE) {
-            registerDeliveryReport(submitSm);
+            if (message.getMessageType() == MessageType.SIMPLE) {
+                registerDeliveryReport(submitSm);
+            }
+
+            return submitSm;
+        } catch (SmppInvalidArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw new SmppMessageBuildingException();
         }
-
-        return submitSm;
     }
 
     /**

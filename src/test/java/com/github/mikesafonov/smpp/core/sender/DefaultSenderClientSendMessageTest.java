@@ -11,6 +11,8 @@ import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageErrorInformation;
 import com.github.mikesafonov.smpp.core.dto.MessageResponse;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
+import com.github.mikesafonov.smpp.core.sender.exceptions.IllegalAddressException;
+import com.github.mikesafonov.smpp.core.sender.exceptions.SmppMessageBuildingException;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
@@ -201,5 +203,52 @@ class DefaultSenderClientSendMessageTest extends BaseDefaultSenderClientTest {
         assertEquals("Cant send message", messageResponse.getMessageErrorInformation().getErrorMessage());
         assertEquals(102, messageResponse.getMessageErrorInformation().getErrorCode());
     }
+
+    @Test
+    void failSendMessageBecauseThrowIllegalAddressException() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException, RecoverablePduException {
+        SmppSession session = mock(SmppSession.class);
+        Message originalMessage = new Message(randomString(), randomString(), randomString(), randomString(), MessageType.SIMPLE);
+        IllegalAddressException illegalAddressException = new IllegalAddressException(randomString());
+
+        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
+        when(session.isBound()).thenReturn(false);
+        when(session.enquireLink(any(EnquireLink.class), anyLong())).thenReturn(new EnquireLinkResp());
+        when(messageBuilder.createSubmitSm(eq(originalMessage), anyBoolean())).thenThrow(illegalAddressException);
+
+        assertDoesNotThrow(() -> senderClient.setup());
+
+
+        MessageResponse messageResponse = senderClient.send(originalMessage);
+
+        assertEquals(originalMessage, messageResponse.getOriginal());
+        assertEquals(senderClient.getId(), messageResponse.getSmscId());
+        assertEquals(101, messageResponse.getMessageErrorInformation().getErrorCode());
+        assertEquals(illegalAddressException.getMessage(), messageResponse.getMessageErrorInformation().getErrorMessage());
+        assertNull(messageResponse.getSmscMessageID());
+    }
+
+    @Test
+    void failSendMessageBecauseThrowSmppInvalidArgumentException() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException, RecoverablePduException {
+        SmppSession session = mock(SmppSession.class);
+        Message originalMessage = new Message(randomString(), randomString(), randomString(), randomString(), MessageType.SIMPLE);
+
+        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
+        when(session.isBound()).thenReturn(false);
+        when(session.enquireLink(any(EnquireLink.class), anyLong())).thenReturn(new EnquireLinkResp());
+        when(messageBuilder.createSubmitSm(eq(originalMessage), anyBoolean())).thenThrow(SmppMessageBuildingException.class);
+
+        assertDoesNotThrow(() -> senderClient.setup());
+
+
+        MessageResponse messageResponse = senderClient.send(originalMessage);
+
+        assertEquals(originalMessage, messageResponse.getOriginal());
+        assertEquals(senderClient.getId(), messageResponse.getSmscId());
+        assertEquals(101, messageResponse.getMessageErrorInformation().getErrorCode());
+        assertEquals("Invalid param", messageResponse.getMessageErrorInformation().getErrorMessage());
+        assertNull(messageResponse.getSmscMessageID());
+    }
+
+
 
 }
