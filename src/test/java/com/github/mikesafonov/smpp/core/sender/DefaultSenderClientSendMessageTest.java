@@ -228,14 +228,14 @@ class DefaultSenderClientSendMessageTest extends BaseDefaultSenderClientTest {
     }
 
     @Test
-    void failSendMessageBecauseThrowSmppInvalidArgumentException() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException, RecoverablePduException {
+    void failSendMessageBecauseThrowSmppMessageBuildingException() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException, RecoverablePduException {
         SmppSession session = mock(SmppSession.class);
         Message originalMessage = new Message(randomString(), randomString(), randomString(), randomString(), MessageType.SIMPLE);
-
+        SmppMessageBuildingException exception = new SmppMessageBuildingException();
         when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
         when(session.isBound()).thenReturn(false);
         when(session.enquireLink(any(EnquireLink.class), anyLong())).thenReturn(new EnquireLinkResp());
-        when(messageBuilder.createSubmitSm(eq(originalMessage), anyBoolean())).thenThrow(SmppMessageBuildingException.class);
+        when(messageBuilder.createSubmitSm(eq(originalMessage), anyBoolean())).thenThrow(exception);
 
         assertDoesNotThrow(() -> senderClient.setup());
 

@@ -3,7 +3,6 @@ package com.github.mikesafonov.smpp.api;
 
 import com.github.mikesafonov.smpp.config.SmscConnection;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -75,43 +74,35 @@ class StrategySenderManagerTest {
         verifyZeroInteractions(indexDetectionStrategy);
     }
 
-    @Nested
-    class RandomIndexDetectionStrategyTest {
+    @Test
+    void shouldReturnNonEmptyClient() {
+        RandomIndexDetectionStrategy strategy = new RandomIndexDetectionStrategy();
+        List<SmscConnection> smscConnections = asList(
+                new SmscConnection(randomString(), mock(SenderClient.class)),
+                new SmscConnection(randomString(), mock(SenderClient.class))
+        );
 
-        @Test
-        void shouldReturnNonEmptyClient() {
-            RandomIndexDetectionStrategy strategy = new RandomIndexDetectionStrategy();
-            List<SmscConnection> smscConnections = asList(
-                    new SmscConnection(randomString(), mock(SenderClient.class)),
-                    new SmscConnection(randomString(), mock(SenderClient.class))
-            );
+        StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, strategy);
 
-            StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, strategy);
+        SenderClient client = strategySenderManager.getClient().get();
 
-            SenderClient client = strategySenderManager.getClient().get();
-
-            assertTrue(smscConnections.stream().map(SmscConnection::getSenderClient).collect(toList()).contains(client));
-
-        }
+        assertTrue(smscConnections.stream().map(SmscConnection::getSenderClient).collect(toList()).contains(client));
 
     }
 
-    @Nested
-    class RoundRobinIndexDetectionStrategyTest {
-        @Test
-        void shouldReturnNonEmptyClient() {
-            RoundRobinIndexDetectionStrategy strategy = new RoundRobinIndexDetectionStrategy();
-            List<SmscConnection> smscConnections = asList(
-                    new SmscConnection(randomString(), mock(SenderClient.class)),
-                    new SmscConnection(randomString(), mock(SenderClient.class))
-            );
+    @Test
+    void shouldReturnNonEmptyClientRoundRobin() {
+        RoundRobinIndexDetectionStrategy strategy = new RoundRobinIndexDetectionStrategy();
+        List<SmscConnection> smscConnections = asList(
+                new SmscConnection(randomString(), mock(SenderClient.class)),
+                new SmscConnection(randomString(), mock(SenderClient.class))
+        );
 
-            StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, strategy);
+        StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, strategy);
 
-            SenderClient client = strategySenderManager.getClient().get();
+        SenderClient client = strategySenderManager.getClient().get();
 
-            assertTrue(smscConnections.stream().map(SmscConnection::getSenderClient).collect(toList()).contains(client));
+        assertTrue(smscConnections.stream().map(SmscConnection::getSenderClient).collect(toList()).contains(client));
 
-        }
     }
 }
