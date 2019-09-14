@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -73,7 +74,7 @@ public class ClientFactory {
 
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu);
         DefaultSmppClient client = new DefaultSmppClient();
-        return new DefaultResponseClient(receiverConfiguration, client, rebindPeriod);
+        return new DefaultResponseClient(receiverConfiguration, client, rebindPeriod, Executors.newSingleThreadScheduledExecutor());
     }
 
     private void validateName(String name) {

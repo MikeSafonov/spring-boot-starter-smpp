@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Default implementation of {@link ResponseClient}.
+ *
  * @author Mike Safonov
  */
 @Slf4j
@@ -63,13 +64,17 @@ public class DefaultResponseClient implements ResponseClient {
     /**
      * Create {@link DefaultResponseClient} with {@link DefaultSmppClient}.
      *
-     * @param receiverConfiguration smpp receiver configuration
-     * @param client {@link DefaultSmppClient}
-     * @param rebindPeriod          reconnection period in seconds
+     * @param receiverConfiguration    smpp receiver configuration
+     * @param client                   {@link DefaultSmppClient}
+     * @param rebindPeriod             reconnection period in seconds
+     * @param scheduledExecutorService executor service
      */
-     public DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration, @NotNull DefaultSmppClient client, long rebindPeriod) {
+    public DefaultResponseClient(@NotNull ReceiverConfiguration receiverConfiguration,
+                                 @NotNull DefaultSmppClient client, long rebindPeriod,
+                                 @NotNull ScheduledExecutorService scheduledExecutorService) {
         this.sessionConfiguration = requireNonNull(receiverConfiguration);
         this.client = requireNonNull(client);
+        this.scheduledExecutorService = requireNonNull(scheduledExecutorService);
         this.rebindPeriod = rebindPeriod;
     }
 
@@ -79,7 +84,7 @@ public class DefaultResponseClient implements ResponseClient {
     }
 
     @Override
-    public void setup(ResponseSmppSessionHandler sessionHandler){
+    public void setup(@NotNull ResponseSmppSessionHandler sessionHandler) {
         if (!inited) {
             this.sessionHandler = sessionHandler;
             bind();
@@ -148,9 +153,6 @@ public class DefaultResponseClient implements ResponseClient {
      * @see Executors#newSingleThreadScheduledExecutor()
      */
     private void setupRebindTask() {
-        if (scheduledExecutorService == null) {
-            scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        }
         interruptIfNotNull();
         rebindTask = scheduledExecutorService.scheduleAtFixedRate(new ResponseClientRebindTask(this),
                 5, rebindPeriod, TimeUnit.SECONDS);
