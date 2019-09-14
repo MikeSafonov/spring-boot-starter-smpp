@@ -6,7 +6,7 @@ addons:
   sonarcloud:
     organization: "mikesafonov-github"
 install:
-  - ./gradlew build --scan
+  - ./gradlew build
 script:
   - sonar-scanner
 
