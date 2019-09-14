@@ -5,8 +5,8 @@ import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
-import com.github.mikesafonov.smpp.core.sender.exceptions.SenderClientBindException;
-import com.github.mikesafonov.smpp.core.sender.exceptions.SmppSessionException;
+import com.github.mikesafonov.smpp.core.exceptions.SenderClientBindException;
+import com.github.mikesafonov.smpp.core.exceptions.SmppSessionException;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.*;

@@ -4,7 +4,7 @@ import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageResponse;
-import com.github.mikesafonov.smpp.core.sender.exceptions.SenderClientBindException;
+import com.github.mikesafonov.smpp.core.exceptions.SenderClientBindException;
 
 import javax.validation.constraints.NotNull;
 

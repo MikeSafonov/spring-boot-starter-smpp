@@ -8,10 +8,10 @@ import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.pdu.*;
 import com.cloudhopper.smpp.type.*;
 import com.github.mikesafonov.smpp.core.dto.*;
-import com.github.mikesafonov.smpp.core.sender.exceptions.IllegalAddressException;
-import com.github.mikesafonov.smpp.core.sender.exceptions.SenderClientBindException;
-import com.github.mikesafonov.smpp.core.sender.exceptions.SmppException;
-import com.github.mikesafonov.smpp.core.sender.exceptions.SmppSessionException;
+import com.github.mikesafonov.smpp.core.exceptions.IllegalAddressException;
+import com.github.mikesafonov.smpp.core.exceptions.SenderClientBindException;
+import com.github.mikesafonov.smpp.core.exceptions.SmppException;
+import com.github.mikesafonov.smpp.core.exceptions.SmppSessionException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;

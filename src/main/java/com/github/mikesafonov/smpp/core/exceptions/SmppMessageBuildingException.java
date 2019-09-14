@@ -1,4 +1,4 @@
-package com.github.mikesafonov.smpp.core.sender.exceptions;
+package com.github.mikesafonov.smpp.core.exceptions;
 
 public class SmppMessageBuildingException extends SmppException {
     public SmppMessageBuildingException() {

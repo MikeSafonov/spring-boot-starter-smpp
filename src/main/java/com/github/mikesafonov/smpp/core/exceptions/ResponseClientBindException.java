@@ -1,4 +1,4 @@
-package com.github.mikesafonov.smpp.core.reciever;
+package com.github.mikesafonov.smpp.core.exceptions;
 
 /**
  * @author Mike Safonov

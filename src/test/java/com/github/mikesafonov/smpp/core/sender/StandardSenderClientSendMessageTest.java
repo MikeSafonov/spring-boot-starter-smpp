@@ -11,8 +11,8 @@ import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageErrorInformation;
 import com.github.mikesafonov.smpp.core.dto.MessageResponse;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
-import com.github.mikesafonov.smpp.core.sender.exceptions.IllegalAddressException;
-import com.github.mikesafonov.smpp.core.sender.exceptions.SmppMessageBuildingException;
+import com.github.mikesafonov.smpp.core.exceptions.IllegalAddressException;
+import com.github.mikesafonov.smpp.core.exceptions.SmppMessageBuildingException;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.randomString;

@@ -3,7 +3,7 @@ package com.github.mikesafonov.smpp.core.sender;
 import com.cloudhopper.commons.gsm.Npi;
 import com.cloudhopper.commons.gsm.Ton;
 import com.cloudhopper.commons.gsm.TypeOfAddress;
-import com.github.mikesafonov.smpp.core.sender.exceptions.IllegalAddressException;
+import com.github.mikesafonov.smpp.core.exceptions.IllegalAddressException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;

@@ -5,6 +5,7 @@ import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
+import com.github.mikesafonov.smpp.core.exceptions.ResponseClientBindException;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.Executors;

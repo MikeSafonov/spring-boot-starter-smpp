@@ -1,6 +1,7 @@
 package com.github.mikesafonov.smpp.core.reciever;
 
 import com.cloudhopper.smpp.SmppSession;
+import com.github.mikesafonov.smpp.core.exceptions.ResponseClientBindException;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;

@@ -8,6 +8,7 @@ import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
+import com.github.mikesafonov.smpp.core.exceptions.ResponseClientBindException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
