@@ -11,7 +11,6 @@ plugins {
     id "java"
     id "jacoco"
     id "io.spring.dependency-management" version "1.0.8.RELEASE"
-    id "com.gradle.build-scan" version "2.2"
     id "org.sonarqube" version "2.7"
 }
 
@@ -89,12 +88,6 @@ test {
     finalizedBy jacocoTestReport, "pitest"
 }
 
-//buildScan {
-//    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-//    termsOfServiceAgree = "yes"
-//
-//    publishAlways()
-//}
 
 pitest {
     testPlugin = "junit5"
