@@ -69,24 +69,22 @@ public class Randomizer {
         }
     }
 
-    public static TransmitterConfiguration randomTransmitterConfiguration() {
+    public static SmppProperties.Credentials randomCredentials(){
         SmppProperties.Credentials credentials = new SmppProperties.Credentials();
         credentials.setHost(randomIp());
         credentials.setPort(randomPort());
         credentials.setUsername(randomString());
         credentials.setPassword(randomString());
+        return credentials;
+    }
 
+    public static TransmitterConfiguration randomTransmitterConfiguration() {
+        SmppProperties.Credentials credentials = randomCredentials();
         return new TransmitterConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt());
     }
 
     public static ReceiverConfiguration randomReceiverConfiguration(){
-        SmppProperties.Credentials credentials = new SmppProperties.Credentials();
-        credentials.setHost(randomIp());
-        credentials.setPort(randomPort());
-        credentials.setUsername(randomString());
-        credentials.setPassword(randomString());
-
-
+        SmppProperties.Credentials credentials = randomCredentials();
         return new ReceiverConfiguration(randomString(), credentials, randomBoolean(), randomBoolean());
     }
 }

@@ -7,6 +7,8 @@ import com.github.mikesafonov.smpp.config.SmppProperties;
 
 import javax.validation.constraints.NotNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Configuration for sender session
  *
@@ -19,7 +21,7 @@ public class TransmitterConfiguration extends SmppSessionConfiguration {
         super();
 
         setType(SmppBindType.TRANSMITTER);
-        setName(name);
+        setName(requireNonNull(name));
         setHost(credentials.getHost());
         setPort(credentials.getPort());
         setSystemId(credentials.getUsername());
