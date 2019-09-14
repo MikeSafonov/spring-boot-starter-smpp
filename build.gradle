@@ -55,12 +55,12 @@ dependencies {
 
     implementation("javax.validation:validation-api:2.0.1.Final")
 
-    compileOnly("org.projectlombok:lombok:1.18.4")
-    annotationProcessor("org.projectlombok:lombok:1.18.4")
+    compileOnly("org.projectlombok:lombok:1.18.10")
+    annotationProcessor("org.projectlombok:lombok:1.18.10")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    testCompileOnly("org.projectlombok:lombok:1.18.4")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.4")
+    testCompileOnly("org.projectlombok:lombok:1.18.10")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.10")
 
     testImplementation("org.assertj:assertj-core:3.13.2")
 
