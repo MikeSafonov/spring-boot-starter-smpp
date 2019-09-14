@@ -1,12 +1,21 @@
 package com.github.mikesafonov.smpp.core.reciever;
 
+import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
-import com.github.mikesafonov.smpp.config.SmppProperties;
+import com.cloudhopper.smpp.type.SmppChannelException;
+import com.cloudhopper.smpp.type.SmppTimeoutException;
+import com.cloudhopper.smpp.type.UnrecoverablePduException;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import static com.github.mikesafonov.smpp.util.Randomizer.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Mike Safonov
@@ -14,8 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class DefaultResponseClientTest {
     @Test
     void shouldThrowNPE() {
-        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(null, new DefaultSmppClient(), 10));
-        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(randomReceiverConfiguration(), null, 10));
+        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(null, new DefaultSmppClient(), 10, Executors.newSingleThreadScheduledExecutor()));
+        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(randomReceiverConfiguration(), null, 10, Executors.newSingleThreadScheduledExecutor()));
+        assertThrows(NullPointerException.class, () -> new DefaultResponseClient(randomReceiverConfiguration(), new DefaultSmppClient(), 10, null));
     }
 
     @Test
@@ -23,23 +33,102 @@ class DefaultResponseClientTest {
 
         ReceiverConfiguration receiverConfiguration = randomReceiverConfiguration();
 
-        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, new DefaultSmppClient(), randomInt());
+        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, new DefaultSmppClient(), randomInt(), Executors.newSingleThreadScheduledExecutor());
 
         assertEquals(receiverConfiguration.getName(), responseClient.getId());
     }
 
-    private ReceiverConfiguration randomReceiverConfiguration(){
-        SmppProperties.Credentials credentials = new SmppProperties.Credentials();
-        credentials.setHost(randomIp());
-        credentials.setPort(randomPort());
-        credentials.setUsername(randomString());
-        credentials.setPassword(randomString());
+    @Test
+    void shouldFailSetup() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
+        ReceiverConfiguration receiverConfiguration = randomReceiverConfiguration();
+        DefaultSmppClient smppClient = mock(DefaultSmppClient.class);
+        ResponseSmppSessionHandler handler = mock(ResponseSmppSessionHandler.class);
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
 
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(credentials);
-        smsc.setLoggingBytes(false);
-        smsc.setLoggingPdu(false);
+        when(smppClient.bind(receiverConfiguration, handler)).thenThrow(SmppChannelException.class);
 
-        return new ReceiverConfiguration(randomString(), smsc.getCredentials(), smsc.getLoggingBytes(), smsc.getLoggingPdu());
+        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, randomInt(), executorService);
+
+
+        ResponseClientBindException exception = assertThrows(ResponseClientBindException.class, () -> responseClient.setup(handler));
+        assertEquals(format("Unable to bind with configuration: %s ", receiverConfiguration.configInformation()),
+                exception.getMessage());
+    }
+
+    @Test
+    void shouldSuccessSetup() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
+        ReceiverConfiguration receiverConfiguration = randomReceiverConfiguration();
+        DefaultSmppClient smppClient = mock(DefaultSmppClient.class);
+        ResponseSmppSessionHandler handler = mock(ResponseSmppSessionHandler.class);
+        SmppSession session = mock(SmppSession.class);
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        long rebindPeriod = randomLong();
+
+        when(smppClient.bind(receiverConfiguration, handler)).thenReturn(session);
+
+        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
+
+
+        responseClient.setup(handler);
+        responseClient.setup(handler);
+
+        assertFalse(responseClient.isInProcess());
+        assertEquals(session, responseClient.getSession());
+        verify(smppClient, times(1)).bind(receiverConfiguration, handler);
+        verify(executorService, times(1)).scheduleAtFixedRate(any(ResponseClientRebindTask.class), eq(5L), eq(rebindPeriod), eq(TimeUnit.SECONDS));
+    }
+
+    @Test
+    void shouldSuccessReconnect() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
+        ReceiverConfiguration receiverConfiguration = randomReceiverConfiguration();
+        DefaultSmppClient smppClient = mock(DefaultSmppClient.class);
+        ResponseSmppSessionHandler handler = mock(ResponseSmppSessionHandler.class);
+        SmppSession session = mock(SmppSession.class);
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        long rebindPeriod = randomLong();
+
+        when(smppClient.bind(receiverConfiguration, handler)).thenReturn(session);
+
+        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
+
+        responseClient.setup(handler);
+
+        responseClient.reconnect();
+
+        assertEquals(session, responseClient.getSession());
+        verify(session, times(1)).close();
+        verify(session, times(1)).destroy();
+        verify(executorService, times(1)).scheduleAtFixedRate(any(ResponseClientRebindTask.class), eq(5L), eq(rebindPeriod), eq(TimeUnit.SECONDS));
+        verify(smppClient, times(2)).bind(receiverConfiguration, handler);
+    }
+
+    @Test
+    void shouldDestroy() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
+        ReceiverConfiguration receiverConfiguration = randomReceiverConfiguration();
+        DefaultSmppClient smppClient = mock(DefaultSmppClient.class);
+        ResponseSmppSessionHandler handler = mock(ResponseSmppSessionHandler.class);
+        SmppSession session = mock(SmppSession.class);
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        long rebindPeriod = randomLong();
+        ScheduledFuture rebindTask = mock(ScheduledFuture.class);
+
+        when(smppClient.bind(receiverConfiguration, handler)).thenReturn(session);
+        when(executorService.scheduleAtFixedRate(any(ResponseClientRebindTask.class), eq(5L), eq(rebindPeriod), eq(TimeUnit.SECONDS))).thenReturn(rebindTask);
+
+        DefaultResponseClient responseClient = new DefaultResponseClient(receiverConfiguration, smppClient, rebindPeriod, executorService);
+
+        responseClient.setup(handler);
+
+        assertEquals(session, responseClient.getSession());
+        verify(executorService, times(1)).scheduleAtFixedRate(any(ResponseClientRebindTask.class), eq(5L), eq(rebindPeriod), eq(TimeUnit.SECONDS));
+
+        responseClient.destroyClient();
+
+        assertNull(responseClient.getSession());
+        verify(rebindTask, times(1)).cancel(true);
+        verify(session, times(1)).close();
+        verify(session, times(1)).destroy();
+        verify(executorService, times(1)).shutdown();
+        verify(smppClient, times(1)).destroy();
     }
 }
