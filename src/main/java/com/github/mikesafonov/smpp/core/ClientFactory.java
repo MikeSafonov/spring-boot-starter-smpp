@@ -2,6 +2,7 @@ package com.github.mikesafonov.smpp.core;
 
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.github.mikesafonov.smpp.config.SmppProperties;
+import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.ReceiverConfiguration;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
@@ -22,6 +23,13 @@ import static java.util.Objects.requireNonNull;
  */
 public class ClientFactory {
 
+    /**
+     * Creates {@link MockSenderClient} with name {@code name} and {@link SmppResultGenerator} {@code smppResultGenerator}
+     *
+     * @param name                name of client
+     * @param smppResultGenerator result generator
+     * @return mock sender client
+     */
     public SenderClient mockSender(@NotBlank String name, @NotNull SmppResultGenerator smppResultGenerator) {
         validateName(name);
         requireNonNull(smppResultGenerator);
@@ -29,6 +37,16 @@ public class ClientFactory {
         return new MockSenderClient(smppResultGenerator, name);
     }
 
+    /**
+     * Creates {@link TestSenderClient} with base client {@code senderClient}, {@link SmppResultGenerator}
+     * {@code smppResultGenerator} and list of allowed phones from {@code smsc} or {@code defaults}
+     *
+     * @param senderClient        base sender client
+     * @param defaults            default smpp properties
+     * @param smsc                smpp properties
+     * @param smppResultGenerator result generator for not allowed phones
+     * @return test sender client
+     */
     public SenderClient testSender(@NotNull SenderClient senderClient, @NotNull SmppProperties.Defaults defaults,
                                    @NotNull SmppProperties.SMSC smsc,
                                    @NotNull SmppResultGenerator smppResultGenerator) {
@@ -42,7 +60,18 @@ public class ClientFactory {
         return new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
     }
 
-    public SenderClient standardSender(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc,
+    /**
+     * Creates {@link StandardSenderClient} with name {@code name} and {@link TypeOfAddressParser} {@code typeOfAddressParser},
+     * configured with properties from {@code smsc} or {@code defaults}
+     *
+     * @param name                name of client
+     * @param defaults            default smpp properties
+     * @param smsc                smpp properties
+     * @param typeOfAddressParser address parser
+     * @return standard sender client
+     */
+    public SenderClient standardSender(@NotBlank String name, @NotNull SmppProperties.Defaults defaults,
+                                       @NotNull SmppProperties.SMSC smsc,
                                        @NotNull TypeOfAddressParser typeOfAddressParser) {
         validateName(name);
         requireNonNull(defaults);
@@ -61,7 +90,16 @@ public class ClientFactory {
                 ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
 
-    public ResponseClient standardResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults, @NotNull SmppProperties.SMSC smsc) {
+    /**
+     * Creates {@link StandardResponseClient} with name {@code name}, configured with properties from {@code smsc} or {@code defaults}
+     *
+     * @param name     name of client
+     * @param defaults default smpp properties
+     * @param smsc     smpp properties
+     * @return standard response client
+     */
+    public ResponseClient standardResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults,
+                                           @NotNull SmppProperties.SMSC smsc) {
         validateName(name);
         requireNonNull(defaults);
         requireNonNull(smsc);
@@ -75,13 +113,19 @@ public class ClientFactory {
         return new StandardResponseClient(receiverConfiguration, client, rebindPeriod, Executors.newSingleThreadScheduledExecutor());
     }
 
+    /**
+     * Check {@code name} not null and not blank
+     *
+     * @param name client name
+     * @throws ClientNameSmppException if name null or blank
+     */
     private void validateName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new RuntimeException("Name must not be empty!");
+            throw new ClientNameSmppException("Name must not be empty!");
         }
     }
 
-    private  <T> T getOrDefault(T obj, T defaultObj) {
+    private <T> T getOrDefault(T obj, T defaultObj) {
         if (obj == null) {
             return defaultObj;
         }

@@ -1,6 +1,7 @@
 package com.github.mikesafonov.smpp.core;
 
 import com.github.mikesafonov.smpp.config.SmppProperties;
+import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
@@ -25,12 +26,12 @@ class ClientFactoryTest {
 
     @Test
     void shouldThrowRuntimeExceptionBecauseNameMustNotBeEmpty() throws Throwable {
-        checkThrowRuntimeWithMessage(() -> clientFactory.mockSender(null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> clientFactory.mockSender("", null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> clientFactory.standardResponse(null, null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> clientFactory.standardResponse("", null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> clientFactory.standardSender(null, null, null, null), "Name must not be empty!");
-        checkThrowRuntimeWithMessage(() -> clientFactory.standardSender("", null, null, null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender(null, null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender("", null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse(null, null, null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse("", null, null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender(null, null, null, null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender("", null, null, null), "Name must not be empty!");
     }
 
     @Test
@@ -269,11 +270,11 @@ class ClientFactoryTest {
     }
 
 
-    private void checkThrowRuntimeWithMessage(Executable executable, String expectedMessage) throws Throwable {
+    private void checkThrowClientNameSmppWithMessage(Executable executable, String expectedMessage) throws Throwable {
         try {
             executable.execute();
             fail("Exception expected but not throwed");
-        } catch (RuntimeException e) {
+        } catch (ClientNameSmppException e) {
             assertEquals(expectedMessage, e.getMessage());
         }
     }
