@@ -6,6 +6,7 @@ import com.cloudhopper.smpp.type.LoggingOptions;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * Configuration for receiver session
@@ -18,7 +19,7 @@ public class ReceiverConfiguration extends SmppSessionConfiguration {
         super();
 
         setType(SmppBindType.RECEIVER);
-        setName(name);
+        setName(Objects.requireNonNull(name));
         setHost(credentials.getHost());
         setPort(credentials.getPort());
         setSystemId(credentials.getUsername());

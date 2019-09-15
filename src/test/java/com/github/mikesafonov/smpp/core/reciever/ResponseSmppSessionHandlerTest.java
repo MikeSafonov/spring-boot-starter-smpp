@@ -69,5 +69,12 @@ class ResponseSmppSessionHandlerTest {
         assertThat(pduResponse.toString()).isEqualTo(deliverSm.createResponse().toString());
     }
 
+    @Test
+    void shouldReconnect(){
+        responseSmppSessionHandler.fireChannelUnexpectedlyClosed();
+
+        verify(responseClient, times(1)).reconnect();
+    }
+
 
 }

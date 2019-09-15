@@ -22,7 +22,7 @@ class TransmitterConfigurationTest {
         SmppProperties.Credentials credentials = Randomizer.randomCredentials();
         boolean loggingBytes = Randomizer.randomBoolean();
         boolean loggingPdu = Randomizer.randomBoolean();
-        int windowsSize = 100;
+        int windowsSize = Randomizer.randomInt();
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, credentials, loggingBytes, loggingPdu, windowsSize);
 
         assertEquals(name, transmitterConfiguration.getName());
@@ -35,6 +35,9 @@ class TransmitterConfigurationTest {
         assertEquals(windowsSize, transmitterConfiguration.getWindowSize());
         assertEquals(loggingBytes, transmitterConfiguration.getLoggingOptions().isLogBytesEnabled());
         assertEquals(loggingPdu, transmitterConfiguration.getLoggingOptions().isLogPduEnabled());
+        assertEquals(String.format("%s host=%s port=%d username=%s windowsSize=%d", name, credentials.getHost(),
+                credentials.getPort(), credentials.getUsername(), windowsSize),
+                transmitterConfiguration.configInformation());
 
     }
 }
