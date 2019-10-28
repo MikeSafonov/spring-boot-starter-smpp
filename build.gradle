@@ -62,7 +62,7 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.10")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.10")
 
-    testImplementation("org.assertj:assertj-core:3.13.2")
+    testImplementation("org.assertj:assertj-core:3.14.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
     testImplementation("com.devskiller:jfairy:0.6.2")
