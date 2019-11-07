@@ -18,7 +18,7 @@ apply plugin: 'java-library'
 apply plugin: "info.solidsoft.pitest"
 
 ext {
-    springBootVersion = '2.2.0.RELEASE'
+    springBootVersion = '2.2.1.RELEASE'
 }
 
 sourceCompatibility = '1.8'
