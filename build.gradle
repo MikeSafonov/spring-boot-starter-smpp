@@ -24,6 +24,19 @@ ext {
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
+sourceSets {
+    testIntegration {
+        java {
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+        }
+    }
+}
+
+configurations {
+    testIntegrationImplementation.extendsFrom implementation
+    testIntegrationRuntime.extendsFrom runtimeOnly
+}
 
 repositories {
     mavenCentral()
@@ -55,6 +68,8 @@ dependencies {
 
     testImplementation("com.devskiller:jfairy:0.6.2")
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    testIntegrationImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 
 jacoco{
