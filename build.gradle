@@ -33,17 +33,6 @@ group = "com.github.mikesafonov"
 
 dependencyManagement {
     imports { mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}") }
-    dependencies {
-        dependencySet(group:'org.junit.jupiter', version: '5.5.2') {
-            entry 'junit-jupiter-api'
-            entry 'junit-jupiter-engine'
-            entry 'junit-jupiter-params'
-        }
-        dependencySet(group:'org.junit.platform', version: '1.5.2') {
-            entry 'junit-platform-engine'
-            entry 'junit-platform-commons'
-        }
-    }
 }
 
 dependencies {
@@ -64,11 +53,8 @@ dependencies {
 
     testImplementation("org.assertj:assertj-core:3.14.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
     testImplementation("com.devskiller:jfairy:0.6.2")
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'junit', module: 'junit'
-    }
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 
 jacoco{
@@ -83,7 +69,6 @@ jacocoTestReport{
 }
 
 test {
-    ignoreFailures = true
     useJUnitPlatform()
     finalizedBy jacocoTestReport, "pitest"
 }
