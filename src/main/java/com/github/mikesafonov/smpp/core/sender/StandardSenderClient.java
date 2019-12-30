@@ -136,6 +136,8 @@ public class StandardSenderClient implements SenderClient {
         }
 
         try {
+            checkSession();
+
             CancelSm cancelSm = messageBuilder.createCancelSm(cancelMessage);
             WindowFuture<Integer, PduRequest, PduResponse> futureResponse = session.sendRequestPdu(cancelSm, timeoutMillis, true);
             if (futureResponse.await() && futureResponse.isDone() && futureResponse.isSuccess()) {
