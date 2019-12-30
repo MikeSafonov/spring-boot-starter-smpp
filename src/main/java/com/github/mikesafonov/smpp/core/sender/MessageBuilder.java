@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class MessageBuilder {
 
-    private static final byte SILENT_CODING = (byte) 0xC0;
+    public static final byte SILENT_CODING = (byte) 0xC0;
 
     private final AddressBuilder addressBuilder;
 
