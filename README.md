@@ -1,7 +1,21 @@
 # spring-boot-starter-smpp
 
-![Travis-CI](https://travis-ci.com/MikeSafonov/spring-boot-starter-smpp.svg?branch=master)
+[![codecov](https://codecov.io/gh/MikeSafonov/spring-boot-starter-smpp/branch/master/graph/badge.svg)](https://codecov.io/gh/MikeSafonov/spring-boot-starter-smpp)
+[![Travis-CI](https://travis-ci.com/MikeSafonov/spring-boot-starter-smpp.svg?branch=master)](https://travis-ci.com/MikeSafonov/spring-boot-starter-smpp)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=alert_status)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=security_rating)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=bugs)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=code_smells)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=ncloc)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=MikeSafonov_spring-boot-starter-smpp&metric=sqale_index)](https://sonarcloud.io/dashboard?id=MikeSafonov_spring-boot-starter-smpp)
 
 
 This Spring Boot starter can be used by any Spring Boot application that wants to send SMS messages 
