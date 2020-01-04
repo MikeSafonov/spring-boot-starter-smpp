@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.toList;
  * @author Mike Safonov
  */
 @RequiredArgsConstructor
-public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnection>> {
+public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHolder> {
 
     private final SmppProperties smppProperties;
     private final SmppResultGenerator smppResultGenerator;
@@ -28,15 +28,16 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
     private final ClientFactory clientFactory;
 
     @Override
-    public List<SmscConnection> getObject() {
+    public SmscConnectionsHolder getObject() {
         SmppProperties.Defaults defaults = smppProperties.getDefaults();
-        return smppProperties.getConnections().entrySet().stream()
+        List<SmscConnection> connections = smppProperties.getConnections().entrySet().stream()
                 .map(smsc -> getSmscConnection(defaults, smsc.getKey(), smsc.getValue()))
                 .collect(toList());
+        return new SmscConnectionsHolder(connections);
     }
 
     private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
-        ConnectionMode connectionMode = smsc.getConnectionMode();
+        ConnectionMode connectionMode = (smsc.getConnectionMode() == null) ? defaults.getConnectionMode() : smsc.getConnectionMode();
         switch (connectionMode) {
             case MOCK: {
                 return new SmscConnection(name, clientFactory.mockSender(name, smppResultGenerator));
@@ -76,7 +77,7 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
 
     @Override
     public Class<?> getObjectType() {
-        return List.class;
+        return SmscConnectionsHolder.class;
     }
 
     @Override

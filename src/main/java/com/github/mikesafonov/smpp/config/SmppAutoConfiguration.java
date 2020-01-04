@@ -16,8 +16,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
 
 /**
  * @author Mike Safonov
@@ -60,7 +58,7 @@ public class SmppAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(SenderManager.class)
-    public SenderManager roundRobinSenderManager(List<SmscConnection> smscConnections) {
-        return new StrategySenderManager(smscConnections, new RoundRobinIndexDetectionStrategy());
+    public SenderManager roundRobinSenderManager(SmscConnectionsHolder smscConnections) {
+        return new StrategySenderManager(smscConnections.getConnections(), new RoundRobinIndexDetectionStrategy());
     }
 }

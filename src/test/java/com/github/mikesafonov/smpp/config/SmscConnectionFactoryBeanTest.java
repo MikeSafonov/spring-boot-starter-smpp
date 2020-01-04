@@ -48,7 +48,7 @@ class SmscConnectionFactoryBeanTest {
     @Test
     void shouldBeSingletonList() {
         assertTrue(smscConnectionFactoryBean.isSingleton());
-        assertEquals(List.class, smscConnectionFactoryBean.getObjectType());
+        assertEquals(SmscConnectionsHolder.class, smscConnectionFactoryBean.getObjectType());
     }
 
 
@@ -56,9 +56,9 @@ class SmscConnectionFactoryBeanTest {
     void shouldReturnEmptyList() {
         when(smppProperties.getConnections()).thenReturn(new HashMap<>());
 
-        List<SmscConnection> connections = smscConnectionFactoryBean.getObject();
+        SmscConnectionsHolder connections = smscConnectionFactoryBean.getObject();
 
-        assertTrue(connections.isEmpty());
+        assertTrue(connections.getConnections().isEmpty());
     }
 
 
@@ -77,7 +77,8 @@ class SmscConnectionFactoryBeanTest {
                 mockSenderClient
         );
 
-        List<SmscConnection> connections = smscConnectionFactoryBean.getObject();
+        SmscConnectionsHolder holder = smscConnectionFactoryBean.getObject();
+        List<SmscConnection> connections = holder.getConnections();
 
         assertThat(connections).satisfies(smscConnections -> {
             assertThat(smscConnections.size()).isEqualTo(1);
@@ -109,7 +110,8 @@ class SmscConnectionFactoryBeanTest {
         when(smppProperties.getConnections()).thenReturn(connectionMap);
         when(smppProperties.getDefaults()).thenReturn(defaults);
 
-        List<SmscConnection> connections = smscConnectionFactoryBean.getObject();
+        SmscConnectionsHolder holder = smscConnectionFactoryBean.getObject();
+        List<SmscConnection> connections = holder.getConnections();
 
         verify(standardSenderClient, times(1)).setup();
         verify(standardResponseClient, times(1)).setup(any(ResponseSmppSessionHandler.class));
@@ -149,7 +151,8 @@ class SmscConnectionFactoryBeanTest {
         when(smppProperties.getConnections()).thenReturn(connectionMap);
         when(smppProperties.getDefaults()).thenReturn(defaults);
 
-        List<SmscConnection> connections = smscConnectionFactoryBean.getObject();
+        SmscConnectionsHolder holder = smscConnectionFactoryBean.getObject();
+        List<SmscConnection> connections = holder.getConnections();
 
         verify(standardSenderClient, times(1)).setup();
         verify(standardResponseClient, times(1)).setup(any(ResponseSmppSessionHandler.class));
