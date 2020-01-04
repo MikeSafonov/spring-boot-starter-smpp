@@ -1,0 +1,23 @@
+@startuml
+interface SenderManager {
+    Optional<SenderClient> getByName(String name)
+    Optional<SenderClient> getClient()
+}
+abstract BaseSenderManager{
+    # List<SmscConnection> smscConnections
+}
+
+class StrategySenderManager{
+    - IndexDetectionStrategy indexDetectionStrategy
+}
+
+interface IndexDetectionStrategy {
+    int next(int size)
+}
+
+IndexDetectionStrategy *- StrategySenderManager
+SenderManager <|-- BaseSenderManager
+BaseSenderManager <|-- StrategySenderManager
+IndexDetectionStrategy <|-- RandomIndexDetectionStrategy
+IndexDetectionStrategy <|-- RoundRobinIndexDetectionStrategy
+@enduml
