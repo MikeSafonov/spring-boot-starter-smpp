@@ -129,7 +129,7 @@ The following tables show the available configuration:
 
 You can build application using following command:
 
-    ./gradlew clean build
+    ./gradlew clean build -x signArchives
     
 #### Requirements:
 
