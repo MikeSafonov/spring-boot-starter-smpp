@@ -14,7 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author Mike Safonov
@@ -33,7 +33,7 @@ class StrategySenderManagerTest {
         StrategySenderManager strategySenderManager = new StrategySenderManager(emptyList(), indexDetectionStrategy);
 
         assertEquals(Optional.empty(), strategySenderManager.getByName(randomString()));
-        verifyZeroInteractions(indexDetectionStrategy);
+        verifyNoInteractions(indexDetectionStrategy);
     }
 
     @Test
@@ -49,7 +49,7 @@ class StrategySenderManagerTest {
 
         assertEquals(Optional.empty(), strategySenderManager.getByName(randomString()));
         assertEquals(expectedConnection.getSenderClient(), strategySenderManager.getByName(expectedName).get());
-        verifyZeroInteractions(indexDetectionStrategy);
+        verifyNoInteractions(indexDetectionStrategy);
     }
 
     @Test
@@ -58,7 +58,7 @@ class StrategySenderManagerTest {
         StrategySenderManager strategySenderManager = new StrategySenderManager(emptyList(), mock(IndexDetectionStrategy.class));
 
         assertEquals(Optional.empty(), strategySenderManager.getClient());
-        verifyZeroInteractions(indexDetectionStrategy);
+        verifyNoInteractions(indexDetectionStrategy);
     }
 
     @Test
@@ -71,7 +71,7 @@ class StrategySenderManagerTest {
         StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, mock(IndexDetectionStrategy.class));
 
         assertEquals(expectedConnection.getSenderClient(), strategySenderManager.getClient().get());
-        verifyZeroInteractions(indexDetectionStrategy);
+        verifyNoInteractions(indexDetectionStrategy);
     }
 
     @Test

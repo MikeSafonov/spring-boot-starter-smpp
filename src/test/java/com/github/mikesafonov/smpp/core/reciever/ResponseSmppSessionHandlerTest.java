@@ -41,7 +41,7 @@ class ResponseSmppSessionHandlerTest {
     void shouldDoNothingBecauseRequestIsNull() {
         responseSmppSessionHandler.firePduRequestReceived(null);
 
-        verifyZeroInteractions(responseClient, deliveryReportConsumer);
+        verifyNoInteractions(responseClient, deliveryReportConsumer);
     }
 
     @Test
@@ -49,7 +49,7 @@ class ResponseSmppSessionHandlerTest {
         EnquireLink enquireLink = new EnquireLink();
         responseSmppSessionHandler.firePduRequestReceived(enquireLink);
 
-        verifyZeroInteractions(responseClient, deliveryReportConsumer);
+        verifyNoInteractions(responseClient, deliveryReportConsumer);
     }
 
     @Test
