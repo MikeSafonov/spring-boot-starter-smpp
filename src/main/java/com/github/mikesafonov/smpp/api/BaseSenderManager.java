@@ -6,7 +6,6 @@ import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,11 +22,12 @@ public abstract class BaseSenderManager implements SenderManager {
     }
 
     @Override
-    public Optional<SenderClient> getByName(@NotBlank String name) {
+    public SenderClient getByName(@NotBlank String name) {
         return smscConnections.stream()
                 .filter(smscConnection -> smscConnection.getName().equals(name))
                 .findFirst()
-                .map(SmscConnection::getSenderClient);
+                .map(SmscConnection::getSenderClient)
+                .orElseThrow(NoSenderClientException::new);
     }
 
     protected boolean isEmpty() {

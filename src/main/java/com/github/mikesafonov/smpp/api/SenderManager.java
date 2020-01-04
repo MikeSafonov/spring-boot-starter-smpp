@@ -3,7 +3,6 @@ package com.github.mikesafonov.smpp.api;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Optional;
 
 /**
  * Holder class for sender clients.
@@ -18,10 +17,10 @@ public interface SenderManager {
      * @param name name of sender client
      * @return sender client
      */
-    Optional<SenderClient> getByName(@NotBlank String name);
+    SenderClient getByName(@NotBlank String name);
 
     /**
      * @return next sender client
      */
-    Optional<SenderClient> getClient();
+    SenderClient getClient();
 }

@@ -5,7 +5,6 @@ import com.github.mikesafonov.smpp.core.sender.SenderClient;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -25,13 +24,12 @@ public class StrategySenderManager extends BaseSenderManager {
     }
 
     @Override
-    public Optional<SenderClient> getClient() {
+    public SenderClient getClient() {
         if (isEmpty()) {
-            return Optional.empty();
+            throw new NoSenderClientException();
         }
 
-
         int nextIndex = indexDetectionStrategy.next(size());
-        return Optional.of(smscConnections.get(nextIndex).getSenderClient());
+        return smscConnections.get(nextIndex).getSenderClient();
     }
 }

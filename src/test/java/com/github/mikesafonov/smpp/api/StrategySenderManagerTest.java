@@ -6,7 +6,6 @@ import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
 import static java.util.Arrays.asList;
@@ -32,7 +31,7 @@ class StrategySenderManagerTest {
         IndexDetectionStrategy indexDetectionStrategy = mock(IndexDetectionStrategy.class);
         StrategySenderManager strategySenderManager = new StrategySenderManager(emptyList(), indexDetectionStrategy);
 
-        assertEquals(Optional.empty(), strategySenderManager.getByName(randomString()));
+        assertThrows(NoSenderClientException.class, () -> strategySenderManager.getByName(randomString()));
         verifyNoInteractions(indexDetectionStrategy);
     }
 
@@ -47,8 +46,8 @@ class StrategySenderManagerTest {
         );
         StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, indexDetectionStrategy);
 
-        assertEquals(Optional.empty(), strategySenderManager.getByName(randomString()));
-        assertEquals(expectedConnection.getSenderClient(), strategySenderManager.getByName(expectedName).get());
+        assertThrows(NoSenderClientException.class, () -> strategySenderManager.getByName(randomString()));
+        assertEquals(expectedConnection.getSenderClient(), strategySenderManager.getByName(expectedName));
         verifyNoInteractions(indexDetectionStrategy);
     }
 
@@ -57,7 +56,7 @@ class StrategySenderManagerTest {
         IndexDetectionStrategy indexDetectionStrategy = mock(IndexDetectionStrategy.class);
         StrategySenderManager strategySenderManager = new StrategySenderManager(emptyList(), mock(IndexDetectionStrategy.class));
 
-        assertEquals(Optional.empty(), strategySenderManager.getClient());
+        assertThrows(NoSenderClientException.class, strategySenderManager::getClient);
         verifyNoInteractions(indexDetectionStrategy);
     }
 
@@ -70,7 +69,7 @@ class StrategySenderManagerTest {
         );
         StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, mock(IndexDetectionStrategy.class));
 
-        assertEquals(expectedConnection.getSenderClient(), strategySenderManager.getClient().get());
+        assertEquals(expectedConnection.getSenderClient(), strategySenderManager.getClient());
         verifyNoInteractions(indexDetectionStrategy);
     }
 
@@ -84,7 +83,7 @@ class StrategySenderManagerTest {
 
         StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, strategy);
 
-        SenderClient client = strategySenderManager.getClient().get();
+        SenderClient client = strategySenderManager.getClient();
 
         assertTrue(smscConnections.stream().map(SmscConnection::getSenderClient).collect(toList()).contains(client));
 
@@ -100,7 +99,7 @@ class StrategySenderManagerTest {
 
         StrategySenderManager strategySenderManager = new StrategySenderManager(smscConnections, strategy);
 
-        SenderClient client = strategySenderManager.getClient().get();
+        SenderClient client = strategySenderManager.getClient();
 
         assertTrue(smscConnections.stream().map(SmscConnection::getSenderClient).collect(toList()).contains(client));
 

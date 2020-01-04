@@ -14,7 +14,7 @@ public class RoundRobinApplicationService {
                 .from(from)
                 .to(to)
                 .build();
-        SenderClient client = senderManager.getClient().get();
+        SenderClient client = senderManager.getClient();
         client.send(message);
     }
 }
