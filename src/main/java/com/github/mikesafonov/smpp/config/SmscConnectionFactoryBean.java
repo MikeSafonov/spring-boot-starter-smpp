@@ -10,8 +10,9 @@ import com.github.mikesafonov.smpp.core.sender.TypeOfAddressParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.FactoryBean;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -26,18 +27,12 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
     private final TypeOfAddressParser typeOfAddressParser;
     private final ClientFactory clientFactory;
 
-
     @Override
     public List<SmscConnection> getObject() {
-
-        List<SmscConnection> smscConnections = new ArrayList<>();
         SmppProperties.Defaults defaults = smppProperties.getDefaults();
-        smppProperties.getConnections().forEach((name, smsc) -> {
-            ConnectionMode connectionMode = smsc.getConnectionMode();
-            smscConnections.add(getSmscConnection(defaults, name, smsc));
-        });
-
-        return smscConnections;
+        return smppProperties.getConnections().entrySet().stream()
+                .map(smsc -> getSmscConnection(defaults, smsc.getKey(), smsc.getValue()))
+                .collect(toList());
     }
 
     private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
@@ -52,7 +47,6 @@ public class SmscConnectionFactoryBean implements FactoryBean<List<SmscConnectio
             case STANDARD: {
                 return getStandardSmscConnection(defaults, name, smsc);
             }
-
             default: {
                 throw new RuntimeException("Unknown connection mode " + connectionMode);
             }

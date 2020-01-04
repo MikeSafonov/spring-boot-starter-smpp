@@ -2,7 +2,7 @@ package com.github.mikesafonov.smpp.api;
 
 
 /**
- * Should be used for next index creation when in {@link StrategySenderManager}
+ * Should be used for next index creation in {@link StrategySenderManager}
  *
  * @author Mike Safonov
  */
