@@ -5,21 +5,21 @@
       "name": "smpp.defaults.ucs2Only",
       "type": "java.lang.Boolean",
       "defaultValue": false,
-      "description": "Using ucs2 encoding only"
+      "description": "Using ucs2 encoding only or not"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
       "name": "smpp.defaults.maxTry",
       "type": "java.lang.Integer",
       "defaultValue": 5,
-      "description": "Number of attempts to reconnect if smpp session closed"
+      "description": "Number of attempts to reconnect if smpp session is closed"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
       "name": "smpp.defaults.connectionMode",
       "type": "com.github.mikesafonov.smpp.config.ConnectionMode",
       "defaultValue": "STANDARD",
-      "description": "Connection mode of client"
+      "description": "Client`s connection mode"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
@@ -74,7 +74,7 @@
       "name": "smpp.setupRightAway",
       "type": "java.lang.Boolean",
       "defaultValue": true,
-      "description": "should setup smpp clients after creation and fail fast if connection cant be established"
+      "description": "Should setup smpp clients after creation and fail fast if connection cant be established"
     }
   ]
 }
