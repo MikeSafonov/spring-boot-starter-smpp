@@ -24,21 +24,128 @@ using [SMPP](https://en.wikipedia.org/wiki/Short_Message_Peer-to-Peer). [SMPP v3
 ## Features
 
 - Sending message with delivery receipt 
-- Sending datagram message
+- Sending datagram message (without delivery receipt)
 - Sending silent message
 - Cancel message
 - Multiply SMPP connection
 - SMPP connection load balancing
 
-## Key abstraction
+## Usage
 
-This starter provide several abstraction:
+Add the following dependency to your project:
+```
+dependencies {
+    implementation 'com.github.mikesafonov:spring-boot-starter-smpp:1.0.0'
+}
+```
+Configure spring-boot application via properties (see [Configuration](#Configuration) section).
+
+## Configuration
+
+The following tables show the available configuration:
+
+| Configuration                                   | Description                                                                              | Default                                                              |
+|-------------------------------------------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| `smpp.defaults`                                 | Default smpp connection properties                                                       |                                                                      |
+| `smpp.defaults.ucs2Only`                        | Using ucs2 encoding only or not                                                          | `false`                                                              |
+| `smpp.defaults.maxTry`                          | Number of attempts to reconnect if smpp session is closed                                | `5`                                                                  |
+| `smpp.defaults.connectionMode`                  | Client`s connection mode                                                                 | `STANDARD`   see `com.github.mikesafonov.smpp.config.ConnectionMode` |
+| `smpp.defaults.windowSize`                      | Smpp connection window size                                                              | `90`                                                                 |
+| `smpp.defaults.loggingPdu`                      | Is logging smpp pdu                                                                      | `false`                                                              |
+| `smpp.defaults.loggingBytes`                    | Is logging smpp bytes                                                                    | `false`                                                              |
+| `smpp.defaults.rebindPeriod`                    | Connection rebind period (Duration)                                                      | `90s`                                                                |
+| `smpp.defaults.requestTimeout`                  | Request timeout (Duration)                                                               | `5s`                                                                 |
+| `smpp.defaults.allowedPhones`                   | Array of phones to send. Using only if `connectionMode` is `TEST`                        | `[]`                                                                 |
+| `smpp.connections`                              | Map of SMSC connections                                                                  |                                                                      |
+| `smpp.connections.<name>.credentials`           | SMSC connection credentials                                                              |                                                                      |
+| `smpp.connections.<name>.credentials.host`      | SMSC host                                                                                |                                                                      |
+| `smpp.connections.<name>.credentials.port`      | SMSC port                                                                                |                                                                      |
+| `smpp.connections.<name>.credentials.username`  | SMSC username                                                                            |                                                                      |
+| `smpp.connections.<name>.credentials.password`  | SMSC password                                                                            |                                                                      |
+| `smpp.connections.<name>.ucs2Only`              | Using ucs2 encoding only or not                                                          | `false`                                                              |
+| `smpp.connections.<name>.maxTry`                | Number of attempts to reconnect if smpp session is closed                                | `5`                                                                  |
+| `smpp.connections.<name>.connectionMode`        | Client`s connection mode                                                                 | `STANDARD`   see `com.github.mikesafonov.smpp.config.ConnectionMode` |
+| `smpp.connections.<name>.windowSize`            | Smpp connection window size                                                              | `90`                                                                 |
+| `smpp.connections.<name>.loggingPdu`            | Is logging smpp pdu | `false`                                                            |                                                                      |
+| `smpp.connections.<name>.loggingBytes`          | Is logging smpp bytes | `false`                                                          |                                                                      |
+| `smpp.connections.<name>.rebindPeriod`          | Connection rebind period (Duration)                                                      | `90s`                                                                |
+| `smpp.connections.<name>.requestTimeout`        | Request timeout (Duration)                                                               | `5s`                                                                 |
+| `smpp.connections.<name>.allowedPhones`         | Array of phones to send. Using only if `connectionMode` is `TEST`                        | `[]`                                                                 |
+| `smpp.setupRightAway`                           | Should setup smpp clients after creation and fail fast if connection cant be established | `true`                                                               |
+
+Configuration example for `.properties` file:
+
+    smpp.connections.one.credentials.host=localhost
+    smpp.connections.one.credentials.username=user
+    smpp.connections.one.credentials.password=pass
+    smpp.connections.one.credentials.port=1111
+    smpp.connections.two.credentials.host=localhost
+    smpp.connections.two.credentials.username=user2
+    smpp.connections.two.credentials.password=pass2
+    smpp.connections.two.credentials.port=2222
+
+Configuration example for `.yaml` file:
+
+    smpp:
+        default:
+            maxTry: 10
+            ucs2Only: true
+        connections:
+            one:
+               credentials:
+                    host: localhost
+                    username: user
+                    password: pass
+                    port: 1111
+            two:
+               credentials:
+                    host: localhost
+                    username: user2
+                    password: pass2
+                    port: 2222
+
+## Build
+
+### Build from source
+
+You can build application using following command:
+
+    ./gradlew clean build -x signArchives
+    
+#### Requirements:
+
+JDK >= 1.8
+
+### Unit tests
+
+You can run unit tests using following command:
+
+    ./gradlew test
+    
+### Mutation tests
+
+You can run mutation tests using following command:
+
+    ./grdlew pitest
+
+You will be able to find pitest report in `build/reports/pitest/` folder.
+
+### Integration tests
+
+You can run integration tests using following command:
+
+    ./grdlew testIntegration
+
+## Key abstractions
+
+This starter provide several abstractions:
 
 ### SenderClient
 
 This interface represents smpp protocol transmitter client. This is entry point to sending any messages.
 Spring-boot-starter-smpp comes with several implementations:
 
+![class diagram](http://www.plantuml.com/plantuml/proxy?src=https://raw.github.com/MikeSafonov/spring-boot-starter-smpp/master/diagrams/senderclient_class.txt)
 
 <dl>
   <dt>DefaultSenderClient</dt>
@@ -90,70 +197,6 @@ list of smsc connections and return sender client based on some rules which impl
 There are two default implementation of **IndexDetectionStrategy** - **RandomIndexDetectionStrategy**(return random sender client) and **RoundRobinIndexDetectionStrategy**
 (return sender client based on round and robbin algorithm). **RoundRobinIndexDetectionStrategy** strategy used by default.
 
-## Configuration
-
-The following tables show the available configuration:
-
-| Configuration                                   | Description                                                                              | Default                                                              |
-|-------------------------------------------------|------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| `smpp.defaults`                                 | Default smpp connection properties                                                       |                                                                      |
-| `smpp.defaults.ucs2Only`                        | Using ucs2 encoding only or not                                                          | `false`                                                              |
-| `smpp.defaults.maxTry`                          | Number of attempts to reconnect if smpp session is closed                                | `5`                                                                  |
-| `smpp.defaults.connectionMode`                  | Client`s connection mode                                                                 | `STANDARD`   see `com.github.mikesafonov.smpp.config.ConnectionMode` |
-| `smpp.defaults.windowSize`                      | Smpp connection window size                                                              | `90`                                                                 |
-| `smpp.defaults.loggingPdu`                      | Is logging smpp pdu                                                                      | `false`                                                              |
-| `smpp.defaults.loggingBytes`                    | Is logging smpp bytes                                                                    | `false`                                                              |
-| `smpp.defaults.rebindPeriod`                    | Connection rebind period (Duration)                                                      | `90s`                                                                |
-| `smpp.defaults.requestTimeout`                  | Request timeout (Duration)                                                               | `5s`                                                                 |
-| `smpp.defaults.allowedPhones`                   | Array of phones to send. Using only if `connectionMode` is `TEST`                        | `[]`                                                                 |
-| `smpp.connections`                              | Map of SMSC connections                                                                  |                                                                      |
-| `smpp.connections.<name>.credentials`           | SMSC connection credentials                                                              |                                                                      |
-| `smpp.connections.<name>.credentials.host`      | SMSC host                                                                                |                                                                      |
-| `smpp.connections.<name>.credentials.port`      | SMSC port                                                                                |                                                                      |
-| `smpp.connections.<name>.credentials.username`  | SMSC username                                                                            |                                                                      |
-| `smpp.connections.<name>.credentials.password`  | SMSC password                                                                            |                                                                      |
-| `smpp.connections.<name>.ucs2Only`              | Using ucs2 encoding only or not                                                          | `false`                                                              |
-| `smpp.connections.<name>.maxTry`                | Number of attempts to reconnect if smpp session is closed                                | `5`                                                                  |
-| `smpp.connections.<name>.connectionMode`        | Client`s connection mode                                                                 | `STANDARD`   see `com.github.mikesafonov.smpp.config.ConnectionMode` |
-| `smpp.connections.<name>.windowSize`            | Smpp connection window size                                                              | `90`                                                                 |
-| `smpp.connections.<name>.loggingPdu`            | Is logging smpp pdu | `false`                                                            |                                                                      |
-| `smpp.connections.<name>.loggingBytes`          | Is logging smpp bytes | `false`                                                          |                                                                      |
-| `smpp.connections.<name>.rebindPeriod`          | Connection rebind period (Duration)                                                      | `90s`                                                                |
-| `smpp.connections.<name>.requestTimeout`        | Request timeout (Duration)                                                               | `5s`                                                                 |
-| `smpp.connections.<name>.allowedPhones`         | Array of phones to send. Using only if `connectionMode` is `TEST`                        | `[]`                                                                 |
-| `smpp.setupRightAway`                           | Should setup smpp clients after creation and fail fast if connection cant be established | `true`                                                               |
-
-## Build
-
-### Build from source
-
-You can build application using following command:
-
-    ./gradlew clean build -x signArchives
-    
-#### Requirements:
-
-JDK >= 1.8
-
-### Unit tests
-
-You can run unit tests using following command:
-
-    ./gradlew test
-    
-### Mutation tests
-
-You can run mutation tests using following command:
-
-    ./grdlew pitest
-
-You will be able to find pitest report in `build/reports/pitest/` folder.
-
-### Integration tests
-
-You can run integration tests using following command:
-
-    ./grdlew testIntegration
 
 ## Contributing
 

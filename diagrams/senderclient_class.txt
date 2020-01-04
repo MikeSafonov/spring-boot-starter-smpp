@@ -1,0 +1,13 @@
+@startuml
+interface SenderClient {
+    String getId()
+    void setup()
+    MessageResponse send(Message message)
+    CancelMessageResponse cancel(CancelMessage cancelMessage)
+}
+
+
+SenderClient <|-- StandardSenderClient
+SenderClient <|-- MockSenderClient
+SenderClient <|-- TestSenderClient
+@enduml
