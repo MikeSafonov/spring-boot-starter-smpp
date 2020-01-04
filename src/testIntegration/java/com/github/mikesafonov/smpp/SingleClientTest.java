@@ -5,10 +5,8 @@ import com.cloudhopper.smpp.pdu.CancelSm;
 import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.github.mikesafonov.smpp.config.SmppProperties;
-import com.github.mikesafonov.smpp.core.ClientFactory;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
-import com.github.mikesafonov.smpp.core.sender.DefaultTypeOfAddressParser;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import com.github.mikesafonov.smpp.server.MockSmppServer;
 import lombok.extern.log4j.Log4j2;
@@ -16,24 +14,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
+import static com.github.mikesafonov.smpp.TestUtils.createDefaultSenderClient;
+import static com.github.mikesafonov.smpp.TestUtils.credentials;
 import static com.github.mikesafonov.smpp.asserts.SmppAssertions.assertThat;
 
 @Log4j2
 public class SingleClientTest {
-    private SmppProperties.Credentials credentials;
     private MockSmppServer mockSmppServer;
     private SenderClient client;
 
     @BeforeEach
     void runMockServer() throws SmppChannelException {
-        credentials = credentials();
+        SmppProperties.Credentials credentials = credentials();
         mockSmppServer = new MockSmppServer(credentials);
         mockSmppServer.start();
 
-        client = createDefaultSenderClient();
+        client = createDefaultSenderClient("test", credentials);
     }
 
     @AfterEach
@@ -133,31 +129,5 @@ public class SingleClientTest {
                         log.debug("ignore " + pduRequest);
                     }
                 });
-    }
-
-    private SenderClient createDefaultSenderClient() {
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(credentials);
-        smsc.setMaxTry(5);
-        return new ClientFactory().standardSender("test", new SmppProperties.Defaults(),
-                smsc, new DefaultTypeOfAddressParser());
-    }
-
-    private static SmppProperties.Credentials credentials() {
-        SmppProperties.Credentials credentials = new SmppProperties.Credentials();
-        credentials.setPort(findRandomOpenPortOnAllLocalInterfaces());
-        credentials.setHost("localhost");
-        credentials.setUsername("username");
-        credentials.setPassword("password");
-        return credentials;
-    }
-
-    private static Integer findRandomOpenPortOnAllLocalInterfaces() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Unable to find port", e);
-        }
     }
 }
