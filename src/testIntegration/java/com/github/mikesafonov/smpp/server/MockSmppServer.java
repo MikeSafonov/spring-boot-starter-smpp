@@ -2,7 +2,9 @@ package com.github.mikesafonov.smpp.server;
 
 import com.cloudhopper.smpp.SmppServerConfiguration;
 import com.cloudhopper.smpp.impl.DefaultSmppServer;
+import com.cloudhopper.smpp.pdu.CancelSm;
 import com.cloudhopper.smpp.pdu.PduRequest;
+import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -66,10 +68,18 @@ public class MockSmppServer {
     }
 
     public int countMessages() {
-        return handler.getSessionHandler().getReceivedPduRequests().size();
+        return handler.countTotalMessages();
     }
 
     public List<PduRequest> getMessages() {
         return new ArrayList<>(handler.getSessionHandler().getReceivedPduRequests());
+    }
+
+    public List<SubmitSm> getSubmitSmMessages() {
+        return new ArrayList<>(handler.getSessionHandler().getSubmitSms());
+    }
+
+    public List<CancelSm> getCancelSmMessages() {
+        return new ArrayList<>(handler.getSessionHandler().getCancelSms());
     }
 }

@@ -2,8 +2,10 @@ package com.github.mikesafonov.smpp.server;
 
 import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppSessionHandler;
+import com.cloudhopper.smpp.pdu.CancelSm;
 import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
+import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.type.RecoverablePduException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +17,29 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class QueueSmppSessionHandler implements SmppSessionHandler {
 
     private final BlockingQueue<PduRequest> receivedPduRequests;
+    private final BlockingQueue<SubmitSm> submitSms;
+    private final BlockingQueue<CancelSm> cancelSms;
 
     public QueueSmppSessionHandler() {
-        this.receivedPduRequests = new LinkedBlockingQueue<PduRequest>();
+        this.receivedPduRequests = new LinkedBlockingQueue<>();
+        this.submitSms = new LinkedBlockingQueue<>();
+        this.cancelSms = new LinkedBlockingQueue<>();
     }
 
     public BlockingQueue<PduRequest> getReceivedPduRequests() {
         return receivedPduRequests;
+    }
+
+    public BlockingQueue<SubmitSm> getSubmitSms() {
+        return submitSms;
+    }
+
+    public BlockingQueue<CancelSm> getCancelSms() {
+        return cancelSms;
+    }
+
+    public int countTotalMessages() {
+        return receivedPduRequests.size();
     }
 
     @Override
@@ -32,6 +50,12 @@ public class QueueSmppSessionHandler implements SmppSessionHandler {
     @Override
     public PduResponse firePduRequestReceived(PduRequest pduRequest) {
         receivedPduRequests.add(pduRequest);
+        if (pduRequest instanceof SubmitSm) {
+            submitSms.add((SubmitSm) pduRequest);
+        }
+        if (pduRequest instanceof CancelSm) {
+            cancelSms.add((CancelSm) pduRequest);
+        }
         return pduRequest.createResponse();
     }
 

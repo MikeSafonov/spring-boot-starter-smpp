@@ -80,7 +80,7 @@ public class SmppAssert extends AbstractAssert<SmppAssert, MockSmppServer> {
         checkEquals(submitSm, message);
     }
 
-    private void checkMessagesCount(List<PduRequest> messages, int expectedCount) {
+    private void checkMessagesCount(List<? extends PduRequest> messages, int expectedCount) {
         if (messages.size() != expectedCount) {
             failWithMessage("Expected messages size to be <%s> but was <%s>", expectedCount, messages.size());
         }
@@ -100,25 +100,16 @@ public class SmppAssert extends AbstractAssert<SmppAssert, MockSmppServer> {
     }
 
     private SubmitSm checkAndGetSubmitSm() {
-        PduRequest request = checkAndGetPduRequest();
-        if (!(request instanceof SubmitSm)) {
-            failWithMessage("Expected SubmitSm object but was <%s>", request.getClass());
-        }
-        return (SubmitSm) request;
+        isNotNull();
+        List<SubmitSm> submitSmMessages = actual.getSubmitSmMessages();
+        checkMessagesCount(submitSmMessages, 1);
+        return submitSmMessages.get(0);
     }
 
     private CancelSm checkAndGetCancelSm() {
-        PduRequest request = checkAndGetPduRequest();
-        if (!(request instanceof CancelSm)) {
-            failWithMessage("Expected CancelSm object but was <%s>", request.getClass());
-        }
-        return (CancelSm) request;
-    }
-
-    private PduRequest checkAndGetPduRequest() {
         isNotNull();
-        List<PduRequest> messages = actual.getMessages();
-        checkMessagesCount(messages, 1);
-        return messages.get(0);
+        List<CancelSm> cancelSmMessages = actual.getCancelSmMessages();
+        checkMessagesCount(cancelSmMessages, 1);
+        return cancelSmMessages.get(0);
     }
 }

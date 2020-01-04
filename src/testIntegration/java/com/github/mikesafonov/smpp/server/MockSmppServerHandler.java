@@ -53,6 +53,10 @@ public class MockSmppServerHandler implements SmppServerHandler {
         return sessionHandler;
     }
 
+    public int countTotalMessages() {
+        return sessionHandler.countTotalMessages();
+    }
+
     public String getSystemId() {
         return systemId;
     }
