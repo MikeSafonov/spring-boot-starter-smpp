@@ -92,3 +92,12 @@ There are two default implementation of **IndexDetectionStrategy** - **RandomInd
 
 ## Configuration
 TODO
+
+## Contributing
+
+Feel free to contribute. 
+New feature proposals and bug fixes should be submitted as GitHub pull requests. 
+Fork the repository on GitHub, prepare your change on your forked copy, and submit a pull request.
+
+**IMPORTANT!**
+>Before contributing please read about [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.2/) / [Conventional Commits RU](https://www.conventionalcommits.org/ru/v1.0.0-beta.2/)
