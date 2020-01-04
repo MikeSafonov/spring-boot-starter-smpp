@@ -87,9 +87,8 @@ jacocoTestReport{
 
 test {
     useJUnitPlatform()
-    finalizedBy jacocoTestReport, "pitest"
+    finalizedBy jacocoTestReport
 }
-tasks.getByName("pitest").finalizedBy("testIntegration")
 
 task testIntegration(type: Test){
     testClassesDirs = sourceSets.testIntegration.output.classesDirs
