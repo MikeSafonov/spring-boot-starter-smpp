@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Mike Safonov
  */
 @Data
-@ConfigurationProperties(prefix = "spring.smpp")
+@ConfigurationProperties(prefix = "smpp")
 public class SmppProperties {
 
     private Defaults defaults = new Defaults();

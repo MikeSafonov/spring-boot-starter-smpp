@@ -2,76 +2,76 @@
   "properties": [
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.ucs2Only",
+      "name": "smpp.defaults.ucs2Only",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "Using ucs2 encoding only"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.maxTry",
+      "name": "smpp.defaults.maxTry",
       "type": "java.lang.Integer",
       "defaultValue": 5,
       "description": "Number of attempts to reconnect if smpp session closed"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.connectionMode",
+      "name": "smpp.defaults.connectionMode",
       "type": "com.github.mikesafonov.smpp.config.ConnectionMode",
       "defaultValue": "STANDARD",
       "description": "Connection mode of client"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.windowSize",
+      "name": "smpp.defaults.windowSize",
       "type": "java.lang.Integer",
       "defaultValue": 90,
       "description": "Smpp connection window size"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.loggingPdu",
+      "name": "smpp.defaults.loggingPdu",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "Is logging smpp pdu"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.loggingBytes",
+      "name": "smpp.defaults.loggingBytes",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "Is logging smpp bytes"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.rebindPeriod",
+      "name": "smpp.defaults.rebindPeriod",
       "type": "java.time.Duration",
       "defaultValue": "90s",
       "description": "Connection rebind period"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.requestTimeout",
+      "name": "smpp.defaults.requestTimeout",
       "type": "java.time.Duration",
       "defaultValue": "5s",
       "description": "Request timeout"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.defaults.allowedPhones",
+      "name": "smpp.defaults.allowedPhones",
       "type": "java.lang.String[]",
       "defaultValue": [],
       "description": "Array of phones to send. Using only if connectionMode is TEST"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.connections",
+      "name": "smpp.connections",
       "type": "java.util.Map<java.lang.String,com.github.mikesafonov.smpp.SmppProperties$SMSC>",
       "description": "Map of SMSC connections"
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
-      "name": "spring.smpp.setupRightAway",
+      "name": "smpp.setupRightAway",
       "type": "java.lang.Boolean",
       "defaultValue": true,
       "description": "should setup smpp clients after creation and fail fast if connection cant be established"
