@@ -83,10 +83,11 @@ public class ClientFactory {
         int windowsSize = getOrDefault(smsc.getWindowSize(), defaults.getWindowSize());
         boolean ucs2Only = getOrDefault(smsc.getUcs2Only(), defaults.isUcs2Only());
         long requestTimeout = getOrDefault(smsc.getRequestTimeout(), defaults.getRequestTimeout()).toMillis();
+        int maxTry = getOrDefault(smsc.getMaxTry(), defaults.getMaxTry());
 
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
         DefaultSmppClient client = new DefaultSmppClient();
-        return new StandardSenderClient(transmitterConfiguration, client, smsc.getMaxTry(),
+        return new StandardSenderClient(transmitterConfiguration, client, maxTry,
                 ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
 
