@@ -40,6 +40,20 @@ dependencies {
 ```
 Configure spring-boot application via properties (see [Configuration](#Configuration) section).
 
+Use [SenderManager](#SenderManager) to send SMS:
+
+    public class RoundRobinApplicationService {
+        private final SenderManager senderManager;
+    
+        public void sendMessage(String from, String to, String text) {
+            Message message = Message.simple(text)
+                    .from(from)
+                    .to(to)
+                    .build();
+            senderManager.getClient().send(message);
+        }
+    }
+
 ## Configuration
 
 The following tables show the available configuration:

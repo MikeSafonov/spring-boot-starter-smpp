@@ -1,7 +1,7 @@
 @startuml
 interface SenderManager {
-    Optional<SenderClient> getByName(String name)
-    Optional<SenderClient> getClient()
+    SenderClient getByName(String name)
+    SenderClient getClient()
 }
 abstract BaseSenderManager{
     # List<SmscConnection> smscConnections
