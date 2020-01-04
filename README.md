@@ -149,16 +149,16 @@ Spring-boot-starter-smpp comes with several implementations:
 
 <dl>
   <dt>DefaultSenderClient</dt>
-  <dd>This is default implementation which create smpp connection and performing all requests</dd>
+  <dd>This is default implementation which create smpp connection and performing all requests.</dd>
   
   <dt>TestSenderClient</dt>
-  <dd>Implementation of SenderClient which should be used for testing purpose. 
-  This client may provide real smpp connection via incoming implementation of SenderClient. 
-  Every incoming request will be redirected to real SenderClient only if list of allowed phone numbers contains message destination phone. 
-  Otherwise response will be generated via SmppResultGenerator</dd>
+  <dd>Implementation of `SenderClient` which should be used for testing purpose. 
+  `TestSenderClient` client may provide real smpp connection via proxy implementation of `SenderClient`. 
+  Every incoming request will be redirected to real `SenderClient` only if list of allowed phone numbers contains message destination phone. 
+  Otherwise response will be generated via [SmppResultGenerator](#SmppResultGenerator)</dd>
     
   <dt>MockSenderClient</dt>
-  <dd>Implementation of SenderClient which not perform any connection via smpp and only generate response by using SmppResultGenerator</dd>
+  <dd>Implementation of `SenderClient` which not perform any connection via smpp and only generate response by using [SmppResultGenerator](#SmppResultGenerator)</dd>
 </dl>
 
 
