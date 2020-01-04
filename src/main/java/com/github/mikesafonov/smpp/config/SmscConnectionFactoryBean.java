@@ -70,9 +70,11 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     }
 
     private void setupClients(SenderClient senderClient, ResponseClient responseClient) {
-        senderClient.setup();
-        ResponseSmppSessionHandler responseSmppSessionHandler = new ResponseSmppSessionHandler(responseClient, deliveryReportConsumer);
-        responseClient.setup(responseSmppSessionHandler);
+        if (smppProperties.isSetupRightAway()) {
+            senderClient.setup();
+            ResponseSmppSessionHandler responseSmppSessionHandler = new ResponseSmppSessionHandler(responseClient, deliveryReportConsumer);
+            responseClient.setup(responseSmppSessionHandler);
+        }
     }
 
     @Override

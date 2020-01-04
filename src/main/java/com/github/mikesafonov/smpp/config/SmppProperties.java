@@ -19,6 +19,7 @@ public class SmppProperties {
 
     private Defaults defaults = new Defaults();
     private Map<String, SMSC> connections = new HashMap<>();
+    private boolean setupRightAway = true;
 
     @Data
     public static class Defaults {

@@ -68,6 +68,13 @@
       "name": "spring.smpp.connections",
       "type": "java.util.Map<java.lang.String,com.github.mikesafonov.smpp.SmppProperties$SMSC>",
       "description": "Map of SMSC connections"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
+      "name": "spring.smpp.setupRightAway",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "should setup smpp clients after creation and fail fast if connection cant be established"
     }
   ]
 }
