@@ -1,5 +1,5 @@
 # spring-boot-starter-smpp
-
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.mikesafonov/spring-boot-starter-smpp.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.mikesafonov%22%20AND%20a:%22spring-boot-starter-smpp%22)
 [![codecov](https://codecov.io/gh/MikeSafonov/spring-boot-starter-smpp/branch/master/graph/badge.svg)](https://codecov.io/gh/MikeSafonov/spring-boot-starter-smpp)
 [![Travis-CI](https://travis-ci.com/MikeSafonov/spring-boot-starter-smpp.svg?branch=master)](https://travis-ci.com/MikeSafonov/spring-boot-starter-smpp)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
@@ -33,11 +33,21 @@ using [SMPP](https://en.wikipedia.org/wiki/Short_Message_Peer-to-Peer). [SMPP v3
 ## Usage
 
 Add the following dependency to your project:
-```
-dependencies {
-    implementation 'com.github.mikesafonov:spring-boot-starter-smpp:1.0.0'
-}
-```
+
+Maven:
+    
+    <dependency>
+      <groupId>com.github.mikesafonov</groupId>
+      <artifactId>spring-boot-starter-smpp</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    
+Gradle:
+
+    dependencies {
+        implementation 'com.github.mikesafonov:spring-boot-starter-smpp:1.0.0'
+    }
+    
 Configure spring-boot application via properties (see [Configuration](#Configuration) section).
 
 Use [SenderManager](#SenderManager) to send SMS:
