@@ -19,7 +19,7 @@ apply plugin: "signing"
 apply plugin: "info.solidsoft.pitest"
 
 ext {
-    springBootVersion = '2.2.2.RELEASE'
+    springBootVersion = '2.2.3.RELEASE'
 }
 
 sourceCompatibility = '1.8'
