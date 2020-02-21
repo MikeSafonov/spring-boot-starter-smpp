@@ -64,7 +64,7 @@ dependencies {
 
     implementation("javax.validation:validation-api:2.0.1.Final")
 
-    compileOnly("org.projectlombok:lombok:1.18.10")
+    compileOnly("org.projectlombok:lombok:1.18.12")
     annotationProcessor("org.projectlombok:lombok:1.18.10")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
