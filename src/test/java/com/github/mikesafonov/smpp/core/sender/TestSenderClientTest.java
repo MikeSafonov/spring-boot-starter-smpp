@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
