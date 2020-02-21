@@ -11,6 +11,7 @@ import com.cloudhopper.smpp.type.RecoverablePduException;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
+import com.github.mikesafonov.smpp.core.connection.TransmitterConfiguration;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.MessageErrorInformation;
@@ -44,7 +45,9 @@ class StandardSenderClientCancelMessageTest extends BaseStandardSenderClientTest
     void shouldReturnErrorBecauseMessageIdIsEmpty() {
         CancelMessage originalMessage = new CancelMessage(null, randomString(), randomString());
         MessageErrorInformation messageErrorInformation = new MessageErrorInformation(0, "Empty message id");
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
         CancelMessageResponse messageResponse = senderClient.cancel(originalMessage);
 
         assertEquals(originalMessage, messageResponse.getOriginal());
@@ -63,12 +66,12 @@ class StandardSenderClientCancelMessageTest extends BaseStandardSenderClientTest
 
         WindowFuture<Integer, PduRequest, PduResponse> futureResponse = successWindowsFuture();
         when(futureResponse.getResponse()).thenReturn(cancelSmResp);
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
+        when(connectionManager.getSession()).thenReturn(session);
         when(messageBuilder.createCancelSm(cancelMessage)).thenReturn(cancelSm);
         when(session.sendRequestPdu(eq(cancelSm), anyLong(), anyBoolean())).thenReturn(futureResponse);
-
-        assertDoesNotThrow(() -> senderClient.setup());
 
         CancelMessageResponse cancelMessageResponse = senderClient.cancel(cancelMessage);
 
@@ -89,12 +92,12 @@ class StandardSenderClientCancelMessageTest extends BaseStandardSenderClientTest
 
         WindowFuture<Integer, PduRequest, PduResponse> futureResponse = successWindowsFuture();
         when(futureResponse.getResponse()).thenReturn(cancelSmResp);
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
+        when(connectionManager.getSession()).thenReturn(session);
         when(messageBuilder.createCancelSm(cancelMessage)).thenReturn(cancelSm);
         when(session.sendRequestPdu(eq(cancelSm), anyLong(), anyBoolean())).thenReturn(futureResponse);
-
-        assertDoesNotThrow(() -> senderClient.setup());
 
         CancelMessageResponse cancelMessageResponse = senderClient.cancel(cancelMessage);
 
@@ -109,11 +112,11 @@ class StandardSenderClientCancelMessageTest extends BaseStandardSenderClientTest
     void shouldFailCancelBecauseUnexpectedException() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
         SmppSession session = mock(SmppSession.class);
         CancelMessage cancelMessage = new CancelMessage(randomString(), randomString(), randomString());
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
+        when(connectionManager.getSession()).thenReturn(session);
         when(messageBuilder.createCancelSm(cancelMessage)).thenThrow(new RuntimeException());
-
-        assertDoesNotThrow(() -> senderClient.setup());
 
         CancelMessageResponse cancelMessageResponse = senderClient.cancel(cancelMessage);
 
@@ -135,12 +138,12 @@ class StandardSenderClientCancelMessageTest extends BaseStandardSenderClientTest
 
         WindowFuture<Integer, PduRequest, PduResponse> futureResponse = successWindowsFuture();
         when(futureResponse.getResponse()).thenReturn(cancelSmResp);
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
+        when(connectionManager.getSession()).thenReturn(session);
         when(messageBuilder.createCancelSm(cancelMessage)).thenReturn(cancelSm);
         when(session.sendRequestPdu(eq(cancelSm), anyLong(), anyBoolean())).thenThrow(new RecoverablePduException("RecoverablePduException"));
-
-        assertDoesNotThrow(() -> senderClient.setup());
 
         CancelMessageResponse cancelMessageResponse = senderClient.cancel(cancelMessage);
 
@@ -153,12 +156,16 @@ class StandardSenderClientCancelMessageTest extends BaseStandardSenderClientTest
 
     @ParameterizedTest
     @MethodSource("failWindowFutureProvider")
-    void shouldFailCancelBecauseRequestFailed(WindowFuture<Integer, PduRequest, PduResponse> futureResponse) throws RecoverablePduException, InterruptedException, SmppChannelException, UnrecoverablePduException, SmppTimeoutException {
+    void shouldFailCancelBecauseRequestFailed(WindowFuture<Integer, PduRequest, PduResponse> futureResponse)
+            throws RecoverablePduException, InterruptedException, SmppChannelException,
+            UnrecoverablePduException, SmppTimeoutException {
         SmppSession session = mock(SmppSession.class);
         CancelMessage cancelMessage = new CancelMessage(randomString(), randomString(), randomString());
         CancelSm cancelSm = new CancelSm();
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
+        when(connectionManager.getSession()).thenReturn(session);
         when(messageBuilder.createCancelSm(cancelMessage)).thenReturn(cancelSm);
         when(session.sendRequestPdu(eq(cancelSm), anyLong(), anyBoolean())).thenReturn(futureResponse);
 

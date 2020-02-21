@@ -1,7 +1,6 @@
-package com.github.mikesafonov.smpp.core.sender;
+package com.github.mikesafonov.smpp.core.connection;
 
 import com.cloudhopper.smpp.SmppBindType;
-import com.cloudhopper.smpp.SmppSessionConfiguration;
 import com.cloudhopper.smpp.type.LoggingOptions;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 
@@ -14,7 +13,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Mike Safonov
  */
-public class TransmitterConfiguration extends SmppSessionConfiguration {
+public class TransmitterConfiguration extends BaseSmppSessionConfiguration {
 
     public TransmitterConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials,
                                     boolean loggingBytes, boolean loggingPdu, int windowsSize) {

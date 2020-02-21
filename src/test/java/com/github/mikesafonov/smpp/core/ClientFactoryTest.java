@@ -3,6 +3,7 @@ package com.github.mikesafonov.smpp.core;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
+import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
@@ -28,8 +29,8 @@ class ClientFactoryTest {
     void shouldThrowRuntimeExceptionBecauseNameMustNotBeEmpty() throws Throwable {
         checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender(null, null), "Name must not be empty!");
         checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender("", null), "Name must not be empty!");
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse(null, null, null), "Name must not be empty!");
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse("", null, null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse(null, null, null, null), "Name must not be empty!");
+        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse("", null, null, null), "Name must not be empty!");
         checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender(null, null, null, null), "Name must not be empty!");
         checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender("", null, null, null), "Name must not be empty!");
     }
@@ -39,8 +40,9 @@ class ClientFactoryTest {
         assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), null, null, null));
         assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), null, null));
         assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
-        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), mock(SmppProperties.Defaults.class), null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), null, null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), mock(SmppProperties.Defaults.class), null, null));
+        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
         assertThrows(NullPointerException.class, () -> clientFactory.mockSender(randomString(), null));
         assertThrows(NullPointerException.class, () -> clientFactory.testSender(null, null, null, null));
         assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), null, null, null));
@@ -70,11 +72,14 @@ class ClientFactoryTest {
         defaults.setRebindPeriod(defaultDuration);
         SmppProperties.SMSC smsc = new SmppProperties.SMSC();
         smsc.setCredentials(new SmppProperties.Credentials());
+        DeliveryReportConsumer deliveryReportConsumer = mock(DeliveryReportConsumer.class);
 
-        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
 
         assertThat(responseClient)
-                .extracting("id", "rebindPeriod", "sessionConfiguration.loggingOptions.isLogPduEnabled", "sessionConfiguration.loggingOptions.isLogBytesEnabled")
+                .extracting("id", "connectionManager.rebindPeriod",
+                        "connectionManager.configuration.loggingOptions.isLogPduEnabled",
+                        "connectionManager.configuration.loggingOptions.isLogBytesEnabled")
                 .containsExactly(name, defaultDuration.getSeconds(), isLoggingPdu, isLoggingBytes);
 
         assertTrue(responseClient instanceof StandardResponseClient);
@@ -98,10 +103,14 @@ class ClientFactoryTest {
         smsc.setLoggingPdu(!isLoggingPdu);
         smsc.setRebindPeriod(customDuration);
 
-        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
+        DeliveryReportConsumer deliveryReportConsumer = mock(DeliveryReportConsumer.class);
+
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
 
         assertThat(responseClient)
-                .extracting("id", "rebindPeriod", "sessionConfiguration.loggingOptions.isLogPduEnabled", "sessionConfiguration.loggingOptions.isLogBytesEnabled")
+                .extracting("id", "connectionManager.rebindPeriod",
+                        "connectionManager.configuration.loggingOptions.isLogPduEnabled",
+                        "connectionManager.configuration.loggingOptions.isLogBytesEnabled")
                 .containsExactly(name, customDuration.getSeconds(), !isLoggingPdu, !isLoggingBytes);
 
         assertTrue(responseClient instanceof StandardResponseClient);
@@ -222,8 +231,10 @@ class ClientFactoryTest {
 
         StandardSenderClient testSenderClient = (StandardSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
 
-        assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "maxTryCount",
-                "sessionConfig.loggingOptions.isLogPduEnabled", "sessionConfig.loggingOptions.isLogBytesEnabled", "sessionConfig.windowSize")
+        assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "connectionManager.maxTryCount",
+                "connectionManager.configuration.loggingOptions.isLogPduEnabled",
+                "connectionManager.configuration.loggingOptions.isLogBytesEnabled",
+                "connectionManager.configuration.windowSize")
                 .containsExactly(name, ucs2Only, requestTimeout, maxTry, isLoggingPdu, isLoggingBytes, windowSize);
     }
 
@@ -261,11 +272,12 @@ class ClientFactoryTest {
         smsc.setWindowSize(windowSize);
         smsc.setRequestTimeout(Duration.ofMillis(requestTimeout));
 
-
         StandardSenderClient testSenderClient = (StandardSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
 
-        assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "maxTryCount",
-                "sessionConfig.loggingOptions.isLogPduEnabled", "sessionConfig.loggingOptions.isLogBytesEnabled", "sessionConfig.windowSize")
+        assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "connectionManager.maxTryCount",
+                "connectionManager.configuration.loggingOptions.isLogPduEnabled",
+                "connectionManager.configuration.loggingOptions.isLogBytesEnabled",
+                "connectionManager.configuration.windowSize")
                 .containsExactly(name, ucs2Only, requestTimeout, maxTry, isLoggingPdu, isLoggingBytes, windowSize);
     }
 

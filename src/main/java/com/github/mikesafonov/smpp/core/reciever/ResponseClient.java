@@ -22,10 +22,9 @@ public interface ResponseClient {
     /**
      * Create smpp connection and bind to it
      *
-     * @param sessionHandler handler for listening PDU events (delivery reports, etc)
      * @throws ResponseClientBindException if connection not successfully
      */
-    void setup(@NotNull ResponseSmppSessionHandler sessionHandler);
+    void setup();
 
     /**
      * Access to SMPP session
@@ -39,21 +38,6 @@ public interface ResponseClient {
      * Perform reconnection
      */
     void reconnect();
-
-    /**
-     * Check is response client in 'in process' state. This status means what response client handing
-     * some pdu request at the moment
-     *
-     * @return current 'in process' status
-     */
-    boolean isInProcess();
-
-    /**
-     * Change client 'in process' status
-     *
-     * @param inProcess 'in process' status
-     */
-    void setInProcess(boolean inProcess);
 
     /**
      * Close smpp session connection and destroy client

@@ -5,8 +5,8 @@ import com.cloudhopper.smpp.pdu.PduRequest;
 import com.cloudhopper.smpp.pdu.PduResponse;
 import com.devskiller.jfairy.Fairy;
 import com.github.mikesafonov.smpp.config.SmppProperties;
-import com.github.mikesafonov.smpp.core.reciever.ReceiverConfiguration;
-import com.github.mikesafonov.smpp.core.sender.TransmitterConfiguration;
+import com.github.mikesafonov.smpp.core.connection.ReceiverConfiguration;
+import com.github.mikesafonov.smpp.core.connection.TransmitterConfiguration;
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
@@ -27,6 +27,10 @@ public class Randomizer {
 
     public static int randomInt() {
         return FAIRY.baseProducer().randomInt(9999);
+    }
+
+    public static int randomPositive(int max) {
+        return FAIRY.baseProducer().randomInt(max) + 1;
     }
 
     public static long randomLong() {
@@ -57,7 +61,7 @@ public class Randomizer {
         return futureResponse;
     }
 
-    public static WindowFuture<Integer, PduRequest, PduResponse> failWindowsFuture(boolean await, boolean done, boolean success)  {
+    public static WindowFuture<Integer, PduRequest, PduResponse> failWindowsFuture(boolean await, boolean done, boolean success) {
         try {
             WindowFuture<Integer, PduRequest, PduResponse> futureResponse = mock(WindowFuture.class);
             when(futureResponse.await()).thenReturn(await);
@@ -69,7 +73,7 @@ public class Randomizer {
         }
     }
 
-    public static SmppProperties.Credentials randomCredentials(){
+    public static SmppProperties.Credentials randomCredentials() {
         SmppProperties.Credentials credentials = new SmppProperties.Credentials();
         credentials.setHost(randomIp());
         credentials.setPort(randomPort());
@@ -83,7 +87,7 @@ public class Randomizer {
         return new TransmitterConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt());
     }
 
-    public static ReceiverConfiguration randomReceiverConfiguration(){
+    public static ReceiverConfiguration randomReceiverConfiguration() {
         SmppProperties.Credentials credentials = randomCredentials();
         return new ReceiverConfiguration(randomString(), credentials, randomBoolean(), randomBoolean());
     }

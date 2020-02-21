@@ -1,18 +1,16 @@
 package com.github.mikesafonov.smpp.core.sender;
 
-import com.cloudhopper.smpp.SmppSession;
-import com.cloudhopper.smpp.impl.DefaultSmppClient;
-import com.cloudhopper.smpp.type.SmppChannelException;
-import com.cloudhopper.smpp.type.SmppTimeoutException;
-import com.cloudhopper.smpp.type.UnrecoverablePduException;
+import com.github.mikesafonov.smpp.core.connection.TransmitterConfiguration;
 import com.github.mikesafonov.smpp.core.exceptions.SenderClientBindException;
 import com.github.mikesafonov.smpp.core.exceptions.SmppSessionException;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.*;
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Mike Safonov
@@ -22,39 +20,34 @@ class StandardSenderClientTest extends BaseStandardSenderClientTest {
     @Test
     void shouldThrowNPE() {
         assertThrows(NullPointerException.class,
-                () -> new StandardSenderClient(randomTransmitterConfiguration(), null, randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
+                () -> new StandardSenderClient(connectionManager, randomBoolean(), randomInt(), null));
         assertThrows(NullPointerException.class,
-                () -> new StandardSenderClient(null, new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
-
-        assertThrows(NullPointerException.class,
-                        () -> new StandardSenderClient(randomTransmitterConfiguration(), new DefaultSmppClient(), randomInt(), randomBoolean(), randomInt(), null));
-
+                () -> new StandardSenderClient(null, randomBoolean(), randomInt(), new MessageBuilder(new DefaultTypeOfAddressParser())));
     }
 
     @Test
     void shouldContainExpectedId() {
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
+
         assertEquals(transmitterConfiguration.getName(), senderClient.getId());
     }
 
     @Test
-    void shouldThrowSenderClientBindExceptionWhenSetupFailed() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
+    void shouldThrowSenderClientBindExceptionWhenSetupFailed() {
+        TransmitterConfiguration transmitterConfiguration = randomTransmitterConfiguration();
 
-        when(smppClient.bind(transmitterConfiguration)).thenThrow(SmppSessionException.class);
+        when(connectionManager.getConfiguration()).thenReturn(transmitterConfiguration);
+        when(connectionManager.getSession()).thenThrow(SmppSessionException.class);
 
         String message = assertThrows(SenderClientBindException.class, () -> senderClient.setup()).getMessage();
         assertEquals(format("Unable to bind with configuration: %s ", transmitterConfiguration.configInformation()), message);
     }
 
     @Test
-    void shouldSuccessSetup() throws UnrecoverablePduException, SmppChannelException, InterruptedException, SmppTimeoutException {
-        SmppSession session = mock(SmppSession.class);
-
-        when(smppClient.bind(transmitterConfiguration)).thenReturn(session);
-
-        assertDoesNotThrow(() -> senderClient.setup());
-
+    void shouldSuccessSetup() {
         senderClient.setup();
 
-        verify(smppClient, times(1)).bind(transmitterConfiguration);
+        verify(connectionManager).getSession();
     }
 }
