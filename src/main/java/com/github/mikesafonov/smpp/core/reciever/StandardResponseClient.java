@@ -90,7 +90,8 @@ public class StandardResponseClient implements ResponseClient {
             this.sessionHandler = sessionHandler;
             bind();
             if (session == null) {
-                throw new ResponseClientBindException(format("Unable to bind with configuration: %s ", sessionConfiguration.configInformation()));
+                throw new ResponseClientBindException(format("Unable to bind with configuration: %s ",
+                        sessionConfiguration.configInformation()));
             }
             setupRebindTask();
             inited = true;

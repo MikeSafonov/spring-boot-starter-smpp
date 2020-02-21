@@ -16,8 +16,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class TransmitterConfiguration extends SmppSessionConfiguration {
 
-    public TransmitterConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials, boolean loggingBytes,
-                                    boolean loggingPdu, int windowsSize) {
+    public TransmitterConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials,
+                                    boolean loggingBytes, boolean loggingPdu, int windowsSize) {
         super();
 
         setType(SmppBindType.TRANSMITTER);
@@ -35,6 +35,7 @@ public class TransmitterConfiguration extends SmppSessionConfiguration {
     }
 
     public String configInformation() {
-        return String.format("%s host=%s port=%d username=%s windowsSize=%d", getName(), getHost(), getPort(), getSystemId(), getWindowSize());
+        return String.format("%s host=%s port=%d username=%s windowsSize=%d", getName(), getHost(),
+                getPort(), getSystemId(), getWindowSize());
     }
 }

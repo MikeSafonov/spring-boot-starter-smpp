@@ -43,11 +43,13 @@ public class SmppAutoConfiguration {
     }
 
     @Bean
-    public SmscConnectionFactoryBean senderClientFactoryBean(SmppProperties smppProperties, SmppResultGenerator smppResultGenerator,
+    public SmscConnectionFactoryBean senderClientFactoryBean(SmppProperties smppProperties,
+                                                             SmppResultGenerator smppResultGenerator,
                                                              TypeOfAddressParser typeOfAddressParser,
                                                              DeliveryReportConsumer deliveryReportConsumer,
                                                              ClientFactory clientFactory) {
-        return new SmscConnectionFactoryBean(smppProperties, smppResultGenerator, deliveryReportConsumer, typeOfAddressParser, clientFactory);
+        return new SmscConnectionFactoryBean(smppProperties, smppResultGenerator, deliveryReportConsumer,
+                typeOfAddressParser, clientFactory);
     }
 
     @Bean

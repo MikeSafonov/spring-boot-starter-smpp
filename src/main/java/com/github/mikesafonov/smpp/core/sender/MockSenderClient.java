@@ -12,8 +12,8 @@ import javax.validation.constraints.NotNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Implementation of {@link SenderClient} which not perform any connection via smpp and only generate {@link MessageResponse}/{@link CancelMessageResponse}
- * by using {@link SmppResultGenerator}
+ * Implementation of {@link SenderClient} which not perform any connection via smpp and only generate
+ * {@link MessageResponse}/{@link CancelMessageResponse} by using {@link SmppResultGenerator}
  *
  * @author Mike Safonov
  */

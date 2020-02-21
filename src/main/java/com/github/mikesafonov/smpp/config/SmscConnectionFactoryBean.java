@@ -37,7 +37,9 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     }
 
     private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
-        ConnectionMode connectionMode = (smsc.getConnectionMode() == null) ? defaults.getConnectionMode() : smsc.getConnectionMode();
+        ConnectionMode connectionMode = (smsc.getConnectionMode() == null)
+                ? defaults.getConnectionMode()
+                : smsc.getConnectionMode();
         switch (connectionMode) {
             case MOCK: {
                 return new SmscConnection(name, clientFactory.mockSender(name, smppResultGenerator));
@@ -54,7 +56,8 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         }
     }
 
-    private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
+    private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults,
+                                                 String name, SmppProperties.SMSC smsc) {
         SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
         SenderClient testSenderClient = clientFactory.testSender(standardSender, defaults, smsc, smppResultGenerator);
         ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
@@ -62,7 +65,8 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         return new SmscConnection(name, responseClient, testSenderClient);
     }
 
-    private SmscConnection getStandardSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
+    private SmscConnection getStandardSmscConnection(SmppProperties.Defaults defaults,
+                                                     String name, SmppProperties.SMSC smsc) {
         SenderClient senderClient = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
         ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
         setupClients(senderClient, responseClient);
@@ -72,7 +76,8 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     private void setupClients(SenderClient senderClient, ResponseClient responseClient) {
         if (smppProperties.isSetupRightAway()) {
             senderClient.setup();
-            ResponseSmppSessionHandler responseSmppSessionHandler = new ResponseSmppSessionHandler(responseClient, deliveryReportConsumer);
+            ResponseSmppSessionHandler responseSmppSessionHandler =
+                    new ResponseSmppSessionHandler(responseClient, deliveryReportConsumer);
             responseClient.setup(responseSmppSessionHandler);
         }
     }

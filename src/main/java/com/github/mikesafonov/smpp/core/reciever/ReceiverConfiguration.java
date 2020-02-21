@@ -15,7 +15,8 @@ import java.util.Objects;
  */
 public class ReceiverConfiguration extends SmppSessionConfiguration {
 
-    public ReceiverConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials, boolean loggingBytes, boolean loggingPdu) {
+    public ReceiverConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials,
+                                 boolean loggingBytes, boolean loggingPdu) {
         super();
 
         setType(SmppBindType.RECEIVER);

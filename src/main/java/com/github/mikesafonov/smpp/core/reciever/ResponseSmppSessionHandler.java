@@ -25,7 +25,8 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
     private final ResponseClient client;
     private final DeliveryReportConsumer deliveryReportConsumer;
 
-    public ResponseSmppSessionHandler(@NotNull ResponseClient client, @NotNull DeliveryReportConsumer deliveryReportConsumer) {
+    public ResponseSmppSessionHandler(@NotNull ResponseClient client,
+                                      @NotNull DeliveryReportConsumer deliveryReportConsumer) {
         this.client = requireNonNull(client);
         this.deliveryReportConsumer = requireNonNull(deliveryReportConsumer);
     }
