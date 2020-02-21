@@ -7,34 +7,35 @@ import com.cloudhopper.smpp.type.SmppChannelException;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
+import com.github.mikesafonov.smpp.core.sender.MessageBuilder;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
+import com.github.mikesafonov.smpp.junit.MockSmppExtension;
+import com.github.mikesafonov.smpp.junit.SmppServer;
 import com.github.mikesafonov.smpp.server.MockSmppServer;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static com.github.mikesafonov.smpp.TestUtils.createDefaultSenderClient;
-import static com.github.mikesafonov.smpp.TestUtils.credentials;
-import static com.github.mikesafonov.smpp.asserts.SmppAssertions.assertThat;
+import static com.github.mikesafonov.smpp.assertj.SmppAssertions.assertThat;
 
 @Log4j2
+@ExtendWith(MockSmppExtension.class)
 public class SingleClientTest {
+    @SmppServer
     private MockSmppServer mockSmppServer;
     private SenderClient client;
 
     @BeforeEach
-    void runMockServer() throws SmppChannelException {
-        SmppProperties.Credentials credentials = credentials();
-        mockSmppServer = new MockSmppServer(credentials);
-        mockSmppServer.start();
+    void createClient() throws SmppChannelException {
+        SmppProperties.Credentials credentials = new SmppProperties.Credentials();
+        credentials.setPort(mockSmppServer.getPort());
+        credentials.setHost("localhost");
+        credentials.setUsername(mockSmppServer.getSystemId());
+        credentials.setPassword(mockSmppServer.getPassword());
 
         client = createDefaultSenderClient("test", credentials);
-    }
-
-    @AfterEach
-    void stopMockServer() {
-        mockSmppServer.stop();
     }
 
     @Test
@@ -50,7 +51,6 @@ public class SingleClientTest {
                 .hasDest("12312312")
                 .hasSource("123123123")
                 .hasText("asdasd")
-                .notSilent()
                 .hasDeliveryReport();
     }
 
@@ -67,7 +67,6 @@ public class SingleClientTest {
                 .hasDest("12312312")
                 .hasSource("123123123")
                 .hasText("asdasd")
-                .notSilent()
                 .doesNotHaveDeliveryReport();
     }
 
@@ -84,8 +83,8 @@ public class SingleClientTest {
                 .hasDest("12312312")
                 .hasSource("123123123")
                 .hasText("asdasd")
-                .silent()
-                .doesNotHaveDeliveryReport();
+                .doesNotHaveDeliveryReport()
+                .satisfies(submitSm -> assertThat(submitSm.getDataCoding()).isEqualTo(MessageBuilder.SILENT_CODING));
     }
 
     @Test
@@ -111,6 +110,7 @@ public class SingleClientTest {
         client.cancel(cancelMessage);
 
         assertThat(mockSmppServer).messages()
+                .asList()
                 .allSatisfy(pduRequest -> {
                     if (pduRequest instanceof SubmitSm) {
                         assertThat((SubmitSm) pduRequest)
@@ -118,7 +118,6 @@ public class SingleClientTest {
                                 .hasDest("12312312")
                                 .hasSource("123123123")
                                 .hasText("asdasd")
-                                .notSilent()
                                 .doesNotHaveDeliveryReport();
                     } else if (pduRequest instanceof CancelSm) {
                         assertThat((CancelSm) pduRequest)

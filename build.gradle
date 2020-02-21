@@ -76,6 +76,12 @@ dependencies {
     testImplementation("com.devskiller:jfairy:0.6.2")
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 
+    testIntegrationImplementation platform("org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR1")
+    testIntegrationImplementation("org.springframework.cloud:spring-cloud-starter")
+    testIntegrationImplementation("com.github.mikesafonov:smpp-server-mock-assertj:1.0.0")
+    testIntegrationImplementation("com.github.mikesafonov:smpp-server-mock-junit:1.0.0")
+    testIntegrationImplementation("com.github.mikesafonov:smpp-server-mock-spring-boot:1.0.0")
+
     testIntegrationCompileOnly("org.projectlombok:lombok:1.18.10")
     testIntegrationAnnotationProcessor("org.projectlombok:lombok:1.18.10")
     testIntegrationImplementation('org.springframework.boot:spring-boot-starter-test')
