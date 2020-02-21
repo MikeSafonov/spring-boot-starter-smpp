@@ -24,7 +24,8 @@ import static java.util.Objects.requireNonNull;
 public class ClientFactory {
 
     /**
-     * Creates {@link MockSenderClient} with name {@code name} and {@link SmppResultGenerator} {@code smppResultGenerator}
+     * Creates {@link MockSenderClient} with name {@code name} and {@link SmppResultGenerator}
+     * {@code smppResultGenerator}
      *
      * @param name                name of client
      * @param smppResultGenerator result generator
@@ -61,7 +62,8 @@ public class ClientFactory {
     }
 
     /**
-     * Creates {@link StandardSenderClient} with name {@code name} and {@link TypeOfAddressParser} {@code typeOfAddressParser},
+     * Creates {@link StandardSenderClient} with name {@code name} and {@link TypeOfAddressParser}
+     * {@code typeOfAddressParser},
      * configured with properties from {@code smsc} or {@code defaults}
      *
      * @param name                name of client
@@ -85,14 +87,16 @@ public class ClientFactory {
         long requestTimeout = getOrDefault(smsc.getRequestTimeout(), defaults.getRequestTimeout()).toMillis();
         int maxTry = getOrDefault(smsc.getMaxTry(), defaults.getMaxTry());
 
-        TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
+        TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name,
+                smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
         DefaultSmppClient client = new DefaultSmppClient();
         return new StandardSenderClient(transmitterConfiguration, client, maxTry,
                 ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
 
     /**
-     * Creates {@link StandardResponseClient} with name {@code name}, configured with properties from {@code smsc} or {@code defaults}
+     * Creates {@link StandardResponseClient} with name {@code name}, configured with properties from
+     * {@code smsc} or {@code defaults}
      *
      * @param name     name of client
      * @param defaults default smpp properties
@@ -109,9 +113,11 @@ public class ClientFactory {
         boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
         long rebindPeriod = getOrDefault(smsc.getRebindPeriod(), defaults.getRebindPeriod()).getSeconds();
 
-        ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(), loggingBytes, loggingPdu);
+        ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(),
+                loggingBytes, loggingPdu);
         DefaultSmppClient client = new DefaultSmppClient();
-        return new StandardResponseClient(receiverConfiguration, client, rebindPeriod, Executors.newSingleThreadScheduledExecutor());
+        return new StandardResponseClient(receiverConfiguration, client, rebindPeriod,
+                Executors.newSingleThreadScheduledExecutor());
     }
 
     /**

@@ -52,7 +52,8 @@ public class MessageBuilder {
             Address sourceAddress = addressBuilder.createSourceAddress(message.getSource());
             Address destAddress = addressBuilder.createDestinationAddress(message.getMsisdn());
 
-            SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress, destAddress, message.isSilent(), ucs2Only);
+            SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress,
+                    destAddress, message.isSilent(), ucs2Only);
 
             if (message.getMessageType() == MessageType.SIMPLE) {
                 registerDeliveryReport(submitSm);
@@ -84,7 +85,9 @@ public class MessageBuilder {
     }
 
     private byte getEsmClass(MessageType messageType) {
-        return (messageType == MessageType.DATAGRAM) ? SmppConstants.ESM_CLASS_MM_DATAGRAM : SmppConstants.ESM_CLASS_MM_STORE_FORWARD;
+        return (messageType == MessageType.DATAGRAM)
+                ? SmppConstants.ESM_CLASS_MM_DATAGRAM
+                : SmppConstants.ESM_CLASS_MM_STORE_FORWARD;
     }
 
 
@@ -101,7 +104,9 @@ public class MessageBuilder {
      * @throws SmppInvalidArgumentException see {@link SubmitSm#setShortMessage}
      */
     @NotNull
-    private SubmitSm createSubmitSm(@NotNull String message, byte esmClass, @NotNull Address sourceAddress, @NotNull Address destAddress, boolean silent, boolean ucs2Only) throws SmppInvalidArgumentException {
+    private SubmitSm createSubmitSm(@NotNull String message, byte esmClass,
+                                    @NotNull Address sourceAddress, @NotNull Address destAddress,
+                                    boolean silent, boolean ucs2Only) throws SmppInvalidArgumentException {
 
         SubmitSm sm = new SubmitSm();
         sm.setEsmClass(esmClass);

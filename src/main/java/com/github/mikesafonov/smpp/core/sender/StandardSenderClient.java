@@ -60,8 +60,9 @@ public class StandardSenderClient implements SenderClient {
     private SmppSession session;
 
 
-    public StandardSenderClient(@NotNull TransmitterConfiguration configuration, @NotNull DefaultSmppClient client, int maxTryCount,
-                                boolean ucs2Only, long timeoutMillis, @NotNull MessageBuilder messageBuilder) {
+    public StandardSenderClient(@NotNull TransmitterConfiguration configuration, @NotNull DefaultSmppClient client,
+                                int maxTryCount, boolean ucs2Only, long timeoutMillis,
+                                @NotNull MessageBuilder messageBuilder) {
         this.sessionConfig = requireNonNull(configuration);
         this.messageBuilder = requireNonNull(messageBuilder);
         this.client = requireNonNull(client);
@@ -87,7 +88,8 @@ public class StandardSenderClient implements SenderClient {
                 checkSession();
             } catch (SmppSessionException e) {
                 log.error(e.getErrorMessage(), e);
-                throw new SenderClientBindException(format("Unable to bind with configuration: %s ", sessionConfig.configInformation()));
+                throw new SenderClientBindException(format("Unable to bind with configuration: %s ",
+                        sessionConfig.configInformation()));
             }
             inited = true;
         }
@@ -105,7 +107,8 @@ public class StandardSenderClient implements SenderClient {
 
         requireNonNull(message);
         if (isNullOrEmpty(message.getText())) {
-            return MessageResponse.error(message, getId(), new MessageErrorInformation(0, "Empty message text"));
+            return MessageResponse.error(message, getId(), new MessageErrorInformation(0,
+                    "Empty message text"));
         }
 
         try {
@@ -132,29 +135,36 @@ public class StandardSenderClient implements SenderClient {
 
         requireNonNull(cancelMessage);
         if (isNullOrEmpty(cancelMessage.getMessageId())) {
-            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(0, "Empty message id"));
+            return CancelMessageResponse.error(cancelMessage, getId(),
+                    new MessageErrorInformation(0, "Empty message id"));
         }
 
         try {
             checkSession();
 
             CancelSm cancelSm = messageBuilder.createCancelSm(cancelMessage);
-            WindowFuture<Integer, PduRequest, PduResponse> futureResponse = session.sendRequestPdu(cancelSm, timeoutMillis, true);
+            WindowFuture<Integer, PduRequest, PduResponse> futureResponse =
+                    session.sendRequestPdu(cancelSm, timeoutMillis, true);
             if (futureResponse.await() && futureResponse.isDone() && futureResponse.isSuccess()) {
                 return createCancelMessageResponse(cancelMessage, futureResponse);
             }
-            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM, "Unable to get response"));
-        } catch (RecoverablePduException | UnrecoverablePduException | SmppTimeoutException | SmppChannelException | InterruptedException e) {
+            return CancelMessageResponse.error(cancelMessage, getId(),
+                    new MessageErrorInformation(INVALID_PARAM, "Unable to get response"));
+        } catch (RecoverablePduException | UnrecoverablePduException
+                | SmppTimeoutException | SmppChannelException | InterruptedException e) {
             log.error(e.getMessage(), e);
-            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_PARAM, e.getMessage()));
+            return CancelMessageResponse.error(cancelMessage, getId(),
+                    new MessageErrorInformation(INVALID_PARAM, e.getMessage()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return CancelMessageResponse.error(cancelMessage, getId(), new MessageErrorInformation(INVALID_SENDING_ERROR, "Unexpected exception"));
+            return CancelMessageResponse.error(cancelMessage, getId(),
+                    new MessageErrorInformation(INVALID_SENDING_ERROR, "Unexpected exception"));
         }
     }
 
     @NotNull
-    private CancelMessageResponse createCancelMessageResponse(@NotNull CancelMessage cancelMessage, WindowFuture<Integer, PduRequest, PduResponse> futureResponse) {
+    private CancelMessageResponse createCancelMessageResponse(@NotNull CancelMessage cancelMessage,
+                                                              WindowFuture<Integer, PduRequest, PduResponse> futureResponse) {
         CancelSmResp cancelSmResp = (CancelSmResp) futureResponse.getResponse();
         if (cancelSmResp.getCommandStatus() == SmppConstants.STATUS_OK) {
             return CancelMessageResponse.success(cancelMessage, getId());
@@ -232,7 +242,6 @@ public class StandardSenderClient implements SenderClient {
      * If <b>true</b>, then sending ping command. If ping fails then trying to reconnect.<br>
      * If <b>false</b>, check is smpp session in binding state then method return false, otherwise try to reconnect session.
      * <p>
-     * Метод для проверки состояния сессии Bound
      *
      * @return true if session in bound state and ping/reconnection success.
      * @see #pingOrReconnect()

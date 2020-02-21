@@ -14,9 +14,10 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Implementation of {@link SenderClient} which should be used for testing purpose. This client
- * may provide real smpp connection via incoming implementation of {@link SenderClient}. Every incoming request will be redirected to
- * real {@link #senderClient} only if list of allowed phone numbers {@link #allowedPhones} contains message destination phone.
- * Otherwise {@link MessageResponse}/{@link CancelMessageResponse} will be generated via {@link SmppResultGenerator}
+ * may provide real smpp connection via incoming implementation of {@link SenderClient}. Every incoming request will
+ * be redirected to real {@link #senderClient} only if list of allowed phone numbers {@link #allowedPhones}
+ * contains message destination phone. Otherwise {@link MessageResponse}/{@link CancelMessageResponse}
+ * will be generated via {@link SmppResultGenerator}
  *
  * @author Mike Safonov
  */
@@ -35,7 +36,8 @@ public class TestSenderClient implements SenderClient {
      */
     private final SmppResultGenerator smppResultGenerator;
 
-    public TestSenderClient(@NotNull SenderClient senderClient, @NotNull List<String> allowedPhones, @NotNull SmppResultGenerator smppResultGenerator) {
+    public TestSenderClient(@NotNull SenderClient senderClient, @NotNull List<String> allowedPhones,
+                            @NotNull SmppResultGenerator smppResultGenerator) {
         this.senderClient = requireNonNull(senderClient);
         this.allowedPhones = new ArrayList<>(allowedPhones);
         this.smppResultGenerator = requireNonNull(smppResultGenerator);

@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 /**
- * Implementation of {@link SmppResultGenerator} which always generate success {@link MessageResponse}/{@link CancelMessageResponse} with
- * random smsc message id (random UUID).
+ * Implementation of {@link SmppResultGenerator} which always generate success {@link MessageResponse}/
+ * {@link CancelMessageResponse} with random smsc message id (random UUID).
  *
  * @author Mike Safonov
  */

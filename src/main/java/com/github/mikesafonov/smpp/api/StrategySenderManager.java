@@ -18,7 +18,8 @@ public class StrategySenderManager extends BaseSenderManager {
 
     private final IndexDetectionStrategy indexDetectionStrategy;
 
-    public StrategySenderManager(@NotNull List<SmscConnection> smscConnections, @NotNull IndexDetectionStrategy indexDetectionStrategy) {
+    public StrategySenderManager(@NotNull List<SmscConnection> smscConnections,
+                                 @NotNull IndexDetectionStrategy indexDetectionStrategy) {
         super(smscConnections);
         this.indexDetectionStrategy = requireNonNull(indexDetectionStrategy);
     }
