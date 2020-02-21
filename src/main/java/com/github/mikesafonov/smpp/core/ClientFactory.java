@@ -2,10 +2,12 @@ package com.github.mikesafonov.smpp.core;
 
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.github.mikesafonov.smpp.config.SmppProperties;
+import com.github.mikesafonov.smpp.core.connection.*;
 import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
-import com.github.mikesafonov.smpp.core.reciever.ReceiverConfiguration;
+import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
+import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
 
@@ -90,7 +92,8 @@ public class ClientFactory {
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name,
                 smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
         DefaultSmppClient client = new DefaultSmppClient();
-        return new StandardSenderClient(transmitterConfiguration, client, maxTry,
+        ConnectionManager connectionManager = new TransmitterConnectionManager(client, transmitterConfiguration, maxTry);
+        return new StandardSenderClient(connectionManager,
                 ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
 
@@ -104,10 +107,12 @@ public class ClientFactory {
      * @return standard response client
      */
     public ResponseClient standardResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults,
-                                           @NotNull SmppProperties.SMSC smsc) {
+                                           @NotNull SmppProperties.SMSC smsc,
+                                           @NotNull DeliveryReportConsumer deliveryReportConsumer) {
         validateName(name);
         requireNonNull(defaults);
         requireNonNull(smsc);
+        requireNonNull(deliveryReportConsumer);
 
         boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
         boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
@@ -116,8 +121,15 @@ public class ClientFactory {
         ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(),
                 loggingBytes, loggingPdu);
         DefaultSmppClient client = new DefaultSmppClient();
-        return new StandardResponseClient(receiverConfiguration, client, rebindPeriod,
-                Executors.newSingleThreadScheduledExecutor());
+
+        ResponseSmppSessionHandler responseSmppSessionHandler =
+                new ResponseSmppSessionHandler(receiverConfiguration.getName(), deliveryReportConsumer);
+
+        ConnectionManager connectionManager = new ReceiverConnectionManager(
+                client, receiverConfiguration, responseSmppSessionHandler, rebindPeriod,
+                Executors.newSingleThreadScheduledExecutor()
+        );
+        return new StandardResponseClient(connectionManager);
     }
 
     /**

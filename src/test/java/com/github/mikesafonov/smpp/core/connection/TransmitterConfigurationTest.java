@@ -1,4 +1,4 @@
-package com.github.mikesafonov.smpp.core.sender;
+package com.github.mikesafonov.smpp.core.connection;
 
 import com.cloudhopper.smpp.SmppBindType;
 import com.github.mikesafonov.smpp.config.SmppProperties;

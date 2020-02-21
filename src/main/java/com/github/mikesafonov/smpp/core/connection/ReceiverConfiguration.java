@@ -1,7 +1,6 @@
-package com.github.mikesafonov.smpp.core.reciever;
+package com.github.mikesafonov.smpp.core.connection;
 
 import com.cloudhopper.smpp.SmppBindType;
-import com.cloudhopper.smpp.SmppSessionConfiguration;
 import com.cloudhopper.smpp.type.LoggingOptions;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 
@@ -13,7 +12,7 @@ import java.util.Objects;
  *
  * @author Mike Safonov
  */
-public class ReceiverConfiguration extends SmppSessionConfiguration {
+public class ReceiverConfiguration extends BaseSmppSessionConfiguration {
 
     public ReceiverConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials,
                                  boolean loggingBytes, boolean loggingPdu) {

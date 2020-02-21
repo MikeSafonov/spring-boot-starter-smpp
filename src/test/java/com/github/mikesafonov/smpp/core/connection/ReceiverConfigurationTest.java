@@ -1,4 +1,4 @@
-package com.github.mikesafonov.smpp.core.reciever;
+package com.github.mikesafonov.smpp.core.connection;
 
 import com.cloudhopper.smpp.SmppBindType;
 import com.github.mikesafonov.smpp.config.SmppProperties;
@@ -12,8 +12,10 @@ class ReceiverConfigurationTest {
 
     @Test
     void shouldThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> new ReceiverConfiguration(null, new SmppProperties.Credentials(), true, true));
-        assertThrows(NullPointerException.class, () -> new ReceiverConfiguration("asdasd", null, true, true));
+        assertThrows(NullPointerException.class, () ->
+                new ReceiverConfiguration(null, new SmppProperties.Credentials(), true, true));
+        assertThrows(NullPointerException.class, () ->
+                new ReceiverConfiguration("asdasd", null, true, true));
     }
 
     @Test

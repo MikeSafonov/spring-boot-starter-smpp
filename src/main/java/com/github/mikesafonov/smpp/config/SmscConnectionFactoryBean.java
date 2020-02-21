@@ -4,7 +4,6 @@ import com.github.mikesafonov.smpp.core.ClientFactory;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
-import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import com.github.mikesafonov.smpp.core.sender.TypeOfAddressParser;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +35,21 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         return new SmscConnectionsHolder(connections);
     }
 
+    @Override
+    public Class<?> getObjectType() {
+        return SmscConnectionsHolder.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
+
     private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
-        ConnectionMode connectionMode = (smsc.getConnectionMode() == null)
-                ? defaults.getConnectionMode()
-                : smsc.getConnectionMode();
+        ConnectionMode connectionMode = getOrDefault(smsc.getConnectionMode(), defaults.getConnectionMode());
         switch (connectionMode) {
             case MOCK: {
-                return new SmscConnection(name, clientFactory.mockSender(name, smppResultGenerator));
+                return getMockSmscConnection(name);
             }
             case TEST: {
                 return getTestSmscConnection(defaults, name, smsc);
@@ -56,11 +63,15 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         }
     }
 
+    private SmscConnection getMockSmscConnection(String name) {
+        return new SmscConnection(name, clientFactory.mockSender(name, smppResultGenerator));
+    }
+
     private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults,
                                                  String name, SmppProperties.SMSC smsc) {
         SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
         SenderClient testSenderClient = clientFactory.testSender(standardSender, defaults, smsc, smppResultGenerator);
-        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
         setupClients(testSenderClient, responseClient);
         return new SmscConnection(name, responseClient, testSenderClient);
     }
@@ -68,7 +79,7 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     private SmscConnection getStandardSmscConnection(SmppProperties.Defaults defaults,
                                                      String name, SmppProperties.SMSC smsc) {
         SenderClient senderClient = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
-        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc);
+        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
         setupClients(senderClient, responseClient);
         return new SmscConnection(name, responseClient, senderClient);
     }
@@ -76,19 +87,14 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     private void setupClients(SenderClient senderClient, ResponseClient responseClient) {
         if (smppProperties.isSetupRightAway()) {
             senderClient.setup();
-            ResponseSmppSessionHandler responseSmppSessionHandler =
-                    new ResponseSmppSessionHandler(responseClient, deliveryReportConsumer);
-            responseClient.setup(responseSmppSessionHandler);
+            responseClient.setup();
         }
     }
 
-    @Override
-    public Class<?> getObjectType() {
-        return SmscConnectionsHolder.class;
-    }
-
-    @Override
-    public boolean isSingleton() {
-        return true;
+    private static <T> T getOrDefault(T value, T defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        return value;
     }
 }

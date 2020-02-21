@@ -1,9 +1,10 @@
 package com.github.mikesafonov.smpp.core.sender;
 
-import com.cloudhopper.smpp.impl.DefaultSmppClient;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import org.junit.jupiter.api.BeforeEach;
 
-import static com.github.mikesafonov.smpp.util.Randomizer.*;
+import static com.github.mikesafonov.smpp.util.Randomizer.randomBoolean;
+import static com.github.mikesafonov.smpp.util.Randomizer.randomInt;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -11,15 +12,13 @@ import static org.mockito.Mockito.mock;
  */
 abstract class BaseStandardSenderClientTest {
     protected StandardSenderClient senderClient;
-    protected TransmitterConfiguration transmitterConfiguration;
-    protected DefaultSmppClient smppClient;
     protected MessageBuilder messageBuilder;
+    protected ConnectionManager connectionManager;
 
     @BeforeEach
     void setUp() {
-        transmitterConfiguration = randomTransmitterConfiguration();
-        smppClient = mock(DefaultSmppClient.class);
+        connectionManager = mock(ConnectionManager.class);
         messageBuilder = mock(MessageBuilder.class);
-        senderClient = new StandardSenderClient(transmitterConfiguration, smppClient, randomInt(), randomBoolean(), randomInt(), messageBuilder);
+        senderClient = new StandardSenderClient(connectionManager, randomBoolean(), randomInt(), messageBuilder);
     }
 }

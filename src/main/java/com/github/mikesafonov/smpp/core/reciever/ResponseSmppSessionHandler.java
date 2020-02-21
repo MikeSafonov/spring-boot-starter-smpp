@@ -22,12 +22,11 @@ import static java.util.Objects.requireNonNull;
 @Slf4j
 public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
 
-    private final ResponseClient client;
+    private final String clientId;
     private final DeliveryReportConsumer deliveryReportConsumer;
 
-    public ResponseSmppSessionHandler(@NotNull ResponseClient client,
-                                      @NotNull DeliveryReportConsumer deliveryReportConsumer) {
-        this.client = requireNonNull(client);
+    public ResponseSmppSessionHandler(String clientId, @NotNull DeliveryReportConsumer deliveryReportConsumer) {
+        this.clientId = requireNonNull(clientId);
         this.deliveryReportConsumer = requireNonNull(deliveryReportConsumer);
     }
 
@@ -36,10 +35,7 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
 
         if (pduRequest != null) {
             if (isDelivery(pduRequest)) {
-                client.setInProcess(true);
-                PduResponse response = processReport(pduRequest);
-                client.setInProcess(false);
-                return response;
+                return processReport(pduRequest);
             }
             log.debug(pduRequest.toString());
         }
@@ -64,15 +60,6 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
         byte[] shortMessage = deliverSm.getShortMessage();
         String sms = new String(shortMessage);
         DeliveryReceipt deliveryReceipt = DeliveryReceipt.parseShortMessage(sms, DateTimeZone.UTC);
-        return DeliveryReport.of(deliveryReceipt, client.getId());
+        return DeliveryReport.of(deliveryReceipt, clientId);
     }
-
-    /**
-     * When channel closed unexpectedly then trying to reconnect using {@link StandardResponseClient#reconnect()}.
-     */
-    @Override
-    public void fireChannelUnexpectedlyClosed() {
-        client.reconnect();
-    }
-
 }
