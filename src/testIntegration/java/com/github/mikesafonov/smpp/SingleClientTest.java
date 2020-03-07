@@ -1,8 +1,6 @@
 package com.github.mikesafonov.smpp;
 
 import com.cloudhopper.smpp.SmppConstants;
-import com.cloudhopper.smpp.pdu.CancelSm;
-import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.type.SmppChannelException;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
@@ -109,24 +107,16 @@ public class SingleClientTest {
         CancelMessage cancelMessage = new CancelMessage("123", "123123123", "12312312");
         client.cancel(cancelMessage);
 
-        assertThat(mockSmppServer).messages()
-                .asList()
-                .allSatisfy(pduRequest -> {
-                    if (pduRequest instanceof SubmitSm) {
-                        assertThat((SubmitSm) pduRequest)
-                                .hasEsmClass(SmppConstants.ESM_CLASS_MM_DATAGRAM)
-                                .hasDest("12312312")
-                                .hasSource("123123123")
-                                .hasText("asdasd")
-                                .doesNotHaveDeliveryReport();
-                    } else if (pduRequest instanceof CancelSm) {
-                        assertThat((CancelSm) pduRequest)
-                                .hasDest("12312312")
-                                .hasSource("123123123")
-                                .hasId("123");
-                    } else {
-                        log.debug("ignore " + pduRequest);
-                    }
-                });
+        assertThat(mockSmppServer).hasSingleMessage()
+                .hasEsmClass(SmppConstants.ESM_CLASS_MM_DATAGRAM)
+                .hasDest("12312312")
+                .hasSource("123123123")
+                .hasText("asdasd")
+                .doesNotHaveDeliveryReport();
+
+        assertThat(mockSmppServer).hasSingleCancelMessage()
+                .hasDest("12312312")
+                .hasSource("123123123")
+                .hasId("123");
     }
 }
