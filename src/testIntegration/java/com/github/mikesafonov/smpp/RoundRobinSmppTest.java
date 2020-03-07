@@ -24,12 +24,15 @@ public class RoundRobinSmppTest {
     void shouldSendTwoMessages() {
         roundRobinApplicationService.sendMessage("one", "two", "one message");
         roundRobinApplicationService.sendMessage("two", "one", "two message");
+        roundRobinApplicationService.sendMessage("one", "three", "three message");
 
-        assertThat(smppServerHolder).serverByName("one").hasSingleMessage()
-                .hasDeliveryReport()
-                .hasDest("two")
-                .hasSource("one")
-                .hasText("one message");
+        assertThat(smppServerHolder).serverByName("one").messages()
+                .hasSize(2)
+                .containsDest("two")
+                .containsDest("three")
+                .containsSource("one")
+                .containsText("one message")
+                .containsText("three message");
 
         assertThat(smppServerHolder).serverByName("two").hasSingleMessage()
                 .hasDeliveryReport()
