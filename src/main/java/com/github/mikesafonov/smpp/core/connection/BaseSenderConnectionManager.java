@@ -2,23 +2,34 @@ package com.github.mikesafonov.smpp.core.connection;
 
 import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.SmppSessionConfiguration;
+import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.pdu.EnquireLink;
 import com.github.mikesafonov.smpp.core.exceptions.SmppSessionException;
+import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
 public abstract class BaseSenderConnectionManager implements ConnectionManager {
+    private static final String SENDER_SUCCESS_BINDED_MESSAGE = "SENDER SUCCESSFUL BINDED";
+
     protected final DefaultSmppClient client;
     protected final BaseSmppSessionConfiguration configuration;
+    protected final ResponseSmppSessionHandler sessionHandler;
     /**
      * Number of attempts to reconnect if smpp session closed
      */
     protected final int maxTryCount;
     protected SmppSession session;
 
+    public BaseSenderConnectionManager(DefaultSmppClient client, BaseSmppSessionConfiguration configuration, int maxTryCount) {
+        this.client = client;
+        this.configuration = configuration;
+        this.maxTryCount = maxTryCount;
+        this.sessionHandler = null;
+    }
 
     @Override
     public SmppSession getSession() {
@@ -74,9 +85,18 @@ public abstract class BaseSenderConnectionManager implements ConnectionManager {
      * Binding new smpp session
      *
      * @return true - if binding was successfully, false - otherwise
-     * @see DefaultSmppClient#bind(SmppSessionConfiguration)
+     * @see DefaultSmppClient#bind(SmppSessionConfiguration, SmppSessionHandler)
      */
-    protected abstract boolean bind();
+    protected boolean bind() {
+        try {
+            session = client.bind(configuration, sessionHandler);
+            log.debug(SENDER_SUCCESS_BINDED_MESSAGE);
+            return true;
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
+        return false;
+    }
 
     /**
      * Check is {@link #session} in bound state. <br>
