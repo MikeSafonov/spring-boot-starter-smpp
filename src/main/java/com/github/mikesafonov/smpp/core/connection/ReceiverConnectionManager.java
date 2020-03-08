@@ -9,7 +9,6 @@ import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
 import com.github.mikesafonov.smpp.core.exceptions.ResponseClientBindException;
-import com.github.mikesafonov.smpp.core.exceptions.SmppSessionException;
 import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,10 +72,9 @@ public class ReceiverConnectionManager implements ConnectionManager {
     }
 
     /**
-     * Checking smpp session state. If session is null - creating new session using method {@link #bind()}.
-     * Otherwise checking bound session state by method {@link #checkBoundState()}.
+     * If session is null - creating new session using method {@link #bind()}.
      *
-     * @throws SmppSessionException if session not connected
+     * @throws ResponseClientBindException if unable to obtain session
      */
     private void checkSession() {
         if (session == null) {
