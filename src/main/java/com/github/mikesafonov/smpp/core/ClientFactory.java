@@ -1,13 +1,9 @@
 package com.github.mikesafonov.smpp.core;
 
-import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.github.mikesafonov.smpp.config.SmppProperties;
-import com.github.mikesafonov.smpp.core.connection.*;
-import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
-import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
-import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
 
@@ -15,8 +11,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 
+import static com.github.mikesafonov.smpp.core.utils.Utils.getOrDefault;
+import static com.github.mikesafonov.smpp.core.utils.Utils.validateName;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
@@ -72,27 +69,23 @@ public class ClientFactory {
      * @param defaults            default smpp properties
      * @param smsc                smpp properties
      * @param typeOfAddressParser address parser
+     * @param connectionManager   connection manager
      * @return standard sender client
      */
-    public SenderClient standardSender(@NotBlank String name, @NotNull SmppProperties.Defaults defaults,
+    public SenderClient standardSender(@NotBlank String name,
+                                       @NotNull SmppProperties.Defaults defaults,
                                        @NotNull SmppProperties.SMSC smsc,
-                                       @NotNull TypeOfAddressParser typeOfAddressParser) {
+                                       @NotNull TypeOfAddressParser typeOfAddressParser,
+                                       @NotNull ConnectionManager connectionManager) {
         validateName(name);
         requireNonNull(defaults);
         requireNonNull(smsc);
         requireNonNull(typeOfAddressParser);
+        requireNonNull(connectionManager);
 
-        boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
-        boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
-        int windowsSize = getOrDefault(smsc.getWindowSize(), defaults.getWindowSize());
         boolean ucs2Only = getOrDefault(smsc.getUcs2Only(), defaults.isUcs2Only());
         long requestTimeout = getOrDefault(smsc.getRequestTimeout(), defaults.getRequestTimeout()).toMillis();
-        int maxTry = getOrDefault(smsc.getMaxTry(), defaults.getMaxTry());
 
-        TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name,
-                smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
-        DefaultSmppClient client = new DefaultSmppClient();
-        ConnectionManager connectionManager = new TransmitterConnectionManager(client, transmitterConfiguration, maxTry);
         return new StandardSenderClient(connectionManager,
                 ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser));
     }
@@ -102,52 +95,13 @@ public class ClientFactory {
      * {@code smsc} or {@code defaults}
      *
      * @param name     name of client
-     * @param defaults default smpp properties
-     * @param smsc     smpp properties
+     * @param connectionManager     connection manager
      * @return standard response client
      */
-    public ResponseClient standardResponse(@NotBlank String name, @NotNull SmppProperties.Defaults defaults,
-                                           @NotNull SmppProperties.SMSC smsc,
-                                           @NotNull DeliveryReportConsumer deliveryReportConsumer) {
+    public ResponseClient standardResponse(@NotBlank String name, @NotNull ConnectionManager connectionManager) {
         validateName(name);
-        requireNonNull(defaults);
-        requireNonNull(smsc);
-        requireNonNull(deliveryReportConsumer);
+        requireNonNull(connectionManager);
 
-        boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
-        boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
-        long rebindPeriod = getOrDefault(smsc.getRebindPeriod(), defaults.getRebindPeriod()).getSeconds();
-
-        ReceiverConfiguration receiverConfiguration = new ReceiverConfiguration(name, smsc.getCredentials(),
-                loggingBytes, loggingPdu);
-        DefaultSmppClient client = new DefaultSmppClient();
-
-        ResponseSmppSessionHandler responseSmppSessionHandler =
-                new ResponseSmppSessionHandler(receiverConfiguration.getName(), deliveryReportConsumer);
-
-        ConnectionManager connectionManager = new ReceiverConnectionManager(
-                client, receiverConfiguration, responseSmppSessionHandler, rebindPeriod,
-                Executors.newSingleThreadScheduledExecutor()
-        );
         return new StandardResponseClient(connectionManager);
-    }
-
-    /**
-     * Check {@code name} not null and not blank
-     *
-     * @param name client name
-     * @throws ClientNameSmppException if name null or blank
-     */
-    private void validateName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new ClientNameSmppException("Name must not be empty!");
-        }
-    }
-
-    private <T> T getOrDefault(T obj, T defaultObj) {
-        if (obj == null) {
-            return defaultObj;
-        }
-        return obj;
     }
 }

@@ -1,12 +1,14 @@
 package com.github.mikesafonov.smpp.core;
 
 import com.github.mikesafonov.smpp.config.SmppProperties;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
-import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
+import java.time.temporal.ChronoUnit;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -25,260 +27,183 @@ class ClientFactoryTest {
 
     private ClientFactory clientFactory = new ClientFactory();
 
-    @Test
-    void shouldThrowRuntimeExceptionBecauseNameMustNotBeEmpty() throws Throwable {
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender(null, null), "Name must not be empty!");
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender("", null), "Name must not be empty!");
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse(null, null, null, null), "Name must not be empty!");
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse("", null, null, null), "Name must not be empty!");
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender(null, null, null, null), "Name must not be empty!");
-        checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender("", null, null, null), "Name must not be empty!");
+    @Nested
+    class EmptyName {
+        @Test
+        void shouldThrowRuntimeExceptionBecauseNameMustNotBeEmpty() throws Throwable {
+            checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender(null, null), "Name must not be empty!");
+            checkThrowClientNameSmppWithMessage(() -> clientFactory.mockSender("", null), "Name must not be empty!");
+            checkThrowClientNameSmppWithMessage(() -> clientFactory.standardResponse(null, null), "Name must not be empty!");
+            checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender(null, null, null, null, null), "Name must not be empty!");
+            checkThrowClientNameSmppWithMessage(() -> clientFactory.standardSender("", null, null, null, null), "Name must not be empty!");
+        }
     }
 
-    @Test
-    void shouldThrowNpeBecauseInputArgumentIsNull() {
-        assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), null, null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
-        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), null, null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), mock(SmppProperties.Defaults.class), null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
-        assertThrows(NullPointerException.class, () -> clientFactory.mockSender(randomString(), null));
-        assertThrows(NullPointerException.class, () -> clientFactory.testSender(null, null, null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), null, null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), null, null));
-        assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
+    @Nested
+    class NPE {
+        @Test
+        void shouldThrowNpeBecauseInputArgumentIsNull() {
+            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), null, null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), mock(TypeOfAddressParser.class), null));
+            assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), null));
+            assertThrows(NullPointerException.class, () -> clientFactory.mockSender(randomString(), null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(null, null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
+        }
     }
 
-    @Test
-    void shouldCreateMockSenderClient() {
-        String name = randomString();
-        SenderClient senderClient = clientFactory.mockSender(name, mock(SmppResultGenerator.class));
+    @Nested
+    class MockSender {
+        @Test
+        void shouldCreateMockSenderClient() {
+            String name = randomString();
+            SenderClient senderClient = clientFactory.mockSender(name, mock(SmppResultGenerator.class));
 
-        assertEquals(name, senderClient.getId());
-        assertTrue(senderClient instanceof MockSenderClient);
+            assertEquals(name, senderClient.getId());
+            assertTrue(senderClient instanceof MockSenderClient);
+        }
     }
 
-    @Test
-    void shouldCreateDefaultResponseClientWithDefaultParameters() {
-        String name = randomString();
-        Duration defaultDuration = randomDuration();
-        boolean isLoggingBytes = false;
-        boolean isLoggingPdu = true;
+    @Nested
+    class StandardResponse {
+        @Test
+        void shouldCreateDefaultResponseClientWithDefaultParameters() {
+            String name = randomString();
+            ConnectionManager connectionManager = mock(ConnectionManager.class);
 
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        defaults.setLoggingPdu(isLoggingPdu);
-        defaults.setLoggingBytes(isLoggingBytes);
-        defaults.setRebindPeriod(defaultDuration);
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
-        DeliveryReportConsumer deliveryReportConsumer = mock(DeliveryReportConsumer.class);
+            ResponseClient responseClient = clientFactory.standardResponse(name, connectionManager);
 
-        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
+            assertThat(responseClient)
+                .extracting("connectionManager")
+                .isEqualTo(connectionManager);
 
-        assertThat(responseClient)
-                .extracting("id", "connectionManager.rebindPeriod",
-                        "connectionManager.configuration.loggingOptions.isLogPduEnabled",
-                        "connectionManager.configuration.loggingOptions.isLogBytesEnabled")
-                .containsExactly(name, defaultDuration.getSeconds(), isLoggingPdu, isLoggingBytes);
-
-        assertTrue(responseClient instanceof StandardResponseClient);
+            assertTrue(responseClient instanceof StandardResponseClient);
+        }
     }
 
-    @Test
-    void shouldCreateDefaultResponseClientWithCustomParameters() {
-        String name = randomString();
-        Duration defaultDuration = randomDuration();
-        Duration customDuration = randomDuration();
-        boolean isLoggingBytes = false;
-        boolean isLoggingPdu = true;
+    @Nested
+    class TestSender {
+        @Test
+        void shouldCreateTestSenderClientWithDefaultParametersWithEmptyPhones() {
+            String name = randomString();
 
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        defaults.setLoggingPdu(isLoggingPdu);
-        defaults.setLoggingBytes(isLoggingBytes);
-        defaults.setRebindPeriod(defaultDuration);
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
-        smsc.setLoggingBytes(!isLoggingBytes);
-        smsc.setLoggingPdu(!isLoggingPdu);
-        smsc.setRebindPeriod(customDuration);
+            SmppProperties.Defaults defaults = new SmppProperties.Defaults();
+            defaults.setAllowedPhones(null);
 
-        DeliveryReportConsumer deliveryReportConsumer = mock(DeliveryReportConsumer.class);
+            SmppProperties.SMSC smsc = new SmppProperties.SMSC();
+            smsc.setCredentials(new SmppProperties.Credentials());
 
-        ResponseClient responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
+            SenderClient senderClient = mock(SenderClient.class);
+            when(senderClient.getId()).thenReturn(name);
 
-        assertThat(responseClient)
-                .extracting("id", "connectionManager.rebindPeriod",
-                        "connectionManager.configuration.loggingOptions.isLogPduEnabled",
-                        "connectionManager.configuration.loggingOptions.isLogBytesEnabled")
-                .containsExactly(name, customDuration.getSeconds(), !isLoggingPdu, !isLoggingBytes);
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
+                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
 
-        assertTrue(responseClient instanceof StandardResponseClient);
+            assertThat(testSenderClient).satisfies(client -> {
+                assertThat(client.getId()).isEqualTo(name);
+                assertThat(client.getAllowedPhones().isEmpty()).isTrue();
+            });
+        }
+
+        @Test
+        void shouldCreateTestSenderClientWithCustomParametersWithEmptyPhones() {
+            String name = randomString();
+
+            SmppProperties.Defaults defaults = new SmppProperties.Defaults();
+            String phone = randomString();
+            defaults.setAllowedPhones(new String[]{phone});
+
+            SmppProperties.SMSC smsc = new SmppProperties.SMSC();
+            smsc.setCredentials(new SmppProperties.Credentials());
+            smsc.setAllowedPhones(new String[]{});
+
+            SenderClient senderClient = mock(SenderClient.class);
+            when(senderClient.getId()).thenReturn(name);
+
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
+                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+
+            assertThat(testSenderClient).satisfies(client -> {
+                assertThat(client.getId()).isEqualTo(name);
+                assertThat(client.getAllowedPhones().isEmpty()).isTrue();
+            });
+        }
+
+        @Test
+        void shouldCreateTestSenderClientWithDefaultParametersWithNotEmptyPhones() {
+            String name = randomString();
+
+            SmppProperties.Defaults defaults = new SmppProperties.Defaults();
+            String phone = randomString();
+            defaults.setAllowedPhones(new String[]{phone});
+
+            SmppProperties.SMSC smsc = new SmppProperties.SMSC();
+            smsc.setCredentials(new SmppProperties.Credentials());
+
+            SenderClient senderClient = mock(SenderClient.class);
+            when(senderClient.getId()).thenReturn(name);
+
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
+                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+
+            assertThat(testSenderClient).satisfies(client -> {
+                assertThat(client.getId()).isEqualTo(name);
+                assertThat(client.getAllowedPhones()).containsOnly(phone);
+            });
+        }
+
+        @Test
+        void shouldCreateTestSenderClientWithCustomParametersWithNotEmptyPhones() {
+            String name = randomString();
+
+            SmppProperties.Defaults defaults = new SmppProperties.Defaults();
+            String phone = randomString();
+            String customPhone = randomString();
+            defaults.setAllowedPhones(new String[]{phone});
+
+            SmppProperties.SMSC smsc = new SmppProperties.SMSC();
+            smsc.setCredentials(new SmppProperties.Credentials());
+            smsc.setAllowedPhones(new String[]{customPhone});
+
+            SenderClient senderClient = mock(SenderClient.class);
+            when(senderClient.getId()).thenReturn(name);
+
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
+                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+
+            assertThat(testSenderClient).satisfies(client -> {
+                assertThat(client.getId()).isEqualTo(name);
+                assertThat(client.getAllowedPhones()).containsOnly(customPhone);
+            });
+        }
     }
 
-    @Test
-    void shouldCreateTestSenderClientWithDefaultParametersWithEmptyPhones() {
-        String name = randomString();
+    @Nested
+    class StandardSender {
+        @Test
+        void shouldCreateDefaultSenderClientWithDefaultParameters() {
+            String name = randomString();
+            boolean ucs2Only = randomBoolean();
+            long requestTimeout = randomLong();
 
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        defaults.setAllowedPhones(null);
+            SmppProperties.Defaults defaults = new SmppProperties.Defaults();
+            defaults.setUcs2Only(ucs2Only);
+            defaults.setRequestTimeout(Duration.ofMillis(requestTimeout));
 
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
+            SmppProperties.SMSC smsc = new SmppProperties.SMSC();
 
-        SenderClient senderClient = mock(SenderClient.class);
-        when(senderClient.getId()).thenReturn(name);
+            ConnectionManager connectionManager = mock(ConnectionManager.class);
 
-        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+            StandardSenderClient client = (StandardSenderClient) clientFactory
+                .standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class), connectionManager);
 
-        assertThat(testSenderClient).satisfies(client -> {
-            assertThat(client.getId()).isEqualTo(name);
-            assertThat(client.getAllowedPhones().isEmpty()).isTrue();
-        });
-    }
-
-    @Test
-    void shouldCreateTestSenderClientWithCustomParametersWithEmptyPhones() {
-        String name = randomString();
-
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        String phone = randomString();
-        defaults.setAllowedPhones(new String[]{phone});
-
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
-        smsc.setAllowedPhones(new String[]{});
-
-        SenderClient senderClient = mock(SenderClient.class);
-        when(senderClient.getId()).thenReturn(name);
-
-        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
-
-        assertThat(testSenderClient).satisfies(client -> {
-            assertThat(client.getId()).isEqualTo(name);
-            assertThat(client.getAllowedPhones().isEmpty()).isTrue();
-        });
-    }
-
-    @Test
-    void shouldCreateTestSenderClientWithDefaultParametersWithNotEmptyPhones() {
-        String name = randomString();
-
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        String phone = randomString();
-        defaults.setAllowedPhones(new String[]{phone});
-
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
-
-        SenderClient senderClient = mock(SenderClient.class);
-        when(senderClient.getId()).thenReturn(name);
-
-        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
-
-        assertThat(testSenderClient).satisfies(client -> {
-            assertThat(client.getId()).isEqualTo(name);
-            assertThat(client.getAllowedPhones()).containsOnly(phone);
-        });
-    }
-
-    @Test
-    void shouldCreateTestSenderClientWithCustomParametersWithNotEmptyPhones() {
-        String name = randomString();
-
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        String phone = randomString();
-        String customPhone = randomString();
-        defaults.setAllowedPhones(new String[]{phone});
-
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
-        smsc.setAllowedPhones(new String[]{customPhone});
-
-        SenderClient senderClient = mock(SenderClient.class);
-        when(senderClient.getId()).thenReturn(name);
-
-        TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
-
-        assertThat(testSenderClient).satisfies(client -> {
-            assertThat(client.getId()).isEqualTo(name);
-            assertThat(client.getAllowedPhones()).containsOnly(customPhone);
-        });
-    }
-
-
-    @Test
-    void shouldCreateDefaultSenderClientWithDefaultParameters() {
-        String name = randomString();
-        boolean isLoggingBytes = false;
-        boolean isLoggingPdu = true;
-        boolean ucs2Only = true;
-        int windowSize = randomInt();
-        long requestTimeout = randomLong();
-        int maxTry = randomInt();
-
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        defaults.setLoggingBytes(isLoggingBytes);
-        defaults.setLoggingPdu(isLoggingPdu);
-        defaults.setUcs2Only(ucs2Only);
-        defaults.setWindowSize(windowSize);
-        defaults.setRequestTimeout(Duration.ofMillis(requestTimeout));
-
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
-        smsc.setMaxTry(maxTry);
-
-
-        StandardSenderClient testSenderClient = (StandardSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
-
-        assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "connectionManager.maxTryCount",
-                "connectionManager.configuration.loggingOptions.isLogPduEnabled",
-                "connectionManager.configuration.loggingOptions.isLogBytesEnabled",
-                "connectionManager.configuration.windowSize")
-                .containsExactly(name, ucs2Only, requestTimeout, maxTry, isLoggingPdu, isLoggingBytes, windowSize);
-    }
-
-    @Test
-    void shouldCreateDefaultSenderClientWithCustomParameters() {
-        String name = randomString();
-
-        boolean defaultIsLoggingBytes = false;
-        boolean defaultIsLoggingPdu = true;
-        boolean defaultUcs2Only = true;
-        int defaultWindowSize = randomInt();
-        long defaultRequestTimeout = randomLong();
-
-
-        boolean isLoggingBytes = !defaultIsLoggingBytes;
-        boolean isLoggingPdu = !defaultIsLoggingPdu;
-        boolean ucs2Only = !defaultUcs2Only;
-        int windowSize = randomInt();
-        long requestTimeout = randomLong();
-        int maxTry = randomInt();
-
-        SmppProperties.Defaults defaults = new SmppProperties.Defaults();
-        defaults.setLoggingBytes(defaultIsLoggingBytes);
-        defaults.setLoggingPdu(defaultIsLoggingPdu);
-        defaults.setUcs2Only(defaultUcs2Only);
-        defaults.setWindowSize(defaultWindowSize);
-        defaults.setRequestTimeout(Duration.ofMillis(defaultRequestTimeout));
-
-        SmppProperties.SMSC smsc = new SmppProperties.SMSC();
-        smsc.setCredentials(new SmppProperties.Credentials());
-        smsc.setMaxTry(maxTry);
-        smsc.setLoggingBytes(isLoggingBytes);
-        smsc.setLoggingPdu(isLoggingPdu);
-        smsc.setUcs2Only(ucs2Only);
-        smsc.setWindowSize(windowSize);
-        smsc.setRequestTimeout(Duration.ofMillis(requestTimeout));
-
-        StandardSenderClient testSenderClient = (StandardSenderClient) clientFactory.standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class));
-
-        assertThat(testSenderClient).extracting("id", "ucs2Only", "timeoutMillis", "connectionManager.maxTryCount",
-                "connectionManager.configuration.loggingOptions.isLogPduEnabled",
-                "connectionManager.configuration.loggingOptions.isLogBytesEnabled",
-                "connectionManager.configuration.windowSize")
-                .containsExactly(name, ucs2Only, requestTimeout, maxTry, isLoggingPdu, isLoggingBytes, windowSize);
+            assertThat(client).extracting("ucs2Only", "timeoutMillis", "connectionManager")
+                .containsExactly(ucs2Only, defaults.getRequestTimeout().toMillis(), connectionManager);
+        }
     }
 
 

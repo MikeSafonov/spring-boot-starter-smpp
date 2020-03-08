@@ -1,7 +1,9 @@
 package com.github.mikesafonov.smpp.config;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.validation.constraints.NotBlank;
@@ -60,9 +62,16 @@ public class SmppProperties {
          * Array of phones to send. Using only if {@link #connectionMode} is {@link ConnectionMode#TEST}
          */
         private String[] allowedPhones = new String[0];
+
+        /**
+         * Type of smpp connection
+         */
+        private ConnectionType connectionType = ConnectionType.TRANSMITTER_RECEIVER;
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Credentials {
         /**
          * SMSC host
@@ -129,5 +138,9 @@ public class SmppProperties {
          * Array of phones to send. Using only if {@link #connectionMode} is {@link ConnectionMode#TEST}
          */
         private String[] allowedPhones;
+        /**
+         * Type of smpp connection
+         */
+        private ConnectionType connectionType;
     }
 }

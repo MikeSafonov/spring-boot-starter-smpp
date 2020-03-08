@@ -23,6 +23,13 @@
     },
     {
       "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
+      "name": "smpp.defaults.connectionType",
+      "type": "com.github.mikesafonov.smpp.config.ConnectionType",
+      "defaultValue": "TRANSMITTER_RECEIVER",
+      "description": "Type of smpp connection"
+    },
+    {
+      "sourceType": "com.github.mikesafonov.smpp.config.SmppProperties",
       "name": "smpp.defaults.windowSize",
       "type": "java.lang.Integer",
       "defaultValue": 90,
