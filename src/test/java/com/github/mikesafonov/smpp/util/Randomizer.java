@@ -6,6 +6,7 @@ import com.cloudhopper.smpp.pdu.PduResponse;
 import com.devskiller.jfairy.Fairy;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.connection.ReceiverConfiguration;
+import com.github.mikesafonov.smpp.core.connection.TransceiverConfiguration;
 import com.github.mikesafonov.smpp.core.connection.TransmitterConfiguration;
 import lombok.experimental.UtilityClass;
 
@@ -85,6 +86,11 @@ public class Randomizer {
     public static TransmitterConfiguration randomTransmitterConfiguration() {
         SmppProperties.Credentials credentials = randomCredentials();
         return new TransmitterConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt());
+    }
+
+    public static TransceiverConfiguration randomTransceiverConfiguration() {
+        SmppProperties.Credentials credentials = randomCredentials();
+        return new TransceiverConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt());
     }
 
     public static ReceiverConfiguration randomReceiverConfiguration() {

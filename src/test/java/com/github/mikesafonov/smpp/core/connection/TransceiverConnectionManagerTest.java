@@ -12,26 +12,28 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.randomPositive;
-import static com.github.mikesafonov.smpp.util.Randomizer.randomTransmitterConfiguration;
+import static com.github.mikesafonov.smpp.util.Randomizer.randomTransceiverConfiguration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-class TransmitterConnectionManagerTest {
+class TransceiverConnectionManagerTest {
     private DefaultSmppClient smppClient;
-    private TransmitterConfiguration configuration;
-    private ResponseSmppSessionHandler responseSmppSessionHandler = null;
+    private TransceiverConfiguration configuration;
+    private ResponseSmppSessionHandler responseSmppSessionHandler;
     private int maxTryCount;
-    private TransmitterConnectionManager connectionManager;
+    private TransceiverConnectionManager connectionManager;
 
     @BeforeEach
     void setUp() {
         smppClient = mock(DefaultSmppClient.class);
-        configuration = randomTransmitterConfiguration();
+        configuration = randomTransceiverConfiguration();
         maxTryCount = randomPositive(5);
-        connectionManager = new TransmitterConnectionManager(smppClient, configuration, maxTryCount);
+        responseSmppSessionHandler = mock(ResponseSmppSessionHandler.class);
+        connectionManager = new TransceiverConnectionManager(smppClient, configuration,
+                responseSmppSessionHandler, maxTryCount);
     }
 
     @Nested
