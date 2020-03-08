@@ -4,6 +4,7 @@ import com.github.mikesafonov.smpp.api.RoundRobinIndexDetectionStrategy;
 import com.github.mikesafonov.smpp.api.SenderManager;
 import com.github.mikesafonov.smpp.api.StrategySenderManager;
 import com.github.mikesafonov.smpp.core.ClientFactory;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManagerFactory;
 import com.github.mikesafonov.smpp.core.generators.AlwaysSuccessSmppResultGenerator;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
@@ -43,13 +44,17 @@ public class SmppAutoConfiguration {
     }
 
     @Bean
+    public ConnectionManagerFactory connectionManagerFactory(){return new ConnectionManagerFactory();}
+
+    @Bean
     public SmscConnectionFactoryBean senderClientFactoryBean(SmppProperties smppProperties,
                                                              SmppResultGenerator smppResultGenerator,
                                                              TypeOfAddressParser typeOfAddressParser,
                                                              DeliveryReportConsumer deliveryReportConsumer,
-                                                             ClientFactory clientFactory) {
+                                                             ClientFactory clientFactory,
+                                                             ConnectionManagerFactory connectionManagerFactory) {
         return new SmscConnectionFactoryBean(smppProperties, smppResultGenerator, deliveryReportConsumer,
-                typeOfAddressParser, clientFactory);
+                typeOfAddressParser, clientFactory, connectionManagerFactory);
     }
 
     @Bean

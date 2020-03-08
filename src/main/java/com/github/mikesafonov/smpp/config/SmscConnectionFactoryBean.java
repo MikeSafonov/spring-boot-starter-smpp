@@ -1,6 +1,8 @@
 package com.github.mikesafonov.smpp.config;
 
 import com.github.mikesafonov.smpp.core.ClientFactory;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManagerFactory;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.NullDeliveryReportConsumer;
@@ -26,6 +28,7 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     private final DeliveryReportConsumer deliveryReportConsumer;
     private final TypeOfAddressParser typeOfAddressParser;
     private final ClientFactory clientFactory;
+    private final ConnectionManagerFactory connectionManagerFactory;
 
     @Override
     public SmscConnectionsHolder getObject() {
@@ -70,11 +73,30 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
 
     private SmscConnection getTestSmscConnection(SmppProperties.Defaults defaults,
                                                  String name, SmppProperties.SMSC smsc) {
-        SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
-        SenderClient testSenderClient = clientFactory.testSender(standardSender, defaults, smsc, smppResultGenerator);
+        SenderClient testSenderClient;
         ResponseClient responseClient = null;
-        if(isResponseClientRequired()){
-            responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
+        ConnectionType type = getOrDefault(smsc.getConnectionType(), defaults.getConnectionType());
+        if (type == ConnectionType.TRANSCEIVER) {
+            ConnectionManager transceiver = connectionManagerFactory.transceiver(name, defaults,
+                    smsc, deliveryReportConsumer);
+            SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc,
+                    typeOfAddressParser, transceiver);
+            testSenderClient = clientFactory.testSender(standardSender, defaults,
+                    smsc, smppResultGenerator);
+            if (isResponseClientRequired()) {
+                responseClient = clientFactory.standardResponse(name, transceiver);
+            }
+        } else {
+            ConnectionManager transmitter = connectionManagerFactory.transmitter(name, defaults, smsc);
+            SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc,
+                    typeOfAddressParser, transmitter);
+            testSenderClient = clientFactory.testSender(standardSender, defaults,
+                    smsc, smppResultGenerator);
+            if (isResponseClientRequired()) {
+                ConnectionManager receiver = connectionManagerFactory.receiver(name, defaults,
+                        smsc, deliveryReportConsumer);
+                responseClient = clientFactory.standardResponse(name, receiver);
+            }
         }
         setupClients(testSenderClient, responseClient);
         return new SmscConnection(name, responseClient, testSenderClient);
@@ -82,10 +104,25 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
 
     private SmscConnection getStandardSmscConnection(SmppProperties.Defaults defaults,
                                                      String name, SmppProperties.SMSC smsc) {
-        SenderClient senderClient = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser);
+        SenderClient senderClient;
         ResponseClient responseClient = null;
-        if(isResponseClientRequired()){
-            responseClient = clientFactory.standardResponse(name, defaults, smsc, deliveryReportConsumer);
+        ConnectionType type = getOrDefault(smsc.getConnectionType(), defaults.getConnectionType());
+        if (type == ConnectionType.TRANSCEIVER) {
+            ConnectionManager connectionManager = connectionManagerFactory.transceiver(name, defaults,
+                    smsc, deliveryReportConsumer);
+            senderClient = clientFactory.standardSender(name, defaults, smsc,
+                    typeOfAddressParser, connectionManager);
+            if (isResponseClientRequired()) {
+                responseClient = clientFactory.standardResponse(name, connectionManager);
+            }
+        } else {
+            ConnectionManager transmitter = connectionManagerFactory.transmitter(name, defaults, smsc);
+            senderClient = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser, transmitter);
+            if (isResponseClientRequired()) {
+                ConnectionManager receiver = connectionManagerFactory.receiver(name, defaults,
+                        smsc, deliveryReportConsumer);
+                responseClient = clientFactory.standardResponse(name, receiver);
+            }
         }
         setupClients(senderClient, responseClient);
         return new SmscConnection(name, responseClient, senderClient);
@@ -94,13 +131,13 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     private void setupClients(SenderClient senderClient, ResponseClient responseClient) {
         if (smppProperties.isSetupRightAway()) {
             senderClient.setup();
-            if(responseClient != null) {
+            if (responseClient != null) {
                 responseClient.setup();
             }
         }
     }
 
-    private boolean isResponseClientRequired(){
+    private boolean isResponseClientRequired() {
         return !(deliveryReportConsumer instanceof NullDeliveryReportConsumer);
     }
 
