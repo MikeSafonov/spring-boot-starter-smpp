@@ -1,4 +1,4 @@
-package com.github.mikesafonov.smpp;
+package com.github.mikesafonov.smpp.roundrobin;
 
 import com.github.mikesafonov.smpp.api.SenderManager;
 import com.github.mikesafonov.smpp.core.dto.Message;
