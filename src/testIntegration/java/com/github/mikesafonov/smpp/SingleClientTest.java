@@ -26,10 +26,10 @@ public class SingleClientTest {
     private SenderClient client;
 
     @BeforeEach
-    void createClient() throws SmppChannelException {
+    void createClient() {
         SmppProperties.Credentials credentials = new SmppProperties.Credentials();
         credentials.setPort(mockSmppServer.getPort());
-        credentials.setHost("localhost");
+        credentials.setHost(mockSmppServer.getHost());
         credentials.setUsername(mockSmppServer.getSystemId());
         credentials.setPassword(mockSmppServer.getPassword());
 
