@@ -80,6 +80,7 @@ The following tables show the available configuration:
 | `smpp.defaults.rebindPeriod`                    | Connection rebind period (Duration)                                                      | `90s`                                                                |
 | `smpp.defaults.requestTimeout`                  | Request timeout (Duration)                                                               | `5s`                                                                 |
 | `smpp.defaults.allowedPhones`                   | Array of phones to send. Using only if `connectionMode` is `TEST`                        | `[]`                                                                 |
+| `smpp.defaults.connectionType`                  | Type of smpp connections(`TRANSCEIVER` or `TRANSMITTER_RECEIVER`)                        | `TRANSMITTER_RECEIVER`                                                                 |
 | `smpp.connections`                              | Map of SMSC connections                                                                  |                                                                      |
 | `smpp.connections.<name>.credentials`           | SMSC connection credentials                                                              |                                                                      |
 | `smpp.connections.<name>.credentials.host`      | SMSC host                                                                                |                                                                      |
@@ -95,6 +96,7 @@ The following tables show the available configuration:
 | `smpp.connections.<name>.rebindPeriod`          | Connection rebind period (Duration)                                                      | `90s`                                                                |
 | `smpp.connections.<name>.requestTimeout`        | Request timeout (Duration)                                                               | `5s`                                                                 |
 | `smpp.connections.<name>.allowedPhones`         | Array of phones to send. Using only if `connectionMode` is `TEST`                        | `[]`                                                                 |
+| `smpp.connections.<name>.connectionType`        | Type of smpp connections(`TRANSCEIVER` or `TRANSMITTER_RECEIVER`)                        |                                                                  |
 | `smpp.setupRightAway`                           | Should setup smpp clients after creation and fail fast if connection cant be established | `true`                                                               |
 
 Configuration example for `.properties` file:
@@ -166,7 +168,8 @@ This starter provide several abstractions:
 
 ### SenderClient
 
-This interface represents smpp protocol _TRANSMITTER_ client. This is entry point to sending any messages.
+This interface represents smpp protocol _TRANSMITTER_ or _TRANSCEIVER_ (see `connectionType` property) client. 
+This is entry point to sending any messages.
 Spring-boot-starter-smpp comes with several implementations:
 
 ![class diagram](http://www.plantuml.com/plantuml/proxy?src=https://raw.github.com/MikeSafonov/spring-boot-starter-smpp/master/diagrams/senderclient_class.txt)
@@ -208,7 +211,8 @@ Starter provide **DefaultTypeOfAddressParser** and **UnknownTypeOfAddressParser*
 
 ### ResponseClient
 
-This abstraction represent connection via SMPP with _RECEIVER_ type. Key purpose is listening delivery receipts. 
+This abstraction represent connection via SMPP with _RECEIVER_ or _TRANSCEIVER_ (see `connectionType` property) type. 
+Key purpose is listening delivery receipts. 
 `By default` starter use **DefaultResponseClient**. This class keeping smpp connection and pushing delivery receipts to [DeliveryReportConsumer](#DeliveryReportConsumer).
 
 ### DeliveryReportConsumer
