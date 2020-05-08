@@ -11,7 +11,7 @@ apply plugin: "maven"
 apply plugin: "signing"
 
 ext {
-    springBootVersion = '2.2.6.RELEASE'
+    springBootVersion = '2.2.7.RELEASE'
 }
 
 sourceCompatibility = '1.8'
