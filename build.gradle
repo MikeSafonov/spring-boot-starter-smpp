@@ -63,7 +63,7 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.10")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.10")
 
-    testImplementation("org.assertj:assertj-core:3.16.0")
+    testImplementation("org.assertj:assertj-core:3.16.1")
 
     testImplementation("com.devskiller:jfairy:0.6.4")
     testImplementation('org.springframework.boot:spring-boot-starter-test')
