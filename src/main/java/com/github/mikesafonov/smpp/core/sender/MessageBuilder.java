@@ -1,20 +1,14 @@
 package com.github.mikesafonov.smpp.core.sender;
 
-import com.cloudhopper.commons.charset.Charset;
-import com.cloudhopper.commons.charset.CharsetUtil;
 import com.cloudhopper.smpp.SmppConstants;
 import com.cloudhopper.smpp.pdu.CancelSm;
 import com.cloudhopper.smpp.pdu.SubmitSm;
-import com.cloudhopper.smpp.tlv.Tlv;
 import com.cloudhopper.smpp.type.Address;
-import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
 import com.github.mikesafonov.smpp.core.exceptions.IllegalAddressException;
 import com.github.mikesafonov.smpp.core.exceptions.SmppMessageBuildingException;
-import com.github.mikesafonov.smpp.core.utils.CountWithEncoding;
-import com.github.mikesafonov.smpp.core.utils.MessageUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -26,16 +20,16 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class MessageBuilder {
 
-    public static final byte SILENT_CODING = (byte) 0xC0;
-
     private final AddressBuilder addressBuilder;
+    private final SubmitSmEncoderFactory encoderFactory;
 
     public MessageBuilder(@NotNull TypeOfAddressParser typeOfAddressParser) {
-       this(new AddressBuilder(typeOfAddressParser));
+        this(new AddressBuilder(typeOfAddressParser), new SubmitSmEncoderFactory());
     }
 
-    public MessageBuilder(@NotNull AddressBuilder addressBuilder) {
+    public MessageBuilder(@NotNull AddressBuilder addressBuilder, @NotNull SubmitSmEncoderFactory encoderFactory) {
         this.addressBuilder = addressBuilder;
+        this.encoderFactory = encoderFactory;
     }
 
     /**
@@ -46,21 +40,14 @@ public class MessageBuilder {
      * @return message {@link SubmitSm}.
      */
     @NotNull
-    public SubmitSm createSubmitSm(@NotNull Message message,  boolean ucs2Only) {
+    public SubmitSm createSubmitSm(@NotNull Message message, boolean ucs2Only) {
         try {
-            byte esmClass = getEsmClass(message.getMessageType());
             Address sourceAddress = addressBuilder.createSourceAddress(message.getSource());
             Address destAddress = addressBuilder.createDestinationAddress(message.getMsisdn());
 
-            SubmitSm submitSm = createSubmitSm(message.getText(), esmClass, sourceAddress,
-                    destAddress, message.isSilent(), ucs2Only);
-
-            if (message.getMessageType() == MessageType.SIMPLE) {
-                registerDeliveryReport(submitSm);
-            }
-
-            return submitSm;
-        } catch (SmppInvalidArgumentException e) {
+            return createSubmitSm(message, sourceAddress,
+                    destAddress, ucs2Only);
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new SmppMessageBuildingException();
         }
@@ -73,7 +60,7 @@ public class MessageBuilder {
      * @return request {@link CancelSm}
      * @throws IllegalAddressException if source/destination address not created
      */
-    public CancelSm createCancelSm(CancelMessage cancelMessage){
+    public CancelSm createCancelSm(CancelMessage cancelMessage) {
         Address sourceAddress = addressBuilder.createSourceAddress(cancelMessage.getSource());
         Address destAddress = addressBuilder.createDestinationAddress(cancelMessage.getMsisdn());
 
@@ -95,46 +82,24 @@ public class MessageBuilder {
      * Builds {@link SubmitSm} for sending via smpp.
      *
      * @param message       client message
-     * @param esmClass      ESM_CLASS, see
-     *                      {@link SmppConstants#ESM_CLASS_MM_STORE_FORWARD} /
-     *                      {@link SmppConstants#ESM_CLASS_MM_DATAGRAM}
      * @param sourceAddress source address
      * @param destAddress   destination address
      * @return message {@link SubmitSm}.
-     * @throws SmppInvalidArgumentException see {@link SubmitSm#setShortMessage}
      */
     @NotNull
-    private SubmitSm createSubmitSm(@NotNull String message, byte esmClass,
-                                    @NotNull Address sourceAddress, @NotNull Address destAddress,
-                                    boolean silent, boolean ucs2Only) throws SmppInvalidArgumentException {
+    private SubmitSm createSubmitSm(@NotNull Message message, @NotNull Address sourceAddress, @NotNull Address destAddress,
+                                    boolean ucs2Only) {
 
+        byte esmClass = getEsmClass(message.getMessageType());
         SubmitSm sm = new SubmitSm();
         sm.setEsmClass(esmClass);
         sm.setSourceAddress(sourceAddress);
         sm.setDestAddress(destAddress);
-        CountWithEncoding countWithEncoding = MessageUtil.calculateCountSMS(message, ucs2Only);
-        byte coding = findCoding(countWithEncoding.getCharset(), silent);
-        sm.setDataCoding(coding);
-        byte[] messageByte = CharsetUtil.encode(message, countWithEncoding.getCharset());
-        if (countWithEncoding.getCount() > 1) {
-            sm.setShortMessage(new byte[0]);
-            sm.addOptionalParameter(new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, messageByte));
-        } else {
-            sm.setShortMessage(messageByte);
+        encoderFactory.get(message).encode(message, sm, ucs2Only);
+
+        if (message.getMessageType() == MessageType.SIMPLE) {
+            sm.setRegisteredDelivery(SmppConstants.REGISTERED_DELIVERY_SMSC_RECEIPT_REQUESTED);
         }
         return sm;
-    }
-
-    private byte findCoding(@NotNull Charset charset, boolean silent) {
-        if (silent) {
-            return SILENT_CODING;
-        }
-
-        return (charset == CharsetUtil.CHARSET_GSM) ? SmppConstants.DATA_CODING_DEFAULT :
-                SmppConstants.DATA_CODING_UCS2;
-    }
-
-    private void registerDeliveryReport(@NotNull SubmitSm sm) {
-        sm.setRegisteredDelivery(SmppConstants.REGISTERED_DELIVERY_SMSC_RECEIPT_REQUESTED);
     }
 }
