@@ -48,4 +48,12 @@ public class MessageResponse {
     public static MessageResponse error(@NotNull Message original, @NotBlank String smscId, @NotNull MessageErrorInformation messageErrorInformation) {
         return new MessageResponse(original, smscId, null, false, messageErrorInformation);
     }
+
+    public boolean isSuccess(){
+        return messageErrorInformation == null;
+    }
+
+    public boolean isError(){
+        return messageErrorInformation != null;
+    }
 }

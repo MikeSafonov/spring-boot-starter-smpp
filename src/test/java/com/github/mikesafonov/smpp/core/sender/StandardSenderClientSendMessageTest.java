@@ -39,6 +39,8 @@ class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertNull(messageResponse.getSmscMessageID());
         assertFalse(messageResponse.isSent());
+        assertTrue(messageResponse.isError());
+        assertFalse(messageResponse.isSuccess());
         assertEquals(messageErrorInformation, messageResponse.getMessageErrorInformation());
     }
 
@@ -60,6 +62,8 @@ class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
 
         MessageResponse messageResponse = senderClient.send(originalMessage);
 
+        assertFalse(messageResponse.isError());
+        assertTrue(messageResponse.isSuccess());
         assertEquals(originalMessage, messageResponse.getOriginal());
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertEquals(smscMessageId, messageResponse.getSmscMessageID());
@@ -85,6 +89,8 @@ class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
 
         MessageResponse messageResponse = senderClient.send(originalMessage);
 
+        assertTrue(messageResponse.isError());
+        assertFalse(messageResponse.isSuccess());
         assertEquals(originalMessage, messageResponse.getOriginal());
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertNull( messageResponse.getSmscMessageID());
@@ -111,6 +117,8 @@ class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
 
         MessageResponse messageResponse = senderClient.send(originalMessage);
 
+        assertTrue(messageResponse.isError());
+        assertFalse(messageResponse.isSuccess());
         assertEquals(originalMessage, messageResponse.getOriginal());
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertNull( messageResponse.getSmscMessageID());
@@ -138,6 +146,8 @@ class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
 
         MessageResponse messageResponse = senderClient.send(originalMessage);
 
+        assertTrue(messageResponse.isError());
+        assertFalse(messageResponse.isSuccess());
         assertEquals(originalMessage, messageResponse.getOriginal());
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertNull( messageResponse.getSmscMessageID());
@@ -159,6 +169,8 @@ class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
 
         MessageResponse messageResponse = senderClient.send(originalMessage);
 
+        assertTrue(messageResponse.isError());
+        assertFalse(messageResponse.isSuccess());
         assertEquals(originalMessage, messageResponse.getOriginal());
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertEquals(101, messageResponse.getMessageErrorInformation().getErrorCode());
@@ -180,6 +192,8 @@ class StandardSenderClientSendMessageTest extends BaseStandardSenderClientTest {
 
         MessageResponse messageResponse = senderClient.send(originalMessage);
 
+        assertTrue(messageResponse.isError());
+        assertFalse(messageResponse.isSuccess());
         assertEquals(originalMessage, messageResponse.getOriginal());
         assertEquals(senderClient.getId(), messageResponse.getSmscId());
         assertEquals(101, messageResponse.getMessageErrorInformation().getErrorCode());
