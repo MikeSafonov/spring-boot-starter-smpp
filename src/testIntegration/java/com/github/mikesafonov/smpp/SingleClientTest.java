@@ -1,12 +1,11 @@
 package com.github.mikesafonov.smpp;
 
 import com.cloudhopper.smpp.SmppConstants;
-import com.cloudhopper.smpp.type.SmppChannelException;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
-import com.github.mikesafonov.smpp.core.sender.MessageBuilder;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
+import com.github.mikesafonov.smpp.core.sender.SilentSubmitSmEncoder;
 import com.github.mikesafonov.smpp.junit.MockSmppExtension;
 import com.github.mikesafonov.smpp.junit.SmppServer;
 import com.github.mikesafonov.smpp.server.MockSmppServer;
@@ -82,7 +81,7 @@ public class SingleClientTest {
                 .hasSource("123123123")
                 .hasText("asdasd")
                 .doesNotHaveDeliveryReport()
-                .satisfies(submitSm -> assertThat(submitSm.getDataCoding()).isEqualTo(MessageBuilder.SILENT_CODING));
+                .satisfies(submitSm -> assertThat(submitSm.getDataCoding()).isEqualTo(SilentSubmitSmEncoder.SILENT_CODING));
     }
 
     @Test

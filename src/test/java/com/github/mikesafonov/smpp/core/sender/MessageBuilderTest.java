@@ -13,6 +13,7 @@ import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
 import com.github.mikesafonov.smpp.core.utils.MessageUtil;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,17 +40,19 @@ class MessageBuilderTest {
     private AddressBuilder addressBuilder;
     private MessageBuilder messageBuilder;
 
-    private static Stream<Arguments> simpleSubmitSmProvider() throws SmppInvalidArgumentException {
+    private static Stream<Arguments> simpleSubmitSmProvider() {
         return Stream.of(
-                simpleMessageWithLatinText(),
-                datagramMessageWithLatinText(),
-                simpleLargeMessageWithLatinText(),
-                simpleMessageWithNonLatinText(),
-                silentMessageWithLatinText()
+            simpleMessageWithLatinText(),
+            datagramMessageWithLatinText(),
+            simpleLargeMessageWithLatinText(),
+            simpleMessageWithNonLatinText(),
+            silentMessageWithLatinText(),
+            silentLargeMessageWithLatinText()
         );
     }
 
-    private static Arguments simpleMessageWithLatinText() throws SmppInvalidArgumentException {
+    @SneakyThrows
+    private static Arguments simpleMessageWithLatinText() {
         Message message = new Message("test", "33312333213", "test", "test", MessageType.SIMPLE);
         Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
         Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
@@ -65,7 +68,8 @@ class MessageBuilderTest {
         return Arguments.of(message, false, sm);
     }
 
-    private static Arguments datagramMessageWithLatinText() throws SmppInvalidArgumentException {
+    @SneakyThrows
+    private static Arguments datagramMessageWithLatinText() {
         Message message = new Message("test", "33312333213", "test", "test", MessageType.DATAGRAM);
         Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
         Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
@@ -80,12 +84,11 @@ class MessageBuilderTest {
         return Arguments.of(message, false, sm);
     }
 
-
-
-    private static Arguments simpleLargeMessageWithLatinText() throws SmppInvalidArgumentException {
+    @SneakyThrows
+    private static Arguments simpleLargeMessageWithLatinText() {
         String longText = IntStream.range(0, MessageUtil.GSM_7_REGULAR_MESSAGE_LENGTH + 1).boxed()
-                .map(integer -> "A")
-                .collect(Collectors.joining());
+            .map(integer -> "A")
+            .collect(Collectors.joining());
 
         Message message = new Message(longText, "33312333213", "test", "test", MessageType.SIMPLE);
         Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
@@ -105,7 +108,8 @@ class MessageBuilderTest {
         return Arguments.of(message, false, sm);
     }
 
-    private static Arguments simpleMessageWithNonLatinText() throws SmppInvalidArgumentException {
+    @SneakyThrows
+    private static Arguments simpleMessageWithNonLatinText() {
         Message message = new Message("Привет", "33312333213", "test", "test", MessageType.SIMPLE);
         Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
         Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
@@ -121,7 +125,8 @@ class MessageBuilderTest {
         return Arguments.of(message, false, sm);
     }
 
-    private static Arguments silentMessageWithLatinText() throws SmppInvalidArgumentException {
+    @SneakyThrows
+    private static Arguments silentMessageWithLatinText() {
         Message message = new Message("test", "33312333213", "test", "test", MessageType.SILENT);
         Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
         Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
@@ -136,10 +141,33 @@ class MessageBuilderTest {
         return Arguments.of(message, false, sm);
     }
 
+    @SneakyThrows
+    private static Arguments silentLargeMessageWithLatinText() {
+        String longText = IntStream.range(0, MessageUtil.GSM_7_REGULAR_MESSAGE_LENGTH + 1).boxed()
+            .map(integer -> "A")
+            .collect(Collectors.joining());
+        Message message = new Message(longText, "33312333213", "test", "test", MessageType.SILENT);
+        Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
+        Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
+
+        byte[] messageByte = CharsetUtil.encode(message.getText(), CharsetUtil.CHARSET_GSM);
+        Tlv tlv = new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, messageByte);
+
+        SubmitSm sm = new SubmitSm();
+        sm.setEsmClass(SmppConstants.ESM_CLASS_MM_STORE_FORWARD);
+        sm.setDestAddress(destinationAddress);
+        sm.setSourceAddress(sourceAddress);
+        sm.setDataCoding((byte) 0xC0);
+        sm.setShortMessage(new byte[0]);
+        sm.addOptionalParameter(tlv);
+
+        return Arguments.of(message, false, sm);
+    }
+
     @BeforeEach
     void setUp() {
         addressBuilder = mock(AddressBuilder.class);
-        messageBuilder = new MessageBuilder(addressBuilder);
+        messageBuilder = new MessageBuilder(addressBuilder, new SubmitSmEncoderFactory());
     }
 
     @Test
@@ -165,8 +193,8 @@ class MessageBuilderTest {
 
     @ParameterizedTest
     @MethodSource("simpleSubmitSmProvider")
-    void shouldCreateExpectedSm(Message message, boolean ucs2Only, SubmitSm expected) throws SmppInvalidArgumentException {
-        MessageBuilder messageBuilder = new MessageBuilder(DEFAULT_ADDRESS_BUILDER);
+    void shouldCreateExpectedSm(Message message, boolean ucs2Only, SubmitSm expected) {
+        MessageBuilder messageBuilder = new MessageBuilder(DEFAULT_ADDRESS_BUILDER, new SubmitSmEncoderFactory());
         SubmitSm submitSm = messageBuilder.createSubmitSm(message, ucs2Only);
 
         assertEquals(expected.getEsmClass(), submitSm.getEsmClass());
