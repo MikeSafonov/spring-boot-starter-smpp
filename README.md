@@ -26,6 +26,7 @@ using [SMPP](https://en.wikipedia.org/wiki/Short_Message_Peer-to-Peer). [SMPP v3
 - Sending message with delivery receipt 
 - Sending datagram message (without delivery receipt)
 - Sending silent message
+- Sending flash message
 - Cancel message
 - Multiply SMPP connection
 - SMPP connection load balancing
@@ -164,7 +165,7 @@ You can run integration tests using following command:
 
 ## Key abstractions
 
-This starter provide several abstractions:
+This starter provides several abstractions:
 
 ### SenderClient
 

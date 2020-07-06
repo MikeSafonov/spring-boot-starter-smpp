@@ -60,12 +60,16 @@ public class Message {
         return new MessageBuilder(text, MessageType.SIMPLE);
     }
 
+    public static MessageBuilder flash(String text){
+        return new MessageBuilder(text, MessageType.FLASH);
+    }
+
     public static class MessageBuilder {
-        private String text;
+        private final String text;
+        private final MessageType messageType;
         private String msisdn;
         private String source;
         private String messageId;
-        private MessageType messageType;
 
         public MessageBuilder(String text, MessageType messageType) {
             this.text = text;

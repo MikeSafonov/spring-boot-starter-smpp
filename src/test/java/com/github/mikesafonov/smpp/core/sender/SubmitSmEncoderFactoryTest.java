@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SubmitSmEncoderFactoryTest {
+
     private SubmitSmEncoderFactory factory;
 
     @BeforeEach
@@ -35,5 +36,13 @@ public class SubmitSmEncoderFactoryTest {
         Message message = Message.silent("").build();
 
         assertThat(factory.get(message)).isInstanceOf(SilentSubmitSmEncoder.class);
+    }
+
+
+    @Test
+    void shouldReturnFlashWhenMessageFlash(){
+        Message message = Message.flash("").build();
+
+        assertThat(factory.get(message)).isInstanceOf(FlashSubmitSmEncoder.class);
     }
 }

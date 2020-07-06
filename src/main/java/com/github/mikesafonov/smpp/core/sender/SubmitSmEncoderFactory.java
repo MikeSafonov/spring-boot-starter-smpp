@@ -16,6 +16,8 @@ public class SubmitSmEncoderFactory {
                 return new SimpleSubmitSmEncoder();
             case SILENT:
                 return new SilentSubmitSmEncoder();
+            case FLASH:
+                return new FlashSubmitSmEncoder();
             default:
                 throw new RuntimeException("Unable to find encoder for message type " + message.getMessageType());
         }
