@@ -6,5 +6,6 @@ package com.github.mikesafonov.smpp.core.dto;
 public enum MessageType {
     SIMPLE,
     DATAGRAM,
-    SILENT
+    SILENT,
+    FLASH
 }

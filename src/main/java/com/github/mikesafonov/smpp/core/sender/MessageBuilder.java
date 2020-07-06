@@ -72,9 +72,13 @@ public class MessageBuilder {
     }
 
     private byte getEsmClass(MessageType messageType) {
-        return (messageType == MessageType.DATAGRAM)
-                ? SmppConstants.ESM_CLASS_MM_DATAGRAM
-                : SmppConstants.ESM_CLASS_MM_STORE_FORWARD;
+        if(messageType == MessageType.DATAGRAM){
+            return SmppConstants.ESM_CLASS_MM_DATAGRAM;
+        }
+        if(messageType == MessageType.FLASH){
+            return SmppConstants.ESM_CLASS_MM_DEFAULT;
+        }
+        return SmppConstants.ESM_CLASS_MM_STORE_FORWARD;
     }
 
 

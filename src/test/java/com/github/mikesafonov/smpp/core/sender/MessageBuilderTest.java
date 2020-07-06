@@ -47,7 +47,9 @@ class MessageBuilderTest {
             simpleLargeMessageWithLatinText(),
             simpleMessageWithNonLatinText(),
             silentMessageWithLatinText(),
-            silentLargeMessageWithLatinText()
+            silentLargeMessageWithLatinText(),
+            flashMessageWithLatinText(),
+            flashLargeMessageWithLatinText()
         );
     }
 
@@ -158,6 +160,45 @@ class MessageBuilderTest {
         sm.setDestAddress(destinationAddress);
         sm.setSourceAddress(sourceAddress);
         sm.setDataCoding((byte) 0xC0);
+        sm.setShortMessage(new byte[0]);
+        sm.addOptionalParameter(tlv);
+
+        return Arguments.of(message, false, sm);
+    }
+
+    @SneakyThrows
+    private static Arguments flashMessageWithLatinText() {
+        Message message = new Message("test", "33312333213", "test", "test", MessageType.FLASH);
+        Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
+        Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
+
+        SubmitSm sm = new SubmitSm();
+        sm.setEsmClass(SmppConstants.ESM_CLASS_MM_DEFAULT);
+        sm.setDestAddress(destinationAddress);
+        sm.setSourceAddress(sourceAddress);
+        sm.setDataCoding((byte) 0x18);
+        sm.setShortMessage(CharsetUtil.encode(message.getText(), CharsetUtil.CHARSET_UCS_2));
+
+        return Arguments.of(message, false, sm);
+    }
+
+    @SneakyThrows
+    private static Arguments flashLargeMessageWithLatinText() {
+        String longText = IntStream.range(0, MessageUtil.GSM_7_REGULAR_MESSAGE_LENGTH + 1).boxed()
+            .map(integer -> "A")
+            .collect(Collectors.joining());
+        Message message = new Message(longText, "33312333213", "test", "test", MessageType.FLASH);
+        Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
+        Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
+
+        byte[] messageByte = CharsetUtil.encode(message.getText(), CharsetUtil.CHARSET_UCS_2);
+        Tlv tlv = new Tlv(SmppConstants.TAG_MESSAGE_PAYLOAD, messageByte);
+
+        SubmitSm sm = new SubmitSm();
+        sm.setEsmClass(SmppConstants.ESM_CLASS_MM_DEFAULT);
+        sm.setDestAddress(destinationAddress);
+        sm.setSourceAddress(sourceAddress);
+        sm.setDataCoding((byte) 0x18);
         sm.setShortMessage(new byte[0]);
         sm.addOptionalParameter(tlv);
 
