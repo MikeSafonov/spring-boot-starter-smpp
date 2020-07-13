@@ -7,6 +7,7 @@ import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 import static com.github.mikesafonov.smpp.core.utils.Utils.getOrDefault;
@@ -40,11 +41,11 @@ public class ConnectionManagerFactory {
     public ConnectionManager receiver(@NotBlank String name,
                                       @NotNull SmppProperties.Defaults defaults,
                                       @NotNull SmppProperties.SMSC smsc,
-                                      @NotNull DeliveryReportConsumer deliveryReportConsumer) {
+                                      @NotNull List<DeliveryReportConsumer> deliveryReportConsumers) {
         validateName(name);
         requireNonNull(defaults);
         requireNonNull(smsc);
-        requireNonNull(deliveryReportConsumer);
+        requireNonNull(deliveryReportConsumers);
 
         boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
         boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
@@ -55,7 +56,7 @@ public class ConnectionManagerFactory {
         DefaultSmppClient client = new DefaultSmppClient();
 
         ResponseSmppSessionHandler responseSmppSessionHandler =
-                new ResponseSmppSessionHandler(receiverConfiguration.getName(), deliveryReportConsumer);
+                new ResponseSmppSessionHandler(receiverConfiguration.getName(), deliveryReportConsumers);
 
         return new ReceiverConnectionManager(
                 client, receiverConfiguration,
@@ -68,11 +69,11 @@ public class ConnectionManagerFactory {
     public ConnectionManager transceiver(@NotBlank String name,
                                          @NotNull SmppProperties.Defaults defaults,
                                          @NotNull SmppProperties.SMSC smsc,
-                                         @NotNull DeliveryReportConsumer deliveryReportConsumer) {
+                                         @NotNull List<DeliveryReportConsumer> deliveryReportConsumers) {
         validateName(name);
         requireNonNull(defaults);
         requireNonNull(smsc);
-        requireNonNull(deliveryReportConsumer);
+        requireNonNull(deliveryReportConsumers);
 
         boolean loggingBytes = getOrDefault(smsc.getLoggingBytes(), defaults.isLoggingBytes());
         boolean loggingPdu = getOrDefault(smsc.getLoggingPdu(), defaults.isLoggingPdu());
@@ -85,7 +86,7 @@ public class ConnectionManagerFactory {
         DefaultSmppClient client = new DefaultSmppClient();
 
         ResponseSmppSessionHandler responseSmppSessionHandler =
-                new ResponseSmppSessionHandler(configuration.getName(), deliveryReportConsumer);
+                new ResponseSmppSessionHandler(configuration.getName(), deliveryReportConsumers);
 
         return new TransceiverConnectionManager(client, configuration, responseSmppSessionHandler, maxTry);
 

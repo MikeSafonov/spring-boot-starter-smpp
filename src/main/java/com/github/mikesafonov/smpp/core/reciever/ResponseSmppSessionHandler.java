@@ -12,6 +12,8 @@ import org.joda.time.DateTimeZone;
 
 import javax.validation.constraints.NotNull;
 
+import java.util.List;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -23,11 +25,11 @@ import static java.util.Objects.requireNonNull;
 public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
 
     private final String clientId;
-    private final DeliveryReportConsumer deliveryReportConsumer;
+    private final List<DeliveryReportConsumer> deliveryReportConsumers;
 
-    public ResponseSmppSessionHandler(String clientId, @NotNull DeliveryReportConsumer deliveryReportConsumer) {
+    public ResponseSmppSessionHandler(String clientId, @NotNull List<DeliveryReportConsumer> deliveryReportConsumers) {
         this.clientId = requireNonNull(clientId);
-        this.deliveryReportConsumer = requireNonNull(deliveryReportConsumer);
+        this.deliveryReportConsumers = requireNonNull(deliveryReportConsumers);
     }
 
     @Override
@@ -49,7 +51,10 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
     private PduResponse processReport(PduRequest pduRequest) {
         DeliverSm dlr = (DeliverSm) pduRequest;
         try {
-            deliveryReportConsumer.accept(toReport(dlr));
+            DeliveryReport report = toReport(dlr);
+            for (DeliveryReportConsumer deliveryReportConsumer : deliveryReportConsumers) {
+                deliveryReportConsumer.accept(report);
+            }
         } catch (DeliveryReceiptException e) {
             log.error(e.getMessage(), e);
         }

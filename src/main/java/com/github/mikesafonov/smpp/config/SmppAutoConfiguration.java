@@ -17,6 +17,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 
 /**
  * @author Mike Safonov
@@ -33,12 +35,6 @@ public class SmppAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(DeliveryReportConsumer.class)
-    public DeliveryReportConsumer nullDeliveryReportConsumer() {
-        return new NullDeliveryReportConsumer();
-    }
-
-    @Bean
     public ClientFactory clientFactory (){
         return new ClientFactory();
     }
@@ -50,10 +46,10 @@ public class SmppAutoConfiguration {
     public SmscConnectionFactoryBean senderClientFactoryBean(SmppProperties smppProperties,
                                                              SmppResultGenerator smppResultGenerator,
                                                              TypeOfAddressParser typeOfAddressParser,
-                                                             DeliveryReportConsumer deliveryReportConsumer,
+                                                             List<DeliveryReportConsumer> deliveryReportConsumers,
                                                              ClientFactory clientFactory,
                                                              ConnectionManagerFactory connectionManagerFactory) {
-        return new SmscConnectionFactoryBean(smppProperties, smppResultGenerator, deliveryReportConsumer,
+        return new SmscConnectionFactoryBean(smppProperties, smppResultGenerator, deliveryReportConsumers,
                 typeOfAddressParser, clientFactory, connectionManagerFactory);
     }
 

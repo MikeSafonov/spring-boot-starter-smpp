@@ -16,9 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
 import static java.util.Collections.emptyList;
@@ -33,7 +31,7 @@ import static org.mockito.Mockito.*;
 class SmscConnectionFactoryBeanTest {
     private SmppProperties smppProperties;
     private SmppResultGenerator smppResultGenerator;
-    private DeliveryReportConsumer deliveryReportConsumer;
+    private List<DeliveryReportConsumer> deliveryReportConsumers;
     private TypeOfAddressParser typeOfAddressParser;
     private ClientFactory clientFactory;
     private ConnectionManagerFactory connectionManagerFactory;
@@ -43,12 +41,12 @@ class SmscConnectionFactoryBeanTest {
     void setUp() {
         smppProperties = mock(SmppProperties.class);
         smppResultGenerator = mock(SmppResultGenerator.class);
-        deliveryReportConsumer = mock(DeliveryReportConsumer.class);
+        deliveryReportConsumers = Arrays.asList(mock(DeliveryReportConsumer.class));
         typeOfAddressParser = mock(TypeOfAddressParser.class);
         clientFactory = mock(ClientFactory.class);
         connectionManagerFactory = mock(ConnectionManagerFactory.class);
         smscConnectionFactoryBean = new SmscConnectionFactoryBean(smppProperties, smppResultGenerator,
-                deliveryReportConsumer, typeOfAddressParser, clientFactory, connectionManagerFactory);
+            deliveryReportConsumers, typeOfAddressParser, clientFactory, connectionManagerFactory);
     }
 
     @Nested
@@ -123,7 +121,7 @@ class SmscConnectionFactoryBeanTest {
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
                     .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumer))
+            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
                     .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
                     .thenReturn(standardSenderClient);
@@ -171,7 +169,7 @@ class SmscConnectionFactoryBeanTest {
             when(smppProperties.isSetupRightAway()).thenReturn(true);
 
             smscConnectionFactoryBean = new SmscConnectionFactoryBean(smppProperties, smppResultGenerator,
-                    new NullDeliveryReportConsumer(), typeOfAddressParser, clientFactory, connectionManagerFactory);
+                    Collections.emptyList(), typeOfAddressParser, clientFactory, connectionManagerFactory);
 
             SmscConnectionsHolder holder = smscConnectionFactoryBean.getObject();
             List<SmscConnection> connections = holder.getConnections();
@@ -201,7 +199,7 @@ class SmscConnectionFactoryBeanTest {
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
                     .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumer))
+            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
                     .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
                     .thenReturn(standardSenderClient);
@@ -241,7 +239,7 @@ class SmscConnectionFactoryBeanTest {
             StandardResponseClient standardResponseClient = mock(StandardResponseClient.class);
             ConnectionManager transceiver = mock(ConnectionManager.class);
 
-            when(connectionManagerFactory.transceiver(connectionName, defaults, smsc, deliveryReportConsumer))
+            when(connectionManagerFactory.transceiver(connectionName, defaults, smsc, deliveryReportConsumers))
                     .thenReturn(transceiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transceiver))
                     .thenReturn(standardSenderClient);
@@ -286,7 +284,7 @@ class SmscConnectionFactoryBeanTest {
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
                     .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumer))
+            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
                     .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
                     .thenReturn(standardSenderClient);
@@ -370,7 +368,7 @@ class SmscConnectionFactoryBeanTest {
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
                     .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumer))
+            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
                     .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
                     .thenReturn(standardSenderClient);
@@ -415,7 +413,7 @@ class SmscConnectionFactoryBeanTest {
             TestSenderClient testSenderClient = new TestSenderClient(standardSenderClient, emptyList(), smppResultGenerator);
             ConnectionManager transceiver = mock(ConnectionManager.class);
 
-            when(connectionManagerFactory.transceiver(connectionName, defaults, smsc, deliveryReportConsumer))
+            when(connectionManagerFactory.transceiver(connectionName, defaults, smsc, deliveryReportConsumers))
                     .thenReturn(transceiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transceiver))
                     .thenReturn(standardSenderClient);

@@ -12,6 +12,9 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -28,12 +31,12 @@ class ResponseSmppSessionHandlerTest {
     void setUp() {
         clientId = Randomizer.randomString();
         deliveryReportConsumer = mock(DeliveryReportConsumer.class);
-        responseSmppSessionHandler = new ResponseSmppSessionHandler(clientId, deliveryReportConsumer);
+        responseSmppSessionHandler = new ResponseSmppSessionHandler(clientId, Arrays.asList(deliveryReportConsumer));
     }
 
     @Test
     void shouldThrowNPE() {
-        assertThrows(NullPointerException.class, () -> new ResponseSmppSessionHandler(null, mock(DeliveryReportConsumer.class)));
+        assertThrows(NullPointerException.class, () -> new ResponseSmppSessionHandler(null, mock(List.class)));
         assertThrows(NullPointerException.class, () -> new ResponseSmppSessionHandler(clientId, null));
     }
 
