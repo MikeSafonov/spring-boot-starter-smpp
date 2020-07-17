@@ -10,6 +10,7 @@ class MessageBuilderTest {
     private String phone = "phone";
     private String source = "source";
     private String messageId = "message_id";
+    private String validityPeriod = "000007000000000R";
 
     @Test
     void shouldBuildSilentMessage() {
@@ -17,6 +18,7 @@ class MessageBuilderTest {
                 .from(source)
                 .to(phone)
                 .messageId(messageId)
+                .validityPeriod(validityPeriod)
                 .build();
 
         assertTrue(message.isSilent());
@@ -25,6 +27,7 @@ class MessageBuilderTest {
         assertEquals(phone, message.getMsisdn());
         assertEquals(source, message.getSource());
         assertEquals(messageId, message.getMessageId());
+        assertEquals(validityPeriod, message.getValidityPeriod());
     }
 
     @Test
@@ -33,12 +36,14 @@ class MessageBuilderTest {
                 .from(source)
                 .to(phone)
                 .messageId(messageId)
+                .validityPeriod(validityPeriod)
                 .build();
         assertEquals(MessageType.DATAGRAM, message.getMessageType());
         assertEquals(text, message.getText());
         assertEquals(phone, message.getMsisdn());
         assertEquals(source, message.getSource());
         assertEquals(messageId, message.getMessageId());
+        assertEquals(validityPeriod, message.getValidityPeriod());
     }
 
     @Test
@@ -47,11 +52,13 @@ class MessageBuilderTest {
                 .from(source)
                 .to(phone)
                 .messageId(messageId)
+                .validityPeriod(validityPeriod)
                 .build();
         assertEquals(MessageType.SIMPLE, message.getMessageType());
         assertEquals(text, message.getText());
         assertEquals(phone, message.getMsisdn());
         assertEquals(source, message.getSource());
         assertEquals(messageId, message.getMessageId());
+        assertEquals(validityPeriod, message.getValidityPeriod());
     }
 }

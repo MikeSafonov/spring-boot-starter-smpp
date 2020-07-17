@@ -44,6 +44,21 @@ public class Message {
     @NotNull
     private MessageType messageType;
 
+    /**
+     * Message validity period
+     */
+    @Nullable
+    private String validityPeriod;
+
+    public Message(@NotBlank String text, @NotBlank String msisdn, @NotBlank String source,
+                   @Nullable String messageId, @NotNull MessageType messageType) {
+        this.text = text;
+        this.msisdn = msisdn;
+        this.source = source;
+        this.messageId = messageId;
+        this.messageType = messageType;
+    }
+
     public boolean isSilent() {
         return messageType == MessageType.SILENT;
     }
@@ -70,6 +85,7 @@ public class Message {
         private String msisdn;
         private String source;
         private String messageId;
+        private String validityPeriod;
 
         public MessageBuilder(String text, MessageType messageType) {
             this.text = text;
@@ -91,8 +107,14 @@ public class Message {
             return this;
         }
 
+        public MessageBuilder validityPeriod(String validityPeriod){
+            this.validityPeriod = validityPeriod;
+            return this;
+        }
+
         public Message build() {
-            return new Message(text, msisdn, source, messageId, messageType);
+            return new Message(text, msisdn, source, messageId,
+                    messageType, validityPeriod);
         }
     }
 }

@@ -8,7 +8,6 @@ import com.cloudhopper.smpp.pdu.CancelSm;
 import com.cloudhopper.smpp.pdu.SubmitSm;
 import com.cloudhopper.smpp.tlv.Tlv;
 import com.cloudhopper.smpp.type.Address;
-import com.cloudhopper.smpp.type.SmppInvalidArgumentException;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
@@ -55,7 +54,8 @@ class MessageBuilderTest {
 
     @SneakyThrows
     private static Arguments simpleMessageWithLatinText() {
-        Message message = new Message("test", "33312333213", "test", "test", MessageType.SIMPLE);
+        Message message = new Message("test", "33312333213", "test", "test",
+                MessageType.SIMPLE, "000007000000000R");
         Address sourceAddress = DEFAULT_ADDRESS_BUILDER.createSourceAddress(message.getSource());
         Address destinationAddress = DEFAULT_ADDRESS_BUILDER.createDestinationAddress(message.getMsisdn());
 
@@ -66,6 +66,7 @@ class MessageBuilderTest {
         sm.setRegisteredDelivery(SmppConstants.REGISTERED_DELIVERY_SMSC_RECEIPT_REQUESTED);
         sm.setDataCoding(SmppConstants.DATA_CODING_DEFAULT);
         sm.setShortMessage(CharsetUtil.encode(message.getText(), CharsetUtil.CHARSET_GSM));
+        sm.setValidityPeriod(message.getValidityPeriod());
 
         return Arguments.of(message, false, sm);
     }

@@ -99,6 +99,7 @@ public class MessageBuilder {
         sm.setEsmClass(esmClass);
         sm.setSourceAddress(sourceAddress);
         sm.setDestAddress(destAddress);
+        sm.setValidityPeriod(message.getValidityPeriod());
         encoderFactory.get(message).encode(message, sm, ucs2Only);
 
         if (message.getMessageType() == MessageType.SIMPLE) {
