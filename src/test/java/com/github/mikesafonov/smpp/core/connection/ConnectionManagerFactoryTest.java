@@ -1,14 +1,11 @@
 package com.github.mikesafonov.smpp.core.connection;
 
+import com.cloudhopper.smpp.SmppSessionHandler;
 import com.github.mikesafonov.smpp.config.SmppProperties;
 import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
-import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,16 +126,15 @@ class ConnectionManagerFactoryTest {
         @Test
         void shouldReturnConnectionManagerWithDefaultProperties(){
             String name = randomString();
-            List<DeliveryReportConsumer> deliveryReportConsumer = Arrays.asList(mock(DeliveryReportConsumer.class));
             SmppProperties.Defaults defaults = new SmppProperties.Defaults();
             SmppProperties.SMSC smsc = new SmppProperties.SMSC();
             smsc.setCredentials(randomCredentials());
+            SmppSessionHandler handler = mock(SmppSessionHandler.class);
 
-            ConnectionManager manager = factory.receiver(name, defaults, smsc, deliveryReportConsumer);
+            ConnectionManager manager = factory.receiver(name, defaults, smsc, handler);
 
             assertThat(manager).isInstanceOf(ReceiverConnectionManager.class)
-                    .extracting("sessionHandler.clientId",
-                            "sessionHandler.deliveryReportConsumers",
+                    .extracting("sessionHandler",
                             "rebindPeriod",
                             "configuration.loggingOptions.isLogPduEnabled",
                             "configuration.loggingOptions.isLogBytesEnabled",
@@ -147,7 +143,7 @@ class ConnectionManagerFactoryTest {
                             "configuration.name",
                             "configuration.password",
                             "configuration.systemId")
-                    .containsExactly(name, deliveryReportConsumer,
+                    .containsExactly(handler,
                             defaults.getRebindPeriod().getSeconds(),
                             defaults.isLoggingPdu(), defaults.isLoggingBytes(),
                             smsc.getCredentials().getPort(),
@@ -161,7 +157,6 @@ class ConnectionManagerFactoryTest {
         @Test
         void shouldReturnConnectionManagerWithCustomProperties(){
             String name = randomString();
-            List<DeliveryReportConsumer> deliveryReportConsumer = Arrays.asList(mock(DeliveryReportConsumer.class));
             SmppProperties.Defaults defaults = new SmppProperties.Defaults();
             SmppProperties.SMSC smsc = new SmppProperties.SMSC();
             smsc.setLoggingBytes(true);
@@ -170,11 +165,12 @@ class ConnectionManagerFactoryTest {
             smsc.setCredentials(randomCredentials());
             smsc.setRebindPeriod(randomDuration());
 
-            ConnectionManager manager = factory.receiver(name, defaults, smsc, deliveryReportConsumer);
+            SmppSessionHandler handler = mock(SmppSessionHandler.class);
+
+            ConnectionManager manager = factory.receiver(name, defaults, smsc, handler);
 
             assertThat(manager).isInstanceOf(ReceiverConnectionManager.class)
-                    .extracting("sessionHandler.clientId",
-                            "sessionHandler.deliveryReportConsumers",
+                    .extracting("sessionHandler",
                             "rebindPeriod",
                             "configuration.loggingOptions.isLogPduEnabled",
                             "configuration.loggingOptions.isLogBytesEnabled",
@@ -183,7 +179,7 @@ class ConnectionManagerFactoryTest {
                             "configuration.name",
                             "configuration.password",
                             "configuration.systemId")
-                    .containsExactly(name, deliveryReportConsumer,
+                    .containsExactly(handler,
                             smsc.getRebindPeriod().getSeconds(),
                             smsc.getLoggingPdu(), smsc.getLoggingBytes(),
                             smsc.getCredentials().getPort(),
@@ -223,13 +219,12 @@ class ConnectionManagerFactoryTest {
         SmppProperties.Defaults defaults = new SmppProperties.Defaults();
         SmppProperties.SMSC smsc = new SmppProperties.SMSC();
         smsc.setCredentials(randomCredentials());
-        List<DeliveryReportConsumer> deliveryReportConsumer = Arrays.asList(mock(DeliveryReportConsumer.class));
+        SmppSessionHandler handler = mock(SmppSessionHandler.class);
 
-        ConnectionManager manager = factory.transceiver(name, defaults, smsc, deliveryReportConsumer);
+        ConnectionManager manager = factory.transceiver(name, defaults, smsc, handler);
 
         assertThat(manager).isInstanceOf(TransceiverConnectionManager.class)
-            .extracting("sessionHandler.clientId",
-                "sessionHandler.deliveryReportConsumers", "maxTryCount",
+            .extracting("sessionHandler", "maxTryCount",
                 "configuration.loggingOptions.isLogPduEnabled",
                 "configuration.loggingOptions.isLogBytesEnabled",
                 "configuration.windowSize",
@@ -238,7 +233,7 @@ class ConnectionManagerFactoryTest {
                 "configuration.name",
                 "configuration.password",
                 "configuration.systemId")
-            .containsExactly(name, deliveryReportConsumer, defaults.getMaxTry(),
+            .containsExactly(handler, defaults.getMaxTry(),
                 defaults.isLoggingPdu(), defaults.isLoggingBytes(),
                 defaults.getWindowSize(),
                 smsc.getCredentials().getPort(),
@@ -259,13 +254,12 @@ class ConnectionManagerFactoryTest {
         smsc.setMaxTry(randomInt());
         smsc.setCredentials(randomCredentials());
         smsc.setWindowSize(randomInt());
-        List<DeliveryReportConsumer> deliveryReportConsumer = Arrays.asList(mock(DeliveryReportConsumer.class));
+        SmppSessionHandler handler = mock(SmppSessionHandler.class);
 
-        ConnectionManager manager = factory.transceiver(name, defaults, smsc, deliveryReportConsumer);
+        ConnectionManager manager = factory.transceiver(name, defaults, smsc, handler);
 
         assertThat(manager).isInstanceOf(TransceiverConnectionManager.class)
-            .extracting("sessionHandler.clientId",
-                "sessionHandler.deliveryReportConsumers", "maxTryCount",
+            .extracting("sessionHandler", "maxTryCount",
                 "configuration.loggingOptions.isLogPduEnabled",
                 "configuration.loggingOptions.isLogBytesEnabled",
                 "configuration.windowSize",
@@ -274,7 +268,7 @@ class ConnectionManagerFactoryTest {
                 "configuration.name",
                 "configuration.password",
                 "configuration.systemId")
-            .containsExactly(name, deliveryReportConsumer, smsc.getMaxTry(),
+            .containsExactly(handler, smsc.getMaxTry(),
                 smsc.getLoggingPdu(), smsc.getLoggingBytes(),
                 smsc.getWindowSize(),
                 smsc.getCredentials().getPort(),

@@ -8,7 +8,6 @@ import com.github.mikesafonov.smpp.core.connection.ConnectionManagerFactory;
 import com.github.mikesafonov.smpp.core.generators.AlwaysSuccessSmppResultGenerator;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
-import com.github.mikesafonov.smpp.core.reciever.NullDeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.sender.DefaultTypeOfAddressParser;
 import com.github.mikesafonov.smpp.core.sender.TypeOfAddressParser;
 import lombok.extern.slf4j.Slf4j;

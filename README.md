@@ -214,13 +214,18 @@ Starter provide **DefaultTypeOfAddressParser** and **UnknownTypeOfAddressParser*
 
 This abstraction represent connection via SMPP with _RECEIVER_ or _TRANSCEIVER_ (see `connectionType` property) type. 
 Key purpose is listening delivery receipts. 
-`By default` starter use **DefaultResponseClient**. This class keeping smpp connection and pushing delivery receipts to [DeliveryReportConsumer](#DeliveryReportConsumer).
+`By default` starter use **DefaultResponseClient**. This class keeping smpp connection and pushing all incoming PDU to [SmppSessionListener](#SmppSessionListener).
 
-### DeliveryReportConsumer
+### SmppSessionListener
 
-This class dedicated to handle _DeliveryReport_ on client side. Client may build custom logic on receiving delivery receipts by implementing this interface.
+This class dedicated to listening all incoming PDU traffic. `By default` starter use **ResponseSmppSessionHandler**. This class 
+find delivery receipts and push to **DeliveryReportConsumer**.
+
+**DeliveryReportConsumer** dedicated to handle _DeliveryReport_ on client side. Client may build custom logic on receiving delivery receipts by implementing this interface.
 Starter use `by default` **NullDeliveryReportConsumer** if client doesnt provide any implementation of **DeliveryReportConsumer**.
 **NullDeliveryReportConsumer** ignore any delivery receipts.
+
+You can use custom **SmppSessionListener** by creating appropriate bean.
 
 ### SenderManager
 

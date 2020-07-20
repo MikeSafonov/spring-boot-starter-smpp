@@ -1,12 +1,13 @@
 package com.github.mikesafonov.smpp.config;
 
 
+import com.cloudhopper.smpp.SmppSessionHandler;
 import com.github.mikesafonov.smpp.core.ClientFactory;
 import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.connection.ConnectionManagerFactory;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
-import com.github.mikesafonov.smpp.core.reciever.NullDeliveryReportConsumer;
+import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.MockSenderClient;
 import com.github.mikesafonov.smpp.core.sender.StandardSenderClient;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
  * @author Mike Safonov
  */
 class SmscConnectionFactoryBeanTest {
+
     private SmppProperties smppProperties;
     private SmppResultGenerator smppResultGenerator;
     private List<DeliveryReportConsumer> deliveryReportConsumers;
@@ -51,6 +53,7 @@ class SmscConnectionFactoryBeanTest {
 
     @Nested
     class IsSingleton {
+
         @Test
         void shouldBeSingletonList() {
             assertTrue(smscConnectionFactoryBean.isSingleton());
@@ -61,6 +64,7 @@ class SmscConnectionFactoryBeanTest {
 
     @Nested
     class EmptyConnections {
+
         @Test
         void shouldReturnEmptyList() {
             when(smppProperties.getConnections()).thenReturn(new HashMap<>());
@@ -73,6 +77,7 @@ class SmscConnectionFactoryBeanTest {
 
     @Nested
     class MockConnection {
+
         @Test
         void shouldReturnMockConnection() {
             Map<String, SmppProperties.SMSC> connectionMap = new HashMap<>();
@@ -86,7 +91,7 @@ class SmscConnectionFactoryBeanTest {
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(new SmppProperties.Defaults());
             when(clientFactory.mockSender(connectionName, smppResultGenerator)).thenReturn(
-                    mockSenderClient
+                mockSenderClient
             );
 
             SmscConnectionsHolder holder = smscConnectionFactoryBean.getObject();
@@ -105,6 +110,15 @@ class SmscConnectionFactoryBeanTest {
 
     @Nested
     class StandardConnection {
+
+        private SmppSessionHandler handler;
+
+        @BeforeEach
+        void setUp() {
+            handler = mock(SmppSessionHandler.class);
+            smscConnectionFactoryBean.setSessionHandler(handler);
+        }
+
         @Test
         void shouldReturnStandardConnection() {
             Map<String, SmppProperties.SMSC> connectionMap = new HashMap<>();
@@ -120,13 +134,13 @@ class SmscConnectionFactoryBeanTest {
             ConnectionManager receiver = mock(ConnectionManager.class);
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
-                    .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
-                    .thenReturn(receiver);
+                .thenReturn(transmitter);
+            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, handler))
+                .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(clientFactory.standardResponse(connectionName, receiver)).thenReturn(
-                    standardResponseClient
+                standardResponseClient
             );
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
@@ -161,15 +175,15 @@ class SmscConnectionFactoryBeanTest {
             ConnectionManager transmitter = mock(ConnectionManager.class);
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
-                    .thenReturn(transmitter);
+                .thenReturn(transmitter);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
             when(smppProperties.isSetupRightAway()).thenReturn(true);
 
             smscConnectionFactoryBean = new SmscConnectionFactoryBean(smppProperties, smppResultGenerator,
-                    Collections.emptyList(), typeOfAddressParser, clientFactory, connectionManagerFactory);
+                Collections.emptyList(), typeOfAddressParser, clientFactory, connectionManagerFactory);
 
             SmscConnectionsHolder holder = smscConnectionFactoryBean.getObject();
             List<SmscConnection> connections = holder.getConnections();
@@ -198,13 +212,13 @@ class SmscConnectionFactoryBeanTest {
             ConnectionManager receiver = mock(ConnectionManager.class);
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
-                    .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
-                    .thenReturn(receiver);
+                .thenReturn(transmitter);
+            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, handler))
+                .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(clientFactory.standardResponse(connectionName, receiver))
-                    .thenReturn(standardResponseClient);
+                .thenReturn(standardResponseClient);
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
             when(smppProperties.isSetupRightAway()).thenReturn(false);
@@ -239,12 +253,12 @@ class SmscConnectionFactoryBeanTest {
             StandardResponseClient standardResponseClient = mock(StandardResponseClient.class);
             ConnectionManager transceiver = mock(ConnectionManager.class);
 
-            when(connectionManagerFactory.transceiver(connectionName, defaults, smsc, deliveryReportConsumers))
-                    .thenReturn(transceiver);
+            when(connectionManagerFactory.transceiver(connectionName, defaults, smsc, handler))
+                .thenReturn(transceiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transceiver))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(clientFactory.standardResponse(connectionName, transceiver))
-                    .thenReturn(standardResponseClient);
+                .thenReturn(standardResponseClient);
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
             when(smppProperties.isSetupRightAway()).thenReturn(true);
@@ -265,7 +279,8 @@ class SmscConnectionFactoryBeanTest {
     }
 
     @Nested
-    class TestConnection{
+    class TestConnection {
+
         @Test
         void shouldReturnTestConnection() {
             String connectionName = randomString();
@@ -277,22 +292,22 @@ class SmscConnectionFactoryBeanTest {
             StandardSenderClient standardSenderClient = mock(StandardSenderClient.class);
             StandardResponseClient standardResponseClient = mock(StandardResponseClient.class);
             TestSenderClient testSenderClient = new TestSenderClient(standardSenderClient,
-                    emptyList(), smppResultGenerator);
+                emptyList(), smppResultGenerator);
 
             ConnectionManager transmitter = mock(ConnectionManager.class);
             ConnectionManager receiver = mock(ConnectionManager.class);
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
-                    .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
-                    .thenReturn(receiver);
+                .thenReturn(transmitter);
+            when(connectionManagerFactory.receiver(eq(connectionName), eq(defaults), eq(smsc), any(ResponseSmppSessionHandler.class)))
+                .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(clientFactory.standardResponse(connectionName, receiver)).thenReturn(
-                    standardResponseClient
+                standardResponseClient
             );
             when(clientFactory.testSender(standardSenderClient, defaults, smsc, smppResultGenerator)).thenReturn(
-                    testSenderClient
+                testSenderClient
             );
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
@@ -329,11 +344,11 @@ class SmscConnectionFactoryBeanTest {
             ConnectionManager transmitter = mock(ConnectionManager.class);
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
-                    .thenReturn(transmitter);
+                .thenReturn(transmitter);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(clientFactory.testSender(standardSenderClient, defaults, smsc, smppResultGenerator)).thenReturn(
-                    testSenderClient
+                testSenderClient
             );
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
@@ -367,16 +382,16 @@ class SmscConnectionFactoryBeanTest {
             ConnectionManager receiver = mock(ConnectionManager.class);
 
             when(connectionManagerFactory.transmitter(connectionName, defaults, smsc))
-                    .thenReturn(transmitter);
-            when(connectionManagerFactory.receiver(connectionName, defaults, smsc, deliveryReportConsumers))
-                    .thenReturn(receiver);
+                .thenReturn(transmitter);
+            when(connectionManagerFactory.receiver(eq(connectionName), eq(defaults), eq(smsc), any(ResponseSmppSessionHandler.class)))
+                .thenReturn(receiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transmitter))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(clientFactory.standardResponse(connectionName, receiver)).thenReturn(
-                    standardResponseClient
+                standardResponseClient
             );
             when(clientFactory.testSender(standardSenderClient, defaults, smsc, smppResultGenerator)).thenReturn(
-                    testSenderClient
+                testSenderClient
             );
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
@@ -413,14 +428,14 @@ class SmscConnectionFactoryBeanTest {
             TestSenderClient testSenderClient = new TestSenderClient(standardSenderClient, emptyList(), smppResultGenerator);
             ConnectionManager transceiver = mock(ConnectionManager.class);
 
-            when(connectionManagerFactory.transceiver(connectionName, defaults, smsc, deliveryReportConsumers))
-                    .thenReturn(transceiver);
+            when(connectionManagerFactory.transceiver(eq(connectionName), eq(defaults), eq(smsc), any(ResponseSmppSessionHandler.class)))
+                .thenReturn(transceiver);
             when(clientFactory.standardSender(connectionName, defaults, smsc, typeOfAddressParser, transceiver))
-                    .thenReturn(standardSenderClient);
+                .thenReturn(standardSenderClient);
             when(clientFactory.standardResponse(connectionName, transceiver))
-                    .thenReturn(standardResponseClient);
+                .thenReturn(standardResponseClient);
             when(clientFactory.testSender(standardSenderClient, defaults, smsc, smppResultGenerator))
-                    .thenReturn(testSenderClient);
+                .thenReturn(testSenderClient);
             when(smppProperties.getConnections()).thenReturn(connectionMap);
             when(smppProperties.getDefaults()).thenReturn(defaults);
             when(smppProperties.isSetupRightAway()).thenReturn(true);

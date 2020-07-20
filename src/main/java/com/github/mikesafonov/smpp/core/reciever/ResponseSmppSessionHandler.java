@@ -7,11 +7,11 @@ import com.cloudhopper.smpp.pdu.PduResponse;
 import com.cloudhopper.smpp.util.DeliveryReceipt;
 import com.cloudhopper.smpp.util.DeliveryReceiptException;
 import com.github.mikesafonov.smpp.core.dto.DeliveryReport;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTimeZone;
 
 import javax.validation.constraints.NotNull;
-
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
  * @author Mike Safonov
  */
 @Slf4j
+@EqualsAndHashCode(callSuper = true)
 public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
 
     private final String clientId;

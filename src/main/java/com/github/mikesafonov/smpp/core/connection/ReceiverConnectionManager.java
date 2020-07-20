@@ -9,7 +9,6 @@ import com.cloudhopper.smpp.type.SmppChannelException;
 import com.cloudhopper.smpp.type.SmppTimeoutException;
 import com.cloudhopper.smpp.type.UnrecoverablePduException;
 import com.github.mikesafonov.smpp.core.exceptions.ResponseClientBindException;
-import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +26,7 @@ public class ReceiverConnectionManager implements ConnectionManager {
 
     private final DefaultSmppClient client;
     private final ReceiverConfiguration configuration;
-    private final ResponseSmppSessionHandler sessionHandler;
+    private final SmppSessionHandler sessionHandler;
     /**
      * reconnection period in seconds
      */

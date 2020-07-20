@@ -1,18 +1,23 @@
 package com.github.mikesafonov.smpp.config;
 
+import com.cloudhopper.smpp.SmppSessionHandler;
 import com.github.mikesafonov.smpp.core.ClientFactory;
 import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.connection.ConnectionManagerFactory;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
+import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import com.github.mikesafonov.smpp.core.sender.TypeOfAddressParser;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.github.mikesafonov.smpp.core.utils.Utils.getOrDefault;
 import static java.util.stream.Collectors.toList;
 
 
@@ -28,13 +33,16 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     private final TypeOfAddressParser typeOfAddressParser;
     private final ClientFactory clientFactory;
     private final ConnectionManagerFactory connectionManagerFactory;
+    @Autowired(required = false)
+    @Setter
+    private SmppSessionHandler sessionHandler;
 
     @Override
     public SmscConnectionsHolder getObject() {
         SmppProperties.Defaults defaults = smppProperties.getDefaults();
         List<SmscConnection> connections = smppProperties.getConnections().entrySet().stream()
-                .map(smsc -> getSmscConnection(defaults, smsc.getKey(), smsc.getValue()))
-                .collect(toList());
+            .map(smsc -> getSmscConnection(defaults, smsc.getKey(), smsc.getValue()))
+            .collect(toList());
         return new SmscConnectionsHolder(connections);
     }
 
@@ -51,18 +59,14 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
     private SmscConnection getSmscConnection(SmppProperties.Defaults defaults, String name, SmppProperties.SMSC smsc) {
         ConnectionMode connectionMode = getOrDefault(smsc.getConnectionMode(), defaults.getConnectionMode());
         switch (connectionMode) {
-            case MOCK: {
+            case MOCK:
                 return getMockSmscConnection(name);
-            }
-            case TEST: {
+            case TEST:
                 return getTestSmscConnection(defaults, name, smsc);
-            }
-            case STANDARD: {
+            case STANDARD:
                 return getStandardSmscConnection(defaults, name, smsc);
-            }
-            default: {
+            default:
                 throw new RuntimeException("Unknown connection mode " + connectionMode);
-            }
         }
     }
 
@@ -77,23 +81,23 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         ConnectionType type = getOrDefault(smsc.getConnectionType(), defaults.getConnectionType());
         if (type == ConnectionType.TRANSCEIVER) {
             ConnectionManager transceiver = connectionManagerFactory.transceiver(name, defaults,
-                    smsc, deliveryReportConsumers);
+                smsc, getOrCreateHandler(name, deliveryReportConsumers));
             SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc,
-                    typeOfAddressParser, transceiver);
+                typeOfAddressParser, transceiver);
             testSenderClient = clientFactory.testSender(standardSender, defaults,
-                    smsc, smppResultGenerator);
+                smsc, smppResultGenerator);
             if (isResponseClientRequired()) {
                 responseClient = clientFactory.standardResponse(name, transceiver);
             }
         } else {
             ConnectionManager transmitter = connectionManagerFactory.transmitter(name, defaults, smsc);
             SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc,
-                    typeOfAddressParser, transmitter);
+                typeOfAddressParser, transmitter);
             testSenderClient = clientFactory.testSender(standardSender, defaults,
-                    smsc, smppResultGenerator);
+                smsc, smppResultGenerator);
             if (isResponseClientRequired()) {
                 ConnectionManager receiver = connectionManagerFactory.receiver(name, defaults,
-                        smsc, deliveryReportConsumers);
+                    smsc, getOrCreateHandler(name, deliveryReportConsumers));
                 responseClient = clientFactory.standardResponse(name, receiver);
             }
         }
@@ -108,9 +112,9 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         ConnectionType type = getOrDefault(smsc.getConnectionType(), defaults.getConnectionType());
         if (type == ConnectionType.TRANSCEIVER) {
             ConnectionManager connectionManager = connectionManagerFactory.transceiver(name, defaults,
-                    smsc, deliveryReportConsumers);
+                smsc, getOrCreateHandler(name, deliveryReportConsumers));
             senderClient = clientFactory.standardSender(name, defaults, smsc,
-                    typeOfAddressParser, connectionManager);
+                typeOfAddressParser, connectionManager);
             if (isResponseClientRequired()) {
                 responseClient = clientFactory.standardResponse(name, connectionManager);
             }
@@ -119,7 +123,7 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
             senderClient = clientFactory.standardSender(name, defaults, smsc, typeOfAddressParser, transmitter);
             if (isResponseClientRequired()) {
                 ConnectionManager receiver = connectionManagerFactory.receiver(name, defaults,
-                        smsc, deliveryReportConsumers);
+                    smsc, getOrCreateHandler(name, deliveryReportConsumers));
                 responseClient = clientFactory.standardResponse(name, receiver);
             }
         }
@@ -140,10 +144,10 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         return !deliveryReportConsumers.isEmpty();
     }
 
-    private static <T> T getOrDefault(T value, T defaultValue) {
-        if (value == null) {
-            return defaultValue;
+    private SmppSessionHandler getOrCreateHandler(String name, List<DeliveryReportConsumer> deliveryReportConsumers) {
+        if (sessionHandler == null) {
+            return new ResponseSmppSessionHandler(name, deliveryReportConsumers);
         }
-        return value;
+        return sessionHandler;
     }
 }

@@ -1,7 +1,7 @@
 package com.github.mikesafonov.smpp.core.connection;
 
+import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
-import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 
 /**
  * Configuration for sender session
@@ -11,7 +11,7 @@ import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 public class TransceiverConnectionManager extends BaseSenderConnectionManager {
     public TransceiverConnectionManager(DefaultSmppClient client,
                                         TransceiverConfiguration configuration,
-                                        ResponseSmppSessionHandler sessionHandler,
+                                        SmppSessionHandler sessionHandler,
                                         int maxTryCount) {
         super(client, configuration, sessionHandler, maxTryCount);
     }

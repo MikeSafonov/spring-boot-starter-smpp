@@ -6,7 +6,6 @@ import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
 import com.cloudhopper.smpp.pdu.EnquireLink;
 import com.github.mikesafonov.smpp.core.exceptions.SmppSessionException;
-import com.github.mikesafonov.smpp.core.reciever.ResponseSmppSessionHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +16,7 @@ public abstract class BaseSenderConnectionManager implements ConnectionManager {
 
     protected final DefaultSmppClient client;
     protected final BaseSmppSessionConfiguration configuration;
-    protected final ResponseSmppSessionHandler sessionHandler;
+    protected final SmppSessionHandler sessionHandler;
     /**
      * Number of attempts to reconnect if smpp session closed
      */
