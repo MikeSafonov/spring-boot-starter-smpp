@@ -35,21 +35,19 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
 
     @Override
     public PduResponse firePduRequestReceived(PduRequest pduRequest) {
-
-        if (pduRequest != null) {
-            if (isDelivery(pduRequest)) {
-                return processReport(pduRequest);
-            }
-            log.debug(pduRequest.toString());
+        log.debug(pduRequest.toString());
+        if (isDelivery(pduRequest)) {
+            processReport(pduRequest);
         }
-        return super.firePduRequestReceived(pduRequest);
+
+        return pduRequest.createResponse();
     }
 
     private boolean isDelivery(PduRequest pduRequest) {
         return pduRequest.isRequest() && pduRequest.getClass() == DeliverSm.class;
     }
 
-    private PduResponse processReport(PduRequest pduRequest) {
+    private void processReport(PduRequest pduRequest) {
         DeliverSm dlr = (DeliverSm) pduRequest;
         try {
             DeliveryReport report = toReport(dlr);
@@ -59,7 +57,6 @@ public class ResponseSmppSessionHandler extends DefaultSmppSessionHandler {
         } catch (DeliveryReceiptException e) {
             log.error(e.getMessage(), e);
         }
-        return dlr.createResponse();
     }
 
     private DeliveryReport toReport(DeliverSm deliverSm) throws DeliveryReceiptException {
