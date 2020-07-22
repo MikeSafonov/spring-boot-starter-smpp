@@ -40,12 +40,6 @@ class ResponseSmppSessionHandlerTest {
         assertThrows(NullPointerException.class, () -> new ResponseSmppSessionHandler(clientId, null));
     }
 
-    @Test
-    void shouldDoNothingBecauseRequestIsNull() {
-        responseSmppSessionHandler.firePduRequestReceived(null);
-
-        verifyNoInteractions(deliveryReportConsumer);
-    }
 
     @Test
     void shouldDoNothingBecauseRequestIsNotDeliveryReceipt() {
