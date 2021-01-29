@@ -85,12 +85,14 @@ public class Randomizer {
 
     public static TransmitterConfiguration randomTransmitterConfiguration() {
         SmppProperties.Credentials credentials = randomCredentials();
-        return new TransmitterConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt());
+        return new TransmitterConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt(),
+            randomString());
     }
 
     public static TransceiverConfiguration randomTransceiverConfiguration() {
         SmppProperties.Credentials credentials = randomCredentials();
-        return new TransceiverConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt());
+        return new TransceiverConfiguration(randomString(), credentials, randomBoolean(), randomBoolean(), randomInt(),
+            randomString());
     }
 
     public static ReceiverConfiguration randomReceiverConfiguration() {

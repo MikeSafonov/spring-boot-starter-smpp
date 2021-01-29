@@ -16,7 +16,7 @@ import static java.util.Objects.requireNonNull;
 public class TransmitterConfiguration extends BaseSmppSessionConfiguration {
 
     public TransmitterConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials,
-                                    boolean loggingBytes, boolean loggingPdu, int windowsSize) {
+                                    boolean loggingBytes, boolean loggingPdu, int windowsSize, String systemType) {
         super();
 
         setType(SmppBindType.TRANSMITTER);
@@ -26,6 +26,7 @@ public class TransmitterConfiguration extends BaseSmppSessionConfiguration {
         setSystemId(credentials.getUsername());
         setPassword(credentials.getPassword());
         setWindowSize(windowsSize);
+        setSystemType(systemType);
 
         LoggingOptions loggingOptions = new LoggingOptions();
         loggingOptions.setLogBytes(loggingBytes);
