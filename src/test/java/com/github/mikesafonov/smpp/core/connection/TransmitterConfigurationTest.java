@@ -12,8 +12,8 @@ class TransmitterConfigurationTest {
 
     @Test
     void shouldThrowNullPointerException() {
-        assertThrows(NullPointerException.class, () -> new TransmitterConfiguration(null, new SmppProperties.Credentials(), true, true, 1));
-        assertThrows(NullPointerException.class, () -> new TransmitterConfiguration("asdasd", null, true, true, 1));
+        assertThrows(NullPointerException.class, () -> new TransmitterConfiguration(null, new SmppProperties.Credentials(), true, true, 1, null));
+        assertThrows(NullPointerException.class, () -> new TransmitterConfiguration("asdasd", null, true, true, 1, null));
     }
 
     @Test
@@ -23,7 +23,7 @@ class TransmitterConfigurationTest {
         boolean loggingBytes = Randomizer.randomBoolean();
         boolean loggingPdu = Randomizer.randomBoolean();
         int windowsSize = Randomizer.randomInt();
-        TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, credentials, loggingBytes, loggingPdu, windowsSize);
+        TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name, credentials, loggingBytes, loggingPdu, windowsSize, null);
 
         assertEquals(name, transmitterConfiguration.getName());
         assertEquals(credentials.getHost(), transmitterConfiguration.getHost());

@@ -31,7 +31,7 @@ public class ConnectionManagerFactory {
         int maxTry = getOrDefault(smsc.getMaxTry(), defaults.getMaxTry());
 
         TransmitterConfiguration transmitterConfiguration = new TransmitterConfiguration(name,
-            smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize);
+            smsc.getCredentials(), loggingBytes, loggingPdu, windowsSize, smsc.getSystemType());
 
         DefaultSmppClient client = new DefaultSmppClient();
         return new TransmitterConnectionManager(client, transmitterConfiguration, maxTry);
@@ -76,7 +76,7 @@ public class ConnectionManagerFactory {
 
 
         TransceiverConfiguration configuration = new TransceiverConfiguration(name, smsc.getCredentials(),
-            loggingBytes, loggingPdu, windowsSize);
+            loggingBytes, loggingPdu, windowsSize, smsc.getSystemType());
         DefaultSmppClient client = new DefaultSmppClient();
 
         return new TransceiverConnectionManager(client, configuration, smppSessionHandler, maxTry);

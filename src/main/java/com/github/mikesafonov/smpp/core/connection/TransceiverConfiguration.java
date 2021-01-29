@@ -10,7 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 public class TransceiverConfiguration extends BaseSmppSessionConfiguration {
     public TransceiverConfiguration(@NotNull String name, @NotNull SmppProperties.Credentials credentials,
-                                    boolean loggingBytes, boolean loggingPdu, int windowsSize) {
+                                    boolean loggingBytes, boolean loggingPdu, int windowsSize, String systemType) {
         super();
 
         setType(SmppBindType.TRANSCEIVER);
@@ -20,6 +20,7 @@ public class TransceiverConfiguration extends BaseSmppSessionConfiguration {
         setSystemId(credentials.getUsername());
         setPassword(credentials.getPassword());
         setWindowSize(windowsSize);
+        setSystemType(systemType);
 
         LoggingOptions loggingOptions = new LoggingOptions();
         loggingOptions.setLogBytes(loggingBytes);

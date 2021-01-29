@@ -13,9 +13,9 @@ class TransceiverConfigurationTest {
     @Test
     void shouldThrowNullPointerException() {
         assertThrows(NullPointerException.class, () -> new TransceiverConfiguration(null,
-                new SmppProperties.Credentials(), true, true, 1));
+                new SmppProperties.Credentials(), true, true, 1, null));
         assertThrows(NullPointerException.class, () -> new TransceiverConfiguration("asdasd",
-                null, true, true, 1));
+                null, true, true, 1, null));
     }
 
     @Test
@@ -26,7 +26,7 @@ class TransceiverConfigurationTest {
         boolean loggingPdu = Randomizer.randomBoolean();
         int windowsSize = Randomizer.randomInt();
         TransceiverConfiguration configuration =
-                new TransceiverConfiguration(name, credentials, loggingBytes, loggingPdu, windowsSize);
+                new TransceiverConfiguration(name, credentials, loggingBytes, loggingPdu, windowsSize, null);
 
         assertEquals(name, configuration.getName());
         assertEquals(credentials.getHost(), configuration.getHost());
