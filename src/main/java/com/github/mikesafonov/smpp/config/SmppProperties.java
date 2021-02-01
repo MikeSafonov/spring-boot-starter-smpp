@@ -67,14 +67,6 @@ public class SmppProperties {
          * Type of smpp connection
          */
         private ConnectionType connectionType = ConnectionType.TRANSMITTER_RECEIVER;
-
-        /**
-         * The systemType parameter is used to categorize the type of ESME that is binding to the SMSC.
-         * Examples include “VMS” (voice mail system) and “OTA” (over-the-air activation system).
-         * Specification of the systemType is optional - some SMSC’s may not require ESME’s to provide
-         * this detail. In this case, the ESME can set the systemType to NULL.
-         */
-        private String systemType;
     }
 
     @Data
