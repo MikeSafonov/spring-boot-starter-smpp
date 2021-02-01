@@ -98,6 +98,7 @@ The following tables show the available configuration:
 | `smpp.connections.<name>.requestTimeout`        | Request timeout (Duration)                                                               | `5s`                                                                 |
 | `smpp.connections.<name>.allowedPhones`         | Array of phones to send. Using only if `connectionMode` is `TEST`                        | `[]`                                                                 |
 | `smpp.connections.<name>.connectionType`        | Type of smpp connections(`TRANSCEIVER` or `TRANSMITTER_RECEIVER`)                        |                                                                  |
+| `smpp.connections.<name>.systemType`        | The systemType parameter is used to categorize the type of ESME that is binding to the SMSC.                    |                                                                  |
 | `smpp.setupRightAway`                           | Should setup smpp clients after creation and fail fast if connection cant be established | `true`                                                               |
 
 Configuration example for `.properties` file:
