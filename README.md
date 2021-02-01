@@ -40,13 +40,13 @@ Maven:
     <dependency>
       <groupId>com.github.mikesafonov</groupId>
       <artifactId>spring-boot-starter-smpp</artifactId>
-      <version>1.2.1</version>
+      <version>latest</version>
     </dependency>
     
 Gradle:
 
     dependencies {
-        implementation 'com.github.mikesafonov:spring-boot-starter-smpp:1.2.1'
+        implementation 'com.github.mikesafonov:spring-boot-starter-smpp:latest'
     }
     
 Configure spring-boot application via properties (see [Configuration](#Configuration) section).
