@@ -1,18 +1,19 @@
 package com.github.mikesafonov.smpp.core;
 
 import com.github.mikesafonov.smpp.config.SmppProperties;
+import com.github.mikesafonov.smpp.core.connection.BaseSmppSessionConfiguration;
 import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.exceptions.ClientNameSmppException;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,10 +23,11 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 class ClientFactoryTest {
 
-    private ClientFactory clientFactory = new ClientFactory();
+    private final ClientFactory clientFactory = new ClientFactory();
 
     @Nested
     class EmptyName {
@@ -40,19 +42,31 @@ class ClientFactoryTest {
     }
 
     @Nested
-    class NPE {
+    class EXC {
         @Test
         void shouldThrowNpeBecauseInputArgumentIsNull() {
             assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), null, null, null, null));
-            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), null, null, null));
-            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null, null));
-            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), mock(TypeOfAddressParser.class), null));
+            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(),
+                mock(SmppProperties.Defaults.class), null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(),
+                mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.standardSender(randomString(),
+                mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), mock(TypeOfAddressParser.class), null));
             assertThrows(NullPointerException.class, () -> clientFactory.standardResponse(randomString(), null));
             assertThrows(NullPointerException.class, () -> clientFactory.mockSender(randomString(), null));
-            assertThrows(NullPointerException.class, () -> clientFactory.testSender(null, null, null, null));
-            assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), null, null, null));
-            assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), null, null));
-            assertThrows(NullPointerException.class, () -> clientFactory.testSender(mock(SenderClient.class), mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null));
+            assertThrows(ClientNameSmppException.class, () -> clientFactory.testSender(null, null, null, null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(randomString(), null, null, null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(randomString(),
+                mock(SmppProperties.Defaults.class), null, null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(randomString(),
+                mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), null, null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(randomString(),
+                mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), mock(TypeOfAddressParser.class), null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(randomString(),
+                mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), mock(TypeOfAddressParser.class), null, null));
+            assertThrows(NullPointerException.class, () -> clientFactory.testSender(randomString(),
+                mock(SmppProperties.Defaults.class), mock(SmppProperties.SMSC.class), mock(TypeOfAddressParser.class),
+                mock(ConnectionManager.class), null));
         }
     }
 
@@ -90,65 +104,89 @@ class ClientFactoryTest {
         @Test
         void shouldCreateTestSenderClientWithDefaultParametersWithEmptyPhones() {
             String name = randomString();
+            boolean ucs2Only = randomBoolean();
+            long requestTimeout = randomLong();
 
             SmppProperties.Defaults defaults = new SmppProperties.Defaults();
+            defaults.setUcs2Only(ucs2Only);
+            defaults.setRequestTimeout(Duration.ofMillis(requestTimeout));
             defaults.setAllowedPhones(null);
+
+            ConnectionManager connectionManager = mock(ConnectionManager.class);
+            BaseSmppSessionConfiguration configuration = mock(BaseSmppSessionConfiguration.class);
 
             SmppProperties.SMSC smsc = new SmppProperties.SMSC();
             smsc.setCredentials(new SmppProperties.Credentials());
 
-            SenderClient senderClient = mock(SenderClient.class);
-            when(senderClient.getId()).thenReturn(name);
+            when(connectionManager.getConfiguration()).thenReturn(configuration);
+            when(configuration.getName()).thenReturn(name);
 
-            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
-                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(name, defaults, smsc, mock(TypeOfAddressParser.class), connectionManager, mock(SmppResultGenerator.class));
 
-            assertThat(testSenderClient).satisfies(client -> {
-                assertThat(client.getId()).isEqualTo(name);
-                assertThat(client.getAllowedPhones().isEmpty()).isTrue();
-            });
+            assertThat(testSenderClient)
+                .satisfies(client -> {
+                    assertThat(client.getId()).isEqualTo(name);
+                    assertThat(client.getAllowedPhones().isEmpty()).isTrue();
+                })
+                .extracting("ucs2Only", "timeoutMillis", "connectionManager")
+                .containsExactly(ucs2Only, defaults.getRequestTimeout().toMillis(), Optional.of(connectionManager));
         }
 
         @Test
         void shouldCreateTestSenderClientWithCustomParametersWithEmptyPhones() {
             String name = randomString();
+            boolean ucs2Only = randomBoolean();
+            long requestTimeout = randomLong();
+            ConnectionManager connectionManager = mock(ConnectionManager.class);
+            BaseSmppSessionConfiguration configuration = mock(BaseSmppSessionConfiguration.class);
 
             SmppProperties.Defaults defaults = new SmppProperties.Defaults();
             String phone = randomString();
             defaults.setAllowedPhones(new String[]{phone});
+            defaults.setUcs2Only(ucs2Only);
+            defaults.setRequestTimeout(Duration.ofMillis(requestTimeout));
 
             SmppProperties.SMSC smsc = new SmppProperties.SMSC();
             smsc.setCredentials(new SmppProperties.Credentials());
             smsc.setAllowedPhones(new String[]{});
 
-            SenderClient senderClient = mock(SenderClient.class);
-            when(senderClient.getId()).thenReturn(name);
+            when(connectionManager.getConfiguration()).thenReturn(configuration);
+            when(configuration.getName()).thenReturn(name);
 
-            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
-                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(name, defaults, smsc,
+                mock(TypeOfAddressParser.class), connectionManager, mock(SmppResultGenerator.class));
 
-            assertThat(testSenderClient).satisfies(client -> {
-                assertThat(client.getId()).isEqualTo(name);
-                assertThat(client.getAllowedPhones().isEmpty()).isTrue();
-            });
+            assertThat(testSenderClient)
+                .satisfies(client -> {
+                    assertThat(client.getId()).isEqualTo(name);
+                    assertThat(client.getAllowedPhones().isEmpty()).isTrue();
+                })
+                .extracting("ucs2Only", "timeoutMillis", "connectionManager")
+                .containsExactly(ucs2Only, defaults.getRequestTimeout().toMillis(), Optional.of(connectionManager));
         }
 
         @Test
         void shouldCreateTestSenderClientWithDefaultParametersWithNotEmptyPhones() {
             String name = randomString();
+            boolean ucs2Only = randomBoolean();
+            long requestTimeout = randomLong();
+            ConnectionManager connectionManager = mock(ConnectionManager.class);
+            BaseSmppSessionConfiguration configuration = mock(BaseSmppSessionConfiguration.class);
 
             SmppProperties.Defaults defaults = new SmppProperties.Defaults();
             String phone = randomString();
             defaults.setAllowedPhones(new String[]{phone});
+            defaults.setUcs2Only(ucs2Only);
+            defaults.setRequestTimeout(Duration.ofMillis(requestTimeout));
 
             SmppProperties.SMSC smsc = new SmppProperties.SMSC();
             smsc.setCredentials(new SmppProperties.Credentials());
 
-            SenderClient senderClient = mock(SenderClient.class);
-            when(senderClient.getId()).thenReturn(name);
+            when(connectionManager.getConfiguration()).thenReturn(configuration);
+            when(configuration.getName()).thenReturn(name);
 
-            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
-                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(name, defaults, smsc,
+                mock(TypeOfAddressParser.class), connectionManager, mock(SmppResultGenerator.class));
 
             assertThat(testSenderClient).satisfies(client -> {
                 assertThat(client.getId()).isEqualTo(name);
@@ -159,21 +197,27 @@ class ClientFactoryTest {
         @Test
         void shouldCreateTestSenderClientWithCustomParametersWithNotEmptyPhones() {
             String name = randomString();
+            boolean ucs2Only = randomBoolean();
+            long requestTimeout = randomLong();
+            ConnectionManager connectionManager = mock(ConnectionManager.class);
+            BaseSmppSessionConfiguration configuration = mock(BaseSmppSessionConfiguration.class);
 
             SmppProperties.Defaults defaults = new SmppProperties.Defaults();
             String phone = randomString();
             String customPhone = randomString();
             defaults.setAllowedPhones(new String[]{phone});
+            defaults.setUcs2Only(ucs2Only);
+            defaults.setRequestTimeout(Duration.ofMillis(requestTimeout));
 
             SmppProperties.SMSC smsc = new SmppProperties.SMSC();
             smsc.setCredentials(new SmppProperties.Credentials());
             smsc.setAllowedPhones(new String[]{customPhone});
 
-            SenderClient senderClient = mock(SenderClient.class);
-            when(senderClient.getId()).thenReturn(name);
+            when(connectionManager.getConfiguration()).thenReturn(configuration);
+            when(configuration.getName()).thenReturn(name);
 
-            TestSenderClient testSenderClient = (TestSenderClient) clientFactory
-                .testSender(senderClient, defaults, smsc, mock(SmppResultGenerator.class));
+            TestSenderClient testSenderClient = (TestSenderClient) clientFactory.testSender(name, defaults, smsc,
+                mock(TypeOfAddressParser.class), connectionManager, mock(SmppResultGenerator.class));
 
             assertThat(testSenderClient).satisfies(client -> {
                 assertThat(client.getId()).isEqualTo(name);
@@ -202,7 +246,7 @@ class ClientFactoryTest {
                 .standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class), connectionManager);
 
             assertThat(client).extracting("ucs2Only", "timeoutMillis", "connectionManager")
-                .containsExactly(ucs2Only, defaults.getRequestTimeout().toMillis(), connectionManager);
+                .containsExactly(ucs2Only, defaults.getRequestTimeout().toMillis(), Optional.of(connectionManager));
         }
     }
 

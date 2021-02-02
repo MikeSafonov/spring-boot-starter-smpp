@@ -10,11 +10,12 @@ import com.github.mikesafonov.smpp.core.sender.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.github.mikesafonov.smpp.core.utils.Utils.getOrDefault;
 import static com.github.mikesafonov.smpp.core.utils.Utils.validateName;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -41,23 +42,35 @@ public class ClientFactory {
      * Creates {@link TestSenderClient} with base client {@code senderClient}, {@link SmppResultGenerator}
      * {@code smppResultGenerator} and list of allowed phones from {@code smsc} or {@code defaults}
      *
-     * @param senderClient        base sender client
+     * @param name                name of client
      * @param defaults            default smpp properties
      * @param smsc                smpp properties
+     * @param typeOfAddressParser address parser
+     * @param connectionManager   connection manager
      * @param smppResultGenerator result generator for not allowed phones
      * @return test sender client
      */
-    public SenderClient testSender(@NotNull SenderClient senderClient, @NotNull SmppProperties.Defaults defaults,
+    public SenderClient testSender(@NotBlank String name,
+                                   @NotNull SmppProperties.Defaults defaults,
                                    @NotNull SmppProperties.SMSC smsc,
+                                   @NotNull TypeOfAddressParser typeOfAddressParser,
+                                   @NotNull ConnectionManager connectionManager,
                                    @NotNull SmppResultGenerator smppResultGenerator) {
-        requireNonNull(senderClient);
+        validateName(name);
         requireNonNull(defaults);
-        requireNonNull(smppResultGenerator);
         requireNonNull(smsc);
+        requireNonNull(typeOfAddressParser);
+        requireNonNull(connectionManager);
+
+        boolean ucs2Only = getOrDefault(smsc.getUcs2Only(), defaults.isUcs2Only());
+        long requestTimeout = getOrDefault(smsc.getRequestTimeout(), defaults.getRequestTimeout()).toMillis();
+
 
         String[] phones = getOrDefault(smsc.getAllowedPhones(), defaults.getAllowedPhones());
-        List<String> allowedPhones = (phones == null) ? emptyList() : Arrays.asList(phones);
-        return new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
+
+        Set<String> allowedPhones = (phones == null) ? emptySet() : Arrays.stream(phones).collect(Collectors.toSet());
+        return new TestSenderClient(connectionManager,
+            ucs2Only, requestTimeout, new MessageBuilder(typeOfAddressParser), allowedPhones, smppResultGenerator);
     }
 
     /**

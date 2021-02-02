@@ -1,5 +1,7 @@
 package com.github.mikesafonov.smpp.config;
 
+import com.cloudhopper.smpp.SmppSession;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import lombok.AllArgsConstructor;
@@ -27,5 +29,9 @@ public class SmscConnection {
 
     public Optional<ResponseClient> getResponseClient() {
         return Optional.ofNullable(responseClient);
+    }
+
+    public void closeSession(){
+        senderClient.getConnectionManager().ifPresent(ConnectionManager::destroy);
     }
 }

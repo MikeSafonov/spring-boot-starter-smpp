@@ -1,5 +1,7 @@
 package com.github.mikesafonov.smpp.core.sender;
 
+import com.github.mikesafonov.smpp.core.connection.BaseSmppSessionConfiguration;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageType;
@@ -7,115 +9,121 @@ import com.github.mikesafonov.smpp.core.generators.AlwaysSuccessSmppResultGenera
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.github.mikesafonov.smpp.util.Randomizer.randomString;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.github.mikesafonov.smpp.util.Randomizer.*;
+import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 class TestSenderClientTest {
 
     @Test
     void shouldThrowNPE() {
-        assertThrows(NullPointerException.class, () -> new TestSenderClient(null, emptyList(), new AlwaysSuccessSmppResultGenerator()));
-        assertThrows(NullPointerException.class, () -> new TestSenderClient(mock(SenderClient.class), emptyList(), null));
-    }
-
-    @Test
-    void shouldContainExpectedId() {
-        SenderClient senderClient = mock(SenderClient.class);
-        SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
-        TestSenderClient testSenderClient = new TestSenderClient(senderClient, emptyList(), smppResultGenerator);
-
-        String id = randomString();
-        when(senderClient.getId()).thenReturn(id);
-
-        assertEquals(id, testSenderClient.getId());
-    }
-
-    @Test
-    void shouldCallSenderClientSetup(){
-        SenderClient senderClient = mock(SenderClient.class);
-        SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
-        TestSenderClient testSenderClient = new TestSenderClient(senderClient, emptyList(), smppResultGenerator);
-        testSenderClient.setup();
-
-        verify(senderClient, times(1)).setup();
+        assertThrows(NullPointerException.class, () -> new TestSenderClient(null, randomBoolean(), randomLong(),
+            mock(MessageBuilder.class), emptySet(), new AlwaysSuccessSmppResultGenerator()));
+        assertThrows(NullPointerException.class, () -> new TestSenderClient(mock(ConnectionManager.class), randomBoolean(),
+            randomLong(), null, emptySet(), new AlwaysSuccessSmppResultGenerator()));
+        assertThrows(NullPointerException.class, () -> new TestSenderClient(mock(ConnectionManager.class), randomBoolean(),
+            randomLong(), mock(MessageBuilder.class), null, new AlwaysSuccessSmppResultGenerator()));
+        assertThrows(NullPointerException.class, () -> new TestSenderClient(mock(ConnectionManager.class), randomBoolean(),
+            randomLong(), mock(MessageBuilder.class), emptySet(), null));
     }
 
     @Test
     void shouldGenerateResponse() {
-        SenderClient senderClient = mock(SenderClient.class);
-        List<String> allowedPhones = asList(randomString());
+        ConnectionManager connectionManager = mock(ConnectionManager.class);
+        MessageBuilder messageBuilder = mock(MessageBuilder.class);
+        BaseSmppSessionConfiguration config = mock(BaseSmppSessionConfiguration.class);
         SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
-        TestSenderClient testSenderClient = new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
-
+        Set<String> allowedPhones = new HashSet<>();
+        allowedPhones.add(randomString());
         String id = randomString();
-        when(senderClient.getId()).thenReturn(id);
+
+        when(connectionManager.getConfiguration()).thenReturn(config);
+        when(config.getName()).thenReturn(id);
+
+        TestSenderClient testSenderClient = spy(new TestSenderClient(connectionManager, randomBoolean(), randomLong(),
+            messageBuilder, allowedPhones, smppResultGenerator));
 
         Message message = new Message(randomString(), randomString(), randomString(), randomString(), MessageType.SIMPLE);
         testSenderClient.send(message);
 
         verify(smppResultGenerator, times(1)).generate(id, message);
-        verify(senderClient, times(0)).send(message);
+        verify(connectionManager, never()).getSession();
     }
 
     @Test
     void shouldCallSenderClient() {
-        SenderClient senderClient = mock(SenderClient.class);
-        String destinationPhone = randomString();
-        List<String> allowedPhones = asList(destinationPhone);
+        ConnectionManager connectionManager = mock(ConnectionManager.class);
+        BaseSmppSessionConfiguration config = mock(BaseSmppSessionConfiguration.class);
         SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
-        TestSenderClient testSenderClient = new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
-
+        String msisdn = randomString();
+        Set<String> allowedPhones = new HashSet<>();
+        allowedPhones.add(msisdn);
         String id = randomString();
-        when(senderClient.getId()).thenReturn(id);
 
-        Message message = new Message(randomString(), destinationPhone, randomString(), randomString(), MessageType.SIMPLE);
+
+        when(connectionManager.getConfiguration()).thenReturn(config);
+        when(config.getName()).thenReturn(id);
+
+        TestSenderClient testSenderClient = spy(new TestSenderClient(connectionManager, randomBoolean(), randomLong(),
+            mock(MessageBuilder.class), allowedPhones, smppResultGenerator));
+
+        Message message = new Message(randomString(), msisdn, randomString(), randomString(), MessageType.SIMPLE);
         testSenderClient.send(message);
 
-        verify(smppResultGenerator, times(0)).generate(id, message);
-        verify(senderClient, times(1)).send(message);
+        verify(smppResultGenerator, never()).generate(id, message);
+        verify(connectionManager, times(1)).getSession();
     }
 
     @Test
     void shouldGenerateResponseForCancel() {
-        SenderClient senderClient = mock(SenderClient.class);
-        List<String> allowedPhones = asList(randomString());
+        ConnectionManager connectionManager = mock(ConnectionManager.class);
+        BaseSmppSessionConfiguration config = mock(BaseSmppSessionConfiguration.class);
         SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
-        TestSenderClient testSenderClient = new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
-
+        Set<String> allowedPhones = new HashSet<>();
+        allowedPhones.add(randomString());
         String id = randomString();
-        when(senderClient.getId()).thenReturn(id);
 
-        CancelMessage message = new CancelMessage(randomString(),  randomString(), randomString());
+        when(connectionManager.getConfiguration()).thenReturn(config);
+        when(config.getName()).thenReturn(id);
+
+        TestSenderClient testSenderClient = spy(new TestSenderClient(connectionManager, randomBoolean(), randomLong(),
+            mock(MessageBuilder.class), allowedPhones, smppResultGenerator));
+
+        CancelMessage message = new CancelMessage(randomString(), randomString(), randomString());
         testSenderClient.cancel(message);
 
         verify(smppResultGenerator, times(1)).generate(id, message);
-        verify(senderClient, times(0)).cancel(message);
+        verify(connectionManager, never()).getSession();
     }
 
     @Test
     void shouldCallSenderClientForCancel() {
-        SenderClient senderClient = mock(SenderClient.class);
-        String destinationPhone = randomString();
-        List<String> allowedPhones = asList(destinationPhone);
+        ConnectionManager connectionManager = mock(ConnectionManager.class);
+        BaseSmppSessionConfiguration config = mock(BaseSmppSessionConfiguration.class);
         SmppResultGenerator smppResultGenerator = mock(SmppResultGenerator.class);
-        TestSenderClient testSenderClient = new TestSenderClient(senderClient, allowedPhones, smppResultGenerator);
-
+        String msisdn = randomString();
+        Set<String> allowedPhones = new HashSet<>();
+        allowedPhones.add(msisdn);
         String id = randomString();
-        when(senderClient.getId()).thenReturn(id);
 
-        CancelMessage message = new CancelMessage(randomString(),  randomString(), destinationPhone);
+        when(connectionManager.getConfiguration()).thenReturn(config);
+        when(config.getName()).thenReturn(id);
+
+        TestSenderClient testSenderClient = spy(new TestSenderClient(connectionManager, randomBoolean(), randomLong(),
+            mock(MessageBuilder.class), allowedPhones, smppResultGenerator));
+
+        CancelMessage message = new CancelMessage(randomString(), randomString(), msisdn);
         testSenderClient.cancel(message);
 
-        verify(smppResultGenerator, times(0)).generate(id, message);
-        verify(senderClient, times(1)).cancel(message);
+        verify(smppResultGenerator, never()).generate(id, message);
+        verify(connectionManager, times(1)).getSession();
     }
 }

@@ -15,6 +15,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.github.mikesafonov.smpp.core.utils.Utils.getOrDefault;
@@ -82,19 +84,17 @@ public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHol
         if (type == ConnectionType.TRANSCEIVER) {
             ConnectionManager transceiver = connectionManagerFactory.transceiver(name, defaults,
                 smsc, getOrCreateHandler(name, deliveryReportConsumers));
-            SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc,
-                typeOfAddressParser, transceiver);
-            testSenderClient = clientFactory.testSender(standardSender, defaults,
-                smsc, smppResultGenerator);
+            testSenderClient = clientFactory.testSender(name, defaults, smsc,typeOfAddressParser, transceiver,
+                smppResultGenerator);
+
             if (isResponseClientRequired()) {
                 responseClient = clientFactory.standardResponse(name, transceiver);
             }
         } else {
             ConnectionManager transmitter = connectionManagerFactory.transmitter(name, defaults, smsc);
-            SenderClient standardSender = clientFactory.standardSender(name, defaults, smsc,
-                typeOfAddressParser, transmitter);
-            testSenderClient = clientFactory.testSender(standardSender, defaults,
-                smsc, smppResultGenerator);
+            testSenderClient = clientFactory.testSender(name, defaults, smsc,typeOfAddressParser, transmitter,
+                smppResultGenerator);
+
             if (isResponseClientRequired()) {
                 ConnectionManager receiver = connectionManagerFactory.receiver(name, defaults,
                     smsc, getOrCreateHandler(name, deliveryReportConsumers));

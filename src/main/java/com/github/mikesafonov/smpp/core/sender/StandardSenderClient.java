@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 
+import java.util.Optional;
+
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -58,7 +60,7 @@ public class StandardSenderClient implements SenderClient {
     }
 
     /**
-     * Setup connection to SMSC.
+     * Setup connection to SMSC
      *
      * @throws SenderClientBindException if connection fails
      * @see ConnectionManager#getSession()
@@ -139,6 +141,11 @@ public class StandardSenderClient implements SenderClient {
             return CancelMessageResponse.error(cancelMessage, getId(),
                     new MessageErrorInformation(INVALID_SENDING_ERROR, "Unexpected exception"));
         }
+    }
+
+    @Override
+    public Optional<ConnectionManager> getConnectionManager() {
+        return Optional.of(connectionManager);
     }
 
     @NotNull

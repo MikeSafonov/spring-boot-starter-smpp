@@ -1,79 +1,76 @@
 package com.github.mikesafonov.smpp.core.sender;
 
+import com.cloudhopper.smpp.SmppSession;
+import com.cloudhopper.smpp.impl.DefaultSmppClient;
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.Message;
 import com.github.mikesafonov.smpp.core.dto.MessageResponse;
 import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Implementation of {@link SenderClient} which should be used for testing purpose. This client
- * may provide real smpp connection via incoming implementation of {@link SenderClient}. Every incoming request will
- * be redirected to real {@link #senderClient} only if list of allowed phone numbers {@link #allowedPhones}
- * contains message destination phone. Otherwise {@link MessageResponse}/{@link CancelMessageResponse}
- * will be generated via {@link SmppResultGenerator}
+ * Default implementation of {@link SenderClient}, build on top of {@link DefaultSmppClient} and
+ * {@link SmppSession}
  *
- * @author Mike Safonov
+ * @author Mikhail Epatko
  */
-public class TestSenderClient implements SenderClient {
+@Slf4j
+public class TestSenderClient extends StandardSenderClient {
 
-    /**
-     * List of allowed phones to real smpp actions
-     */
-    private final List<String> allowedPhones;
-    /**
-     * Real smpp sender client
-     */
-    private final SenderClient senderClient;
-    /**
-     * Generator for {@link MessageResponse}
-     */
+    private final Set<String> allowedPhones;
     private final SmppResultGenerator smppResultGenerator;
 
-    public TestSenderClient(@NotNull SenderClient senderClient, @NotNull List<String> allowedPhones,
+    public TestSenderClient(@NotNull ConnectionManager connectionManager,
+                            boolean ucs2Only, long timeoutMillis,
+                            @NotNull MessageBuilder messageBuilder,
+                            @NotNull Set<String> allowedPhones,
                             @NotNull SmppResultGenerator smppResultGenerator) {
-        this.senderClient = requireNonNull(senderClient);
-        this.allowedPhones = new ArrayList<>(allowedPhones);
+        super(connectionManager, ucs2Only, timeoutMillis, messageBuilder);
+        this.allowedPhones = requireNonNull(allowedPhones);
         this.smppResultGenerator = requireNonNull(smppResultGenerator);
     }
 
-    @Override
-    public @NotNull String getId() {
-        return senderClient.getId();
-    }
-
-    @Override
-    public void setup() {
-        senderClient.setup();
-    }
-
+    /**
+     * Sending message via smpp protocol or generate result
+     *
+     * @param message incoming message
+     * @return message response
+     */
+    @NotNull
     @Override
     public MessageResponse send(Message message) {
         if (isAllowed(message.getMsisdn())) {
-            return senderClient.send(message);
+            return super.send(message);
         }
-        return smppResultGenerator.generate(senderClient.getId(), message);
+        return smppResultGenerator.generate(getId(), message);
     }
 
+    /**
+     * Cancel smsc message via smpp protocol or generate result
+     *
+     * @param cancelMessage message to cancel
+     * @return cancel response
+     */
     @Override
     public @NotNull CancelMessageResponse cancel(@NotNull CancelMessage cancelMessage) {
         if (isAllowed(cancelMessage.getMsisdn())) {
-            return senderClient.cancel(cancelMessage);
+            return super.cancel(cancelMessage);
         }
-        return smppResultGenerator.generate(senderClient.getId(), cancelMessage);
+        return smppResultGenerator.generate(getId(), cancelMessage);
     }
 
     private boolean isAllowed(String phone) {
         return allowedPhones.contains(phone);
     }
 
-    public List<String> getAllowedPhones() {
+    public Set<String> getAllowedPhones() {
         return allowedPhones;
     }
 }
