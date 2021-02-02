@@ -10,7 +10,7 @@ public class SmscConnectionsHolder {
     private final List<SmscConnection> connections;
 
     @PreDestroy
-    public void closeSessions() {
-        connections.forEach(SmscConnection::closeSession);
+    public void closeConnections() {
+        connections.forEach(SmscConnection::closeConnection);
     }
 }

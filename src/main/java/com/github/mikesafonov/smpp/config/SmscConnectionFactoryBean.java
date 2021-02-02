@@ -15,8 +15,6 @@ import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.github.mikesafonov.smpp.core.utils.Utils.getOrDefault;
@@ -25,6 +23,7 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 @RequiredArgsConstructor
 public class SmscConnectionFactoryBean implements FactoryBean<SmscConnectionsHolder> {

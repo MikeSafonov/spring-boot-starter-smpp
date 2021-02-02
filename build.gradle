@@ -99,9 +99,6 @@ artifacts {
     archives javadocJar
 }
 
-signing {
-    sign configurations.archives
-}
 
 jacoco{
     toolVersion = "0.8.3"

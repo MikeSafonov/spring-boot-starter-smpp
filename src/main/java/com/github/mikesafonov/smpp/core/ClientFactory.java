@@ -20,6 +20,9 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Helper class for building {@link SenderClient} and {@link ResponseClient}
+ *
+ * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 public class ClientFactory {
 

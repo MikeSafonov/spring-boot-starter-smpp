@@ -26,6 +26,7 @@ import static java.util.Objects.requireNonNull;
  * {@link SmppSession}
  *
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 @Slf4j
 public class StandardSenderClient implements SenderClient {

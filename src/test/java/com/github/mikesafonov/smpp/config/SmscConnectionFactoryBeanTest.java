@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 class SmscConnectionFactoryBeanTest {
 

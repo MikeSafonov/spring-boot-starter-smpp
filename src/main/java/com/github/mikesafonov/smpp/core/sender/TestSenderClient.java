@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
  * Default implementation of {@link SenderClient}, build on top of {@link DefaultSmppClient} and
  * {@link SmppSession}
  *
+ * @author Mike Safonov
  * @author Mikhail Epatko
  */
 @Slf4j

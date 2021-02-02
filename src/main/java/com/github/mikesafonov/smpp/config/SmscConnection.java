@@ -1,6 +1,5 @@
 package com.github.mikesafonov.smpp.config;
 
-import com.cloudhopper.smpp.SmppSession;
 import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
@@ -13,6 +12,7 @@ import java.util.Optional;
  * This class represent configured smsc connection with {@link SenderClient} and {@link ResponseClient} (optionally)
  *
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 @Value
 @AllArgsConstructor
@@ -31,7 +31,7 @@ public class SmscConnection {
         return Optional.ofNullable(responseClient);
     }
 
-    public void closeSession(){
+    public void closeConnection(){
         senderClient.getConnectionManager().ifPresent(ConnectionManager::destroy);
     }
 }

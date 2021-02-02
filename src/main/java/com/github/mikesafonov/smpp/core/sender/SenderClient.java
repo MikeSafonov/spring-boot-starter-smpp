@@ -1,6 +1,5 @@
 package com.github.mikesafonov.smpp.core.sender;
 
-import com.cloudhopper.smpp.SmppSession;
 import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
@@ -15,6 +14,7 @@ import java.util.Optional;
  * This interface represents smpp protocol transmitter client
  *
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 public interface SenderClient {
 
