@@ -31,7 +31,10 @@ public class SmscConnection {
         return Optional.ofNullable(responseClient);
     }
 
-    public void closeConnection(){
+    public void closeConnection() {
         senderClient.getConnectionManager().ifPresent(ConnectionManager::destroy);
+        if (responseClient != null) {
+            responseClient.destroyClient();
+        }
     }
 }
