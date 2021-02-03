@@ -7,12 +7,12 @@ import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.reciever.StandardResponseClient;
 import com.github.mikesafonov.smpp.core.sender.*;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static com.github.mikesafonov.smpp.util.Randomizer.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 class ClientFactoryTest {
 
@@ -202,7 +203,7 @@ class ClientFactoryTest {
                 .standardSender(name, defaults, smsc, mock(TypeOfAddressParser.class), connectionManager);
 
             assertThat(client).extracting("ucs2Only", "timeoutMillis", "connectionManager")
-                .containsExactly(ucs2Only, defaults.getRequestTimeout().toMillis(), connectionManager);
+                .containsExactly(ucs2Only, defaults.getRequestTimeout().toMillis(), Optional.of(connectionManager));
         }
     }
 

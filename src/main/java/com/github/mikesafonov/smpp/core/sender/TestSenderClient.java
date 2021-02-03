@@ -1,5 +1,6 @@
 package com.github.mikesafonov.smpp.core.sender;
 
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.Message;
@@ -9,6 +10,7 @@ import com.github.mikesafonov.smpp.core.generators.SmppResultGenerator;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,6 +22,7 @@ import static java.util.Objects.requireNonNull;
  * will be generated via {@link SmppResultGenerator}
  *
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 public class TestSenderClient implements SenderClient {
 
@@ -67,6 +70,11 @@ public class TestSenderClient implements SenderClient {
             return senderClient.cancel(cancelMessage);
         }
         return smppResultGenerator.generate(senderClient.getId(), cancelMessage);
+    }
+
+    @Override
+    public Optional<ConnectionManager> getConnectionManager() {
+        return senderClient.getConnectionManager();
     }
 
     private boolean isAllowed(String phone) {
