@@ -1,5 +1,6 @@
 package com.github.mikesafonov.smpp.config;
 
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.reciever.ResponseClient;
 import com.github.mikesafonov.smpp.core.sender.SenderClient;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.Optional;
  * This class represent configured smsc connection with {@link SenderClient} and {@link ResponseClient} (optionally)
  *
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 @Value
 @AllArgsConstructor
@@ -27,5 +29,12 @@ public class SmscConnection {
 
     public Optional<ResponseClient> getResponseClient() {
         return Optional.ofNullable(responseClient);
+    }
+
+    public void closeConnection() {
+        senderClient.getConnectionManager().ifPresent(ConnectionManager::destroy);
+        if (responseClient != null) {
+            responseClient.destroyClient();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.github.mikesafonov.smpp.core.sender;
 
+import com.github.mikesafonov.smpp.core.connection.ConnectionManager;
 import com.github.mikesafonov.smpp.core.dto.CancelMessage;
 import com.github.mikesafonov.smpp.core.dto.CancelMessageResponse;
 import com.github.mikesafonov.smpp.core.dto.Message;
@@ -9,6 +10,8 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -16,6 +19,7 @@ import static java.util.Objects.requireNonNull;
  * {@link MessageResponse}/{@link CancelMessageResponse} by using {@link SmppResultGenerator}
  *
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 @EqualsAndHashCode
 public class MockSenderClient implements SenderClient {
@@ -46,6 +50,11 @@ public class MockSenderClient implements SenderClient {
     @Override
     public @NotNull CancelMessageResponse cancel(@NotNull CancelMessage cancelMessage) {
         return smppResultGenerator.generate(id, cancelMessage);
+    }
+
+    @Override
+    public Optional<ConnectionManager> getConnectionManager() {
+        return Optional.empty();
     }
 
 }

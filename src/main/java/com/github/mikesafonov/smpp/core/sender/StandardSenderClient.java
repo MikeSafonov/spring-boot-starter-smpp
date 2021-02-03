@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 
+import java.util.Optional;
+
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -24,6 +26,7 @@ import static java.util.Objects.requireNonNull;
  * {@link SmppSession}
  *
  * @author Mike Safonov
+ * @author Mikhail Epatko
  */
 @Slf4j
 public class StandardSenderClient implements SenderClient {
@@ -139,6 +142,11 @@ public class StandardSenderClient implements SenderClient {
             return CancelMessageResponse.error(cancelMessage, getId(),
                     new MessageErrorInformation(INVALID_SENDING_ERROR, "Unexpected exception"));
         }
+    }
+
+    @Override
+    public Optional<ConnectionManager> getConnectionManager() {
+        return Optional.of(connectionManager);
     }
 
     @NotNull
