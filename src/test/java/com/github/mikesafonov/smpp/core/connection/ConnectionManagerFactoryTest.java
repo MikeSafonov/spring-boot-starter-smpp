@@ -48,8 +48,8 @@ class ConnectionManagerFactoryTest {
 
             assertThat(manager).isInstanceOf(TransmitterConnectionManager.class)
                     .extracting("sessionHandler", "maxTryCount",
-                            "configuration.loggingOptions.isLogPduEnabled",
-                            "configuration.loggingOptions.isLogBytesEnabled",
+                            "configuration.loggingOptions.logPduEnabled",
+                            "configuration.loggingOptions.logBytesEnabled",
                             "configuration.windowSize",
                             "configuration.port",
                             "configuration.host",
@@ -82,8 +82,8 @@ class ConnectionManagerFactoryTest {
 
             assertThat(manager).isInstanceOf(TransmitterConnectionManager.class)
                     .extracting("sessionHandler", "maxTryCount",
-                            "configuration.loggingOptions.isLogPduEnabled",
-                            "configuration.loggingOptions.isLogBytesEnabled",
+                            "configuration.loggingOptions.logPduEnabled",
+                            "configuration.loggingOptions.logBytesEnabled",
                             "configuration.windowSize",
                             "configuration.port",
                             "configuration.host",
@@ -136,8 +136,8 @@ class ConnectionManagerFactoryTest {
             assertThat(manager).isInstanceOf(ReceiverConnectionManager.class)
                     .extracting("sessionHandler",
                             "rebindPeriod",
-                            "configuration.loggingOptions.isLogPduEnabled",
-                            "configuration.loggingOptions.isLogBytesEnabled",
+                            "configuration.loggingOptions.logPduEnabled",
+                            "configuration.loggingOptions.logBytesEnabled",
                             "configuration.port",
                             "configuration.host",
                             "configuration.name",
@@ -172,8 +172,8 @@ class ConnectionManagerFactoryTest {
             assertThat(manager).isInstanceOf(ReceiverConnectionManager.class)
                     .extracting("sessionHandler",
                             "rebindPeriod",
-                            "configuration.loggingOptions.isLogPduEnabled",
-                            "configuration.loggingOptions.isLogBytesEnabled",
+                            "configuration.loggingOptions.logPduEnabled",
+                            "configuration.loggingOptions.logBytesEnabled",
                             "configuration.port",
                             "configuration.host",
                             "configuration.name",
@@ -225,8 +225,8 @@ class ConnectionManagerFactoryTest {
 
         assertThat(manager).isInstanceOf(TransceiverConnectionManager.class)
             .extracting("sessionHandler", "maxTryCount",
-                "configuration.loggingOptions.isLogPduEnabled",
-                "configuration.loggingOptions.isLogBytesEnabled",
+                "configuration.loggingOptions.logPduEnabled",
+                "configuration.loggingOptions.logBytesEnabled",
                 "configuration.windowSize",
                 "configuration.port",
                 "configuration.host",
@@ -260,8 +260,8 @@ class ConnectionManagerFactoryTest {
 
         assertThat(manager).isInstanceOf(TransceiverConnectionManager.class)
             .extracting("sessionHandler", "maxTryCount",
-                "configuration.loggingOptions.isLogPduEnabled",
-                "configuration.loggingOptions.isLogBytesEnabled",
+                "configuration.loggingOptions.logPduEnabled",
+                "configuration.loggingOptions.logBytesEnabled",
                 "configuration.windowSize",
                 "configuration.port",
                 "configuration.host",
