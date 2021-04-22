@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
+import static com.github.mikesafonov.smpp.TestUtils.sessionSet;
 import static com.github.mikesafonov.smpp.assertj.SmppAssertions.assertThat;
 
 
@@ -39,9 +40,9 @@ public class RoundRobinSmppTest {
     @Test
     void shouldOpenTwoConnection(){
         org.assertj.core.api.Assertions.assertThat(smppServerHolder.getByName("one").get())
-            .extracting("handler.sessions.size").isEqualTo(2);
+            .extracting("handler.sessions").asInstanceOf(sessionSet()).hasSize(2);
         org.assertj.core.api.Assertions.assertThat(smppServerHolder.getByName("two").get())
-            .extracting("handler.sessions.size").isEqualTo(2);
+            .extracting("handler.sessions").asInstanceOf(sessionSet()).hasSize(2);
     }
 
     @Test

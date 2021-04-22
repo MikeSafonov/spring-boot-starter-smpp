@@ -68,8 +68,9 @@ dependencies {
     testImplementation("com.devskiller:jfairy:0.6.4")
     testImplementation('org.springframework.boot:spring-boot-starter-test')
 
-    testIntegrationImplementation platform("org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR11")
+    testIntegrationImplementation platform("org.springframework.cloud:spring-cloud-dependencies:2020.0.2")
     testIntegrationImplementation("org.springframework.cloud:spring-cloud-starter")
+    testIntegrationImplementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
     testIntegrationImplementation("org.awaitility:awaitility:4.0.3")
     testIntegrationImplementation("com.github.mikesafonov:smpp-server-mock-assertj:1.5.0")
     testIntegrationImplementation("com.github.mikesafonov:smpp-server-mock-junit:1.5.0")

@@ -9,14 +9,19 @@ import com.github.mikesafonov.smpp.core.dto.MessageResponse;
 import com.github.mikesafonov.smpp.core.reciever.DeliveryReportConsumer;
 import com.github.mikesafonov.smpp.server.MockSmppServer;
 import com.github.mikesafonov.smpp.server.MockSmppServerHolder;
-import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.github.mikesafonov.smpp.TestUtils.sessionSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,7 +63,9 @@ public class TransceiverTest {
     @Test
     void shouldOpenOneConnection() {
         MockSmppServer smppServer = smppServerHolder.getByName("one").get();
-        assertThat(smppServer).extracting("handler.sessions.size").isEqualTo(1);
+        assertThat(smppServer).extracting("handler.sessions")
+                .asInstanceOf(sessionSet())
+                .hasSize(1);
     }
 
     @Test
@@ -84,4 +91,6 @@ public class TransceiverTest {
         assertEquals(response.getSmscMessageID(), report.getMessageId());
         assertEquals("one", report.getResponseClientId());
     }
+
+
 }
